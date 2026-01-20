@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario Cloud TI - Domino's</title>
+    <title>Inventario TI Cloud - Domino's</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
@@ -29,6 +29,8 @@
         label { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #777; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px; }
         .hidden { display: none !important; }
+        .super-admin-only { display: none; }
+        body.is-super-admin .super-admin-only { display: block; }
         .loading-bar { position: fixed; top: 0; left: 0; height: 4px; background: var(--dominos-red); width: 0; transition: width 0.3s; z-index: 10000; }
         #mappingModal { position: fixed; inset: 0; background: rgba(0,43,62,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; width: 500px; max-height: 80vh; overflow-y: auto; }
@@ -41,32 +43,33 @@
 <div id="loginOverlay">
     <div class="login-card">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="60">
-        <h2 style="margin: 20px 0; color: var(--dominos-blue);">Inventario Cloud TI</h2>
-        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ddd;">
-        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:20px; border-radius:5px; border:1px solid #ddd;">
+        <h2 style="margin: 20px 0; color: var(--dominos-blue);">Inventario Cloud Supabase</h2>
+        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:10px; margin-bottom:10px;">
+        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:20px;">
         <button onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:12px; width:100%; border-radius:6px; cursor:pointer; font-weight:bold;">Entrar</button>
     </div>
 </div>
 
 <div id="sidebar">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="100" style="margin-bottom:30px; align-self:center;">
-    <button class="side-btn active"><i class="fas fa-chart-pie"></i> Panel Principal</button>
+    <button class="side-btn active"><i class="fas fa-chart-pie"></i> Inventario TI</button>
     <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
         <button class="side-btn" onclick="createNewUser()"><i class="fas fa-plus"></i> Nuevo Registro</button>
-        <label class="side-btn"><i class="fas fa-upload"></i> Importar CSV <input type="file" id="csvInput" hidden></label>
+        <label class="side-btn" style="cursor:pointer;"><i class="fas fa-upload"></i> Importar CSV <input type="file" id="csvInput" hidden accept=".csv"></label>
         <button class="side-btn" onclick="fetchData()"><i class="fas fa-sync"></i> Sincronizar</button>
+        <button class="side-btn super-admin-only" style="background:#000; margin-top:10px;" onclick="massDelete()"><i class="fas fa-trash-alt"></i> Vaciar Base</button>
     </div>
     <div style="margin-top:auto; font-size:0.7rem; text-align:center;">
         <span id="roleDisplay"></span><br>
-        <span onclick="location.reload()" style="text-decoration:underline; cursor:pointer;">Cerrar Sesión</span>
+        <span onclick="logout()" style="text-decoration:underline; cursor:pointer;">Cerrar Sesión</span>
     </div>
 </div>
 
 <div class="main-content">
     <div class="dashboard-grid">
-        <div class="kpi-card"><p>Total</p><h3 id="kpi-total">0</h3></div>
+        <div class="kpi-card"><p>Total Registros</p><h3 id="kpi-total">0</h3></div>
         <div class="kpi-card"><p>Vigentes</p><h3 id="kpi-vigentes" style="color: green;">0</h3></div>
-        <div class="kpi-card"><p>Sin Firma</p><h3 id="kpi-firma" style="color: var(--dominos-red);">0</h3></div>
+        <div class="kpi-card"><p>Pendientes Firma</p><h3 id="kpi-firma" style="color: var(--dominos-red);">0</h3></div>
     </div>
     <div class="charts-container">
         <div class="chart-box"><canvas id="chartTiendas"></canvas></div>
@@ -78,11 +81,11 @@
             <div id="usersList"></div>
         </div>
         <div class="panel">
-            <div id="emptyState" style="text-align:center; padding-top:100px; color:#ccc;"><i class="fas fa-cloud-upload-alt fa-3x"></i><p>Selecciona un registro</p></div>
+            <div id="emptyState" style="text-align:center; padding-top:100px; color:#ccc;"><i class="fas fa-bolt fa-3x"></i><p>Conectado a Supabase</p></div>
             <form id="userForm" class="hidden" onsubmit="event.preventDefault(); saveToCloud();">
                 <input type="hidden" id="f-id">
                 <div class="grid-form">
-                    <div><label>Nombre</label><input type="text" id="f-persona" required></div>
+                    <div><label>Nombre Completo</label><input type="text" id="f-persona" required></div>
                     <div><label>RUT</label><input type="text" id="f-rut"></div>
                 </div>
                 <div class="grid-form" style="margin-top:15px;">
@@ -90,11 +93,11 @@
                     <div><label>Vigencia</label><select id="f-contrato"><option>Vigente</option><option>Cesado</option></select></div>
                 </div>
                 <div class="form-section" style="margin-top:20px;">
-                    <label>Firma Acta</label><select id="f-doc_firmado"><option>Si</option><option>No</option></select>
+                    <label>Documento Firmado</label><select id="f-doc_firmado"><option>Si</option><option>No</option></select>
                 </div>
                 <div id="extras-container" class="grid-form" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;"></div>
                 <div style="display:flex; gap:10px; margin-top:30px;">
-                    <button type="submit" style="background:var(--dominos-blue); color:white; border:none; padding:12px; flex-grow:1; border-radius:6px; cursor:pointer; font-weight:bold;">Actualizar en Nube</button>
+                    <button type="submit" style="background:var(--dominos-blue); color:white; border:none; padding:12px; flex-grow:1; border-radius:6px; cursor:pointer; font-weight:bold;">Actualizar Nube</button>
                     <button type="button" onclick="deleteFromCloud()" style="background:var(--dominos-red); color:white; border:none; padding:12px; border-radius:6px; cursor:pointer;"><i class="fas fa-trash"></i></button>
                 </div>
             </form>
@@ -104,110 +107,111 @@
 
 <div id="mappingModal">
     <div class="modal-content">
-        <h3>Mapeo de CSV</h3>
-        <div id="mappingContainer"></div>
-        <button onclick="finalizeImport()" style="background:var(--dominos-blue); color:white; border:none; padding:12px; width:100%; border-radius:6px; margin-top:15px;">Confirmar Subida</button>
+        <h3>Mapear Columnas CSV</h3>
+        <div id="mappingContainer" style="margin-top:15px;"></div>
+        <button onclick="finalizeImport()" style="background:var(--dominos-blue); color:white; border:none; padding:12px; width:100%; border-radius:6px; margin-top:20px;">Confirmar e Importar</button>
     </div>
 </div>
 
 <script>
-    const API_URL = "https://sheetdb.io/api/v1/xy2jum63lbtx8";
-    const SYSTEM_FIELDS = [
-        {id: 'persona', l: 'Nombre'}, {id: 'tienda', l: 'Tienda'}, {id: 'rut', l: 'RUT'},
-        {id: 'contrato', l: 'Vigencia'}, {id: 'doc_firmado', l: 'Firma'}
-    ];
+    const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
+    const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
+    const SYSTEM_FIELDS = [{id:'persona', l:'Nombre'}, {id:'rut', l:'RUT'}, {id:'tienda', l:'Tienda'}, {id:'contrato', l:'Vigencia'}, {id:'doc_firmado', l:'Firma'}];
+    
     let inventory = [];
     let currentId = null;
     let csvTemp = null;
     let charts = {};
 
+    window.onload = () => {
+        if (sessionStorage.getItem('isLogged') === 'true') {
+            const role = sessionStorage.getItem('userRole');
+            if(role === 'super_admin') document.body.classList.add('is-super-admin');
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('roleDisplay').innerText = `PERFIL: ${role.toUpperCase()}`;
+            fetchData();
+        }
+    };
+
     function handleLogin() {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
         if ((u === 'admin' && p === '123') || (u === 'edc_admin' && p === 'dominos2026')) {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('roleDisplay').innerText = `PERFIL: ${u.toUpperCase()}`;
-            fetchData();
-        } else { alert("Acceso denegado"); }
+            sessionStorage.setItem('isLogged', 'true');
+            sessionStorage.setItem('userRole', u === 'edc_admin' ? 'super_admin' : 'admin');
+            location.reload();
+        } else { alert("Error de acceso"); }
     }
+
+    function logout() { sessionStorage.clear(); location.reload(); }
 
     async function fetchData() {
         setLoading(true);
         try {
-            const res = await fetch(API_URL);
-            const data = await res.json();
-            inventory = data.map(u => ({ ...u, extras: u.extras ? JSON.parse(u.extras) : {} }));
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/inventario?select=*`, { headers });
+            inventory = await res.json();
             renderList();
             updateDashboards();
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Error cargando datos:", e); }
         setLoading(false);
     }
 
     function renderList() {
         const q = document.getElementById('searchBox').value.toLowerCase();
-        document.getElementById('usersList').innerHTML = inventory.filter(u => u.persona.toLowerCase().includes(q) || u.rut.includes(q)).map(u => `
+        document.getElementById('usersList').innerHTML = inventory.filter(u => u.persona.toLowerCase().includes(q) || (u.rut && u.rut.includes(q))).map(u => `
             <div class="user-item ${u.id == currentId ? 'active' : ''}" onclick="selectUser('${u.id}')">
-                <strong>${u.persona}</strong><br><small>${u.tienda} | ${u.rut}</small>
-            </div>
-        `).join('');
+                <strong>${u.persona}</strong><br><small>${u.tienda || 'S/A'} | ${u.rut || 'S/R'}</small>
+            </div>`).join('');
     }
 
     function selectUser(id) {
-        currentId = id;
-        const u = inventory.find(x => x.id == id);
+        currentId = id; const u = inventory.find(x => x.id == id);
         document.getElementById('emptyState').classList.add('hidden');
         document.getElementById('userForm').classList.remove('hidden');
         document.getElementById('f-id').value = u.id;
         document.getElementById('f-persona').value = u.persona;
-        document.getElementById('f-rut').value = u.rut;
-        document.getElementById('f-tienda').value = u.tienda;
-        document.getElementById('f-contrato').value = u.contrato;
-        document.getElementById('f-doc_firmado').value = u.doc_firmado;
-        const extrasCont = document.getElementById('extras-container');
-        extrasCont.innerHTML = '';
-        for (let key in u.extras) {
-            extrasCont.innerHTML += `<div><label>${key}</label><input type="text" value="${u.extras[key]}" onchange="updateExtra('${key}', this.value)"></div>`;
-        }
+        document.getElementById('f-rut').value = u.rut || '';
+        document.getElementById('f-tienda').value = u.tienda || '';
+        document.getElementById('f-contrato').value = u.contrato || 'Vigente';
+        document.getElementById('f-doc_firmado').value = u.doc_firmado || 'No';
+        const cont = document.getElementById('extras-container'); cont.innerHTML = '';
+        for(let k in u.extras) cont.innerHTML += `<div><label>${k}</label><input type="text" value="${u.extras[k]}" onchange="updateExtra('${k}',this.value)"></div>`;
         renderList();
     }
 
     async function saveToCloud() {
         setLoading(true);
-        const u = inventory.find(x => x.id == document.getElementById('f-id').value);
-        u.persona = document.getElementById('f-persona').value;
-        u.rut = document.getElementById('f-rut').value;
-        u.tienda = document.getElementById('f-tienda').value;
-        u.contrato = document.getElementById('f-contrato').value;
-        u.doc_firmado = document.getElementById('f-doc_firmado').value;
-        await fetch(`${API_URL}/id/${u.id}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ data: { ...u, extras: JSON.stringify(u.extras) } })
-        });
+        const u = inventory.find(x => x.id == currentId);
+        const data = {
+            persona: document.getElementById('f-persona').value,
+            rut: document.getElementById('f-rut').value,
+            tienda: document.getElementById('f-tienda').value,
+            contrato: document.getElementById('f-contrato').value,
+            doc_firmado: document.getElementById('f-doc_firmado').value,
+            extras: u.extras
+        };
+        await fetch(`${SUPABASE_URL}/rest/v1/inventario?id=eq.${u.id}`, { method: 'PATCH', headers, body: JSON.stringify(data) });
         fetchData();
     }
 
     async function deleteFromCloud() {
-        if(!confirm("¿Eliminar de la nube permanentemente?")) return;
+        if(!confirm("¿Borrar permanentemente?")) return;
         setLoading(true);
-        await fetch(`${API_URL}/id/${currentId}`, { method: 'DELETE' });
+        await fetch(`${SUPABASE_URL}/rest/v1/inventario?id=eq.${currentId}`, { method: 'DELETE', headers });
         document.getElementById('userForm').classList.add('hidden');
         fetchData();
     }
 
     document.getElementById('csvInput').onchange = (e) => {
-        Papa.parse(e.target.files[0], { header: true, complete: (res) => {
+        Papa.parse(e.target.files[0], { header: true, skipEmptyLines: true, complete: (res) => {
             csvTemp = res.data;
             const cols = Object.keys(res.data[0]);
             document.getElementById('mappingContainer').innerHTML = cols.map(col => `
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:5px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; margin-bottom:5px;">
                     <span style="font-size:0.8rem">${col}</span>
-                    <select class="map-sel" data-csv="${col}">
-                        <option value="extra">-- Extra --</option>
-                        ${SYSTEM_FIELDS.map(f => `<option value="${f.id}">${f.l}</option>`).join('')}
-                    </select>
-                </div>
-            `).join('');
+                    <select class="map-sel" data-csv="${col}"><option value="extra">-- Extra --</option>${SYSTEM_FIELDS.map(f => `<option value="${f.id}">${f.l}</option>`).join('')}</select>
+                </div>`).join('');
             document.getElementById('mappingModal').style.display = 'flex';
         }});
     };
@@ -215,17 +219,30 @@
     async function finalizeImport() {
         setLoading(true);
         const selects = document.querySelectorAll('.map-sel');
-        const rows = csvTemp.map(row => {
-            const u = { id: Date.now() + Math.random(), extras: {} };
+        const rows = csvTemp.filter(row => {
+            const rutCsv = row[Array.from(selects).find(s => s.value === 'rut')?.dataset.csv];
+            return !inventory.some(exist => exist.rut === rutCsv);
+        }).map(row => {
+            const u = { extras: {} };
             selects.forEach(s => {
                 if(s.value === 'extra') u.extras[s.dataset.csv] = row[s.dataset.csv];
                 else u[s.value] = row[s.dataset.csv];
             });
-            u.extras = JSON.stringify(u.extras);
             return u;
         });
-        await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ data: rows }) });
+
+        if(rows.length > 0) {
+            await fetch(`${SUPABASE_URL}/rest/v1/inventario`, { method: 'POST', headers, body: JSON.stringify(rows) });
+            alert(`Cargados ${rows.length} nuevos.`);
+        } else { alert("No hay registros nuevos (RUTs duplicados)."); }
         document.getElementById('mappingModal').style.display = 'none';
+        fetchData();
+    }
+
+    async function massDelete() {
+        if(!confirm("⚠️ VAS A BORRAR TODA LA TABLA. ¿Confirmas?")) return;
+        setLoading(true);
+        await fetch(`${SUPABASE_URL}/rest/v1/inventario?select=*`, { method: 'DELETE', headers });
         fetchData();
     }
 
@@ -234,29 +251,23 @@
         document.getElementById('kpi-vigentes').innerText = inventory.filter(u => u.contrato === 'Vigente').length;
         document.getElementById('kpi-firma').innerText = inventory.filter(u => u.doc_firmado === 'No').length;
         const tCount = {}; inventory.forEach(u => tCount[u.tienda] = (tCount[u.tienda] || 0) + 1);
-        renderChart('chartTiendas', 'bar', 'Por Tienda', Object.keys(tCount), Object.values(tCount), '#006491');
+        renderChart('chartTiendas', 'bar', 'Activos por Tienda', Object.keys(tCount), Object.values(tCount), '#006491');
         const vCount = { 'Vigentes': inventory.filter(u => u.contrato === 'Vigente').length, 'Cesados': inventory.filter(u => u.contrato === 'Cesado').length };
-        renderChart('chartContratos', 'doughnut', 'Vigencia', Object.keys(vCount), Object.values(vCount), ['#27ae60', '#E31837']);
+        renderChart('chartContratos', 'doughnut', 'Vigencia Laboral', Object.keys(vCount), Object.values(vCount), ['#27ae60', '#E31837']);
     }
 
     function renderChart(id, type, label, labels, data, color) {
         if (charts[id]) charts[id].destroy();
-        charts[id] = new Chart(document.getElementById(id), {
-            type: type,
-            data: { labels: labels, datasets: [{ label: label, data: data, backgroundColor: color }] },
-            options: { maintainAspectRatio: false }
-        });
+        charts[id] = new Chart(document.getElementById(id), { type, data: { labels, datasets: [{ label, data, backgroundColor: color }] }, options: { maintainAspectRatio: false } });
     }
 
-    function createNewUser() {
-        const nid = Date.now();
-        inventory.push({ id: nid, persona: 'Nuevo Registro', tienda: 'S/A', rut: '', contrato: 'Vigente', doc_firmado: 'No', extras: {} });
-        renderList(); selectUser(nid);
-    }
-
-    function updateExtra(k, v) { inventory.find(x => x.id == currentId).extras[k] = v; }
+    function updateExtra(k,v) { inventory.find(x => x.id == currentId).extras[k] = v; }
     function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
-    setInterval(() => { document.getElementById('currentTime'); }, 1000);
+    async function createNewUser() {
+        const nUser = { persona:'Nuevo Registro', tienda:'S/A', rut:'', contrato:'Vigente', doc_firmado:'No', extras:{} };
+        await fetch(`${SUPABASE_URL}/rest/v1/inventario`, { method: 'POST', headers, body: JSON.stringify([nUser]) });
+        fetchData();
+    }
 </script>
 </body>
 </html>
