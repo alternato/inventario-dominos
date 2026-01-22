@@ -3,59 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v8.3 - Domino's Pizza Chile</title>
+    <title>TI Maestro v8.4 - Domino's Pizza Chile</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root { 
             --dominos-blue: #0066CC; 
             --dominos-red: #E31837; 
             --bg: #FFFFF5; 
             --white: #ffffff; 
-            --green: #22c55e; 
             --dark-blue: #0066CC; 
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        #sidebar { width: 280px; background: var(--dark-blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        /* Sidebar */
+        #sidebar { width: 280px; background: var(--dark-blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; position: relative; }
         
-        /* Logo con fondo blanco para que resalte */
         .logo-wrapper { width: 100%; display: flex; justify-content: center; margin-bottom: 35px; background: white; padding: 15px; border-radius: 15px; }
-        .logo-wrapper img { width: 100px; height: auto; filter: none !important; }
+        .logo-wrapper img { width: 100px; height: auto; }
 
-        .side-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 500; transition: 0.2s; }
+        .side-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 600; }
         .side-btn.active { background: var(--dominos-red); }
 
-        .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Marca de Agua / Créditos */
+        .watermark { 
+            position: fixed; bottom: 15px; right: 20px; 
+            font-size: 0.65rem; color: #cbd5e1; font-weight: bold;
+            letter-spacing: 1px; text-transform: uppercase; z-index: 100;
+            pointer-events: none; opacity: 0.6;
+        }
 
-        .panel { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; border: 1px solid #f0f0e0; }
+        .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .panel { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; }
         .app-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; height: calc(100vh - 220px); }
         .scroll-panel { background: white; border-radius: 16px; padding: 15px; overflow-y: auto; border: 1px solid #eef2f6; }
         
         .user-item { padding: 14px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; margin-bottom: 6px; }
         .user-item.active { background: #eef6fb; border-color: var(--dominos-blue); }
-        .badge-count { float: right; background: var(--dominos-blue); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; }
 
-        .btn-action { background: var(--dominos-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .hidden { display: none !important; }
-        #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--dominos-red); width: 0; transition: width 0.3s; z-index: 10000; }
+        #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--dominos-red); width: 0; transition: width 0.3s; }
+        
+        /* Overlay Login */
+        #loginOverlay { position: fixed; inset: 0; background: var(--dominos-blue); z-index: 10000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="loadingBar"></div>
+<div class="watermark">ENGINEERED BY MILO DROGUETT + GEMINI AI</div>
 
-<div id="loginOverlay" style="position:fixed; inset:0; background:var(--dominos-blue); z-index:9999; display:flex; align-items:center; justify-content:center;">
-    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+<div id="loginOverlay">
+    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="90">
-        <h2 style="color:var(--dominos-blue); margin-top:20px; margin-bottom:20px;">Acceso TI Maestro</h2>
-        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ddd; border-radius:10px; outline:none;">
-        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #ddd; border-radius:10px; outline:none;">
-        <button id="btnLogin" onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1rem;">INGRESAR AL SISTEMA</button>
+        <h2 style="color:var(--dominos-blue); margin: 20px 0;">Acceso Seguro TI</h2>
+        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ddd; border-radius:10px; font-size: 1rem;">
+        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #ddd; border-radius:10px; font-size: 1rem;">
+        <button onclick="ejecutarLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1rem;">INGRESAR</button>
     </div>
 </div>
 
@@ -68,26 +78,27 @@
     <button class="side-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
     
     <div id="admin-tools" class="hidden" style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.2);">
-        <button onclick="document.getElementById('csvInput').click()" class="side-btn" style="background:var(--green); font-size:0.75rem;">
+        <button onclick="document.getElementById('csvInput').click()" class="side-btn" style="background:var(--green); font-size: 0.7rem;">
             <i class="fas fa-file-csv"></i> CARGAR CSV SHAREPOINT
         </button>
         <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="handleCSV(this)">
     </div>
 
     <div style="margin-top:auto; padding:15px; border-radius:12px; background: rgba(0,0,0,0.1); font-size: 0.8rem;">
+        <p style="font-size: 0.6rem; color: rgba(255,255,255,0.5);">OPERADOR:</p>
         <strong id="roleDisplay">---</strong><br>
-        <span onclick="logout()" style="color: #ffcccc; cursor: pointer; font-size: 0.75rem; display:inline-block; margin-top:8px;">Cerrar Sesión</span>
+        <span onclick="cerrarSesion()" style="color: #ffcccc; cursor: pointer; display:inline-block; margin-top:10px;">Cerrar Sesión</span>
     </div>
 </div>
 
 <div class="main-content">
     <div id="home" class="tab-pane active">
-        <h1 style="color:var(--dominos-blue); margin-bottom:30px;">Dashboard de Activos</h1>
+        <h1 style="color:var(--dominos-blue); margin-bottom:30px;">Estado General de Activos</h1>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
             <div class="panel"><h4>Colaboradores</h4><h2 id="kpi-users" style="color:var(--dominos-blue)">0</h2></div>
-            <div class="panel"><h4>Equipos Registrados</h4><h2 id="kpi-assets">0</h2></div>
-            <div class="panel"><h4>Por Firmar</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
-            <div class="panel"><h4>Ubicaciones</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
+            <div class="panel"><h4>Total Equipos</h4><h2 id="kpi-assets">0</h2></div>
+            <div class="panel"><h4>Sin Acta</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
+            <div class="panel"><h4>Áreas/Áreas</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
         </div>
         <div class="panel" style="height: 380px;"><canvas id="mainChart"></canvas></div>
     </div>
@@ -95,20 +106,20 @@
     <div id="inventory" class="tab-pane">
         <div class="app-grid">
             <div class="scroll-panel" id="colaboradoresList">
-                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar por Nombre o RUT..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
+                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
                 <div id="userItemsContainer"></div>
             </div>
             <div class="scroll-panel" id="detailPanel">
                 <div id="emptyState" style="text-align:center; padding-top:120px; color:#ccc;">
                     <i class="fas fa-id-card-alt fa-5x"></i>
-                    <p style="margin-top:20px;">Seleccione un colaborador del listado</p>
+                    <p style="margin-top:20px;">Seleccione un colaborador</p>
                 </div>
                 <div id="userDetails" class="hidden">
-                    <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f1f5f9; padding-bottom:20px; margin-bottom:25px;">
-                        <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut" style="font-weight:bold;"></p></div>
-                        <button onclick="alert('Módulo manual disponible en v9.0')" class="btn-action" style="background:var(--green)">+ ASIGNAR MANUAL</button>
+                    <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f1f5f9; padding-bottom:20px;">
+                        <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut"></p></div>
+                        <button onclick="alert('Disponible en v9.0')" class="side-btn" style="background:var(--green); width:auto;">+ MANUAL</button>
                     </div>
-                    <div id="activosContainer"></div>
+                    <div id="activosContainer" style="margin-top:20px;"></div>
                 </div>
             </div>
         </div>
@@ -116,43 +127,39 @@
 </div>
 
 <script>
+    // Configuración Base
     const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
     const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
-
     let masterData = [], rawActivos = [];
 
-    // FUNCIÓN DE LOGIN CORREGIDA
-    function handleLogin() {
+    // LÓGICA DE LOGIN (CORREGIDA AL 100%)
+    function ejecutarLogin() {
         const u = document.getElementById('userInput').value.trim();
         const p = document.getElementById('passInput').value.trim();
         
         if ((u === 'edc_admin' && p === 'dominos2026') || (u === 'admin' && p === '123')) {
-            sessionStorage.setItem('isLogged', 'true');
-            sessionStorage.setItem('userRole', u.toUpperCase());
-            document.getElementById('loginOverlay').style.display = 'none';
-            
-            // Forzar carga de datos al entrar
-            const role = sessionStorage.getItem('userRole');
-            document.getElementById('roleDisplay').innerText = role;
-            if(role === 'EDC_ADMIN') document.getElementById('admin-tools').classList.remove('hidden');
-            fetchData();
-        } else { 
-            alert("Usuario o clave incorrectos. Intente de nuevo."); 
+            sessionStorage.setItem('sesionActiva', 'true');
+            sessionStorage.setItem('usuarioRol', u.toUpperCase());
+            location.reload(); // Recargamos para aplicar cambios de UI
+        } else {
+            alert("Credenciales incorrectas. Verifique usuario y clave.");
         }
     }
 
-    // Persistencia del Login al Recargar
     window.onload = () => {
-        if (sessionStorage.getItem('isLogged') === 'true') {
+        if (sessionStorage.getItem('sesionActiva') === 'true') {
             document.getElementById('loginOverlay').style.display = 'none';
-            const role = sessionStorage.getItem('userRole');
+            const role = sessionStorage.getItem('usuarioRol');
             document.getElementById('roleDisplay').innerText = role;
             if(role === 'EDC_ADMIN') document.getElementById('admin-tools').classList.remove('hidden');
             fetchData();
         }
     };
 
+    function cerrarSesion() { sessionStorage.clear(); location.reload(); }
+
+    // FETCH DATA
     async function fetchData() {
         setLoading(true);
         try {
@@ -165,106 +172,69 @@
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
             renderList();
             updateDashboard();
-        } catch (e) { console.error("Error cargando datos:", e); }
+        } catch (e) { console.error(e); }
         setLoading(false);
     }
 
-    // LÓGICA DE CSV SHAREPOINT ACTUALIZADA
+    // CARGA CSV MAPEADA SEGÚN TU ESTRUCTURA
     function handleCSV(input) {
         const reader = new FileReader();
-        reader.onload = async function(e) {
-            const text = e.target.result;
-            const rows = text.split('\n').filter(r => r.trim() !== "").slice(1);
+        reader.onload = async (e) => {
+            const lines = e.target.result.split('\n').filter(l => l.trim() !== "").slice(1);
             setLoading(true);
+            for (let line of lines) {
+                const c = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+                if (c.length < 2) continue;
+                const clean = (v) => v?.replace(/"/g, '').trim();
 
-            for (let row of rows) {
-                // Regex para manejar comas dentro de comillas
-                const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
-                if (cols.length < 2) continue;
+                const rut = clean(c[0]), nombre = clean(c[1]), area = clean(c[5]);
+                if (!rut) continue;
 
-                const clean = (val) => val?.replace(/"/g, '').trim();
-
-                // MAPEO BASADO EN TU ESTRUCTURA: Rut (0), Persona (1), Área (5), Marca (7), Modelo (8), Serie (9), Firmado (10)
-                const rut = clean(cols[0]);       
-                const persona = clean(cols[1]);   
-                const area = clean(cols[5]);      
-                const marca = clean(cols[7]);     
-                const modelo = clean(cols[8]);    
-                const serie = clean(cols[9]);     
-
-                if (!rut || rut === "Rut") continue;
-
-                // 1. Guardar Colaborador
                 await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
-                    method: 'POST',
-                    headers: { ...headers, "Prefer": "resolution=merge-duplicates" },
-                    body: JSON.stringify({ rut, nombre: persona, tienda: area })
+                    method: 'POST', headers: { ...headers, "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ rut, nombre, tienda: area })
                 });
 
-                // 2. Guardar Activo
-                if (serie && serie !== "N/A" && serie !== "") {
+                if (clean(c[9])) { // Nº de Serie
                     await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
-                        method: 'POST',
-                        headers: { ...headers, "Prefer": "resolution=merge-duplicates", "on_conflict": "serie" },
+                        method: 'POST', headers: { ...headers, "Prefer": "resolution=merge-duplicates", "on_conflict": "serie" },
                         body: JSON.stringify({
-                            rut_responsable: rut,
-                            serie: serie,
-                            marca: marca,
-                            modelo: modelo,
-                            tipo_activo: 'Hardware',
-                            estado: clean(cols[3]) || 'Activo',
-                            extras: { Doc_Firmado: clean(cols[10]), Ubicacion: clean(cols[6]) }
+                            rut_responsable: rut, serie: clean(c[9]), marca: clean(c[7]), modelo: clean(c[8]),
+                            tipo_activo: 'Hardware', estado: clean(c[3]), extras: { Doc_Firmado: clean(c[10]) }
                         })
                     });
                 }
             }
-            alert("CSV Sincronizado Correctamente.");
             fetchData();
+            alert("Sincronización finalizada.");
         };
         reader.readAsText(input.files[0]);
     }
 
+    // Funciones de UI
     function renderList() {
         const q = document.getElementById('searchBox').value.toLowerCase();
         document.getElementById('userItemsContainer').innerHTML = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
             <div class="user-item" onclick="selectColaborador('${c.rut}')" id="user-${c.rut}">
-                <span class="badge-count">${c.equipos.length}</span>
-                <strong>${c.nombre}</strong><br><small>${c.rut}</small>
+                <strong style="font-size:0.9rem;">${c.nombre}</strong><br><small>${c.rut}</small>
             </div>
         `).join('');
     }
 
     function selectColaborador(rut) {
         document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
-        const el = document.getElementById(`user-${rut}`);
-        if(el) el.classList.add('active');
-        
+        const el = document.getElementById(`user-${rut}`); if(el) el.classList.add('active');
         const u = masterData.find(x => x.rut === rut);
         document.getElementById('emptyState').classList.add('hidden');
         document.getElementById('userDetails').classList.remove('hidden');
         document.getElementById('d-nombre').innerText = u.nombre;
         document.getElementById('d-rut').innerText = `RUT: ${u.rut}`;
-        
         document.getElementById('activosContainer').innerHTML = u.equipos.map(eq => `
-            <div class="panel" style="display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; margin-bottom:10px;">
+            <div class="panel" style="display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; padding:15px; border-radius:10px;">
                 <div><strong>${eq.marca} ${eq.modelo || ''}</strong><br><small>S/N: ${eq.serie}</small></div>
-                <button class="btn-action" onclick="generatePDF('${u.rut}', '${eq.serie}')">ACTA PDF</button>
+                <button onclick="alert('Generando Acta...')" style="background:var(--dominos-blue); color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">ACTA</button>
             </div>
-        `).join('') || '<p style="text-align:center; padding:20px; color:#999;">Sin activos asignados.</p>';
-    }
-
-    function generatePDF(rut, serie) {
-        const u = masterData.find(x => x.rut === rut), a = u.equipos.find(x => x.serie === serie);
-        const win = window.open('', '_blank');
-        win.document.write(`<html><body style="font-family:sans-serif; padding:50px;">
-            <div style="border-bottom:3px solid #0066CC; padding-bottom:10px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <h1 style="color:#0066CC">ACTA DE ENTREGA TI</h1>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80">
-            </div>
-            <p><b>Colaborador:</b> ${u.nombre} | <b>RUT:</b> ${u.rut}</p><hr>
-            <p><b>Equipo:</b> ${a.marca} ${a.modelo || ''} | <b>Serie:</b> ${a.serie}</p>
-            <p style="margin-top:100px;">Firma Colaborador: __________________________</p>
-            <script>window.print();<\/script></body></html>`);
+        `).join('');
     }
 
     function updateDashboard() {
@@ -281,7 +251,6 @@
         btn.classList.add('active');
     }
 
-    function logout() { sessionStorage.clear(); location.reload(); }
     function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
 </script>
 </body>
