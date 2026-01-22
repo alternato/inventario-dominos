@@ -3,50 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v25.8 - Domino's Pizza Chile</title>
+    <title>TI Maestro v26.0 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --blue: #0066CC; --red: #E31837; --bg: #FFFFF5; --green: #22c55e; --dark: #1e293b; }
+        :root { --blue: #0066CC; --red: #E31837; --bg: #FFFFF5; --green: #22c55e; --dark: #1e293b; --gray: #64748b; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar */
-        #sidebar { width: 260px; background: var(--blue); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        /* SIDEBAR MINIMALISTA */
+        #sidebar { 
+            width: 260px; 
+            background: var(--blue); 
+            color: white; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+        }
+
         .logo-box { margin-bottom: 25px; text-align: center; }
-        .logo-box img { width: 100px; }
+        .logo-box img { width: 90px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
         
-        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; text-align: left; width: 100%; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .nav-btn.active { background: var(--red); font-weight: 700; }
+        .nav-btn { 
+            background: rgba(255,255,255,0.08); 
+            color: white; border: none; padding: 12px 15px; border-radius: 10px; 
+            cursor: pointer; text-align: left; width: 100%; margin-bottom: 8px; 
+            font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; 
+        }
+        .nav-btn.active { background: var(--red); font-weight: 700; box-shadow: 0 4px 10px rgba(227, 24, 55, 0.3); }
+        .nav-btn:hover { background: rgba(255,255,255,0.15); }
 
-        /* Usuario Centrado */
-        .user-center-box { margin: auto 0; padding: 15px; background: rgba(0,0,0,0.15); border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .user-center-box small { font-size: 0.6rem; text-transform: uppercase; opacity: 0.7; letter-spacing: 1px; }
-        .user-center-box strong { display: block; font-size: 0.9rem; margin: 4px 0; }
-        .logout-link { color: #ffcccc; font-size: 0.7rem; cursor: pointer; text-decoration: underline; }
+        /* DATOS USUARIO CENTRADOS (Solicitado) */
+        .user-center-box {
+            margin: auto 0; /* Centrado vertical */
+            padding: 18px;
+            background: rgba(0,0,0,0.12);
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .user-center-box small { font-size: 0.55rem; text-transform: uppercase; opacity: 0.6; letter-spacing: 1.2px; font-weight: 800; }
+        .user-center-box strong { display: block; font-size: 0.9rem; margin: 5px 0; color: #fff; }
+        .logout-link { color: #ffcccc; font-size: 0.65rem; cursor: pointer; text-decoration: none; font-weight: bold; }
+        .logout-link:hover { text-decoration: underline; }
 
-        /* Marca de Agua Minimalista */
-        .minimal-watermark { padding-top: 15px; text-align: center; opacity: 0.5; font-size: 0.55rem; letter-spacing: 0.5px; }
-        .gemini-mini { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; color: white; }
+        /* MARCA DE AGUA FINAL MINIMALISTA (Solicitado) */
+        .minimal-watermark {
+            padding-top: 15px;
+            text-align: center;
+            opacity: 0.4;
+            font-size: 0.55rem;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        .gemini-mini { 
+            display: flex; align-items: center; justify-content: center; 
+            gap: 4px; margin-top: 4px; color: white; font-weight: bold; 
+        }
 
-        /* Contenido */
-        .main-view { flex-grow: 1; padding: 30px; overflow-y: auto; }
-        .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #eee; }
-        .tab-pane { display: none; }
-        .user-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .user-item:hover { background: #f0f7ff; }
+        /* ÁREA DE TRABAJO */
+        .main-view { flex-grow: 1; padding: 25px; overflow-y: auto; }
+        .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 20px; border: 1px solid #edf2f7; }
+        
+        /* DISEÑO DE LA FICHA TÉCNICA 360° (Solución a tu duda) */
+        .ficha-header { border-left: 6px solid var(--blue); padding-left: 20px; margin-bottom: 25px; }
+        .ficha-seccion-titulo { 
+            font-size: 0.75rem; font-weight: 800; color: var(--blue); 
+            text-transform: uppercase; margin: 20px 0 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .grid-ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .info-card { background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; transition: 0.2s; }
+        .info-card:hover { border-color: var(--blue); background: #fff; }
+        .info-card label { display: block; font-size: 0.6rem; color: var(--gray); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .info-card span { font-size: 0.85rem; color: var(--dark); font-weight: 600; word-break: break-all; }
 
-        /* Ficha */
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .info-box { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 10px; color: white; font-weight: bold; }
-        .tag.success { background: var(--green); }
-        .tag.alert { background: var(--red); }
-
-        #loginOverlay { position: fixed; inset: 0; background: var(--blue); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 40px; border-radius: 24px; width: 350px; text-align: center; }
-        #mapperModal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 20000; display: none; align-items: center; justify-content: center; }
-        .mapper-card { background: white; padding: 30px; border-radius: 20px; width: 500px; max-height: 80vh; overflow-y: auto; }
+        /* Utilidades */
+        .tag { padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; color: white; }
+        .tag-blue { background: var(--blue); }
+        .tag-red { background: var(--red); }
+        .tag-green { background: var(--green); }
         .hidden { display: none !important; }
         #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--red); width: 0; transition: width 0.3s; z-index: 21000; }
     </style>
@@ -55,40 +93,42 @@
 
 <div id="loadingBar"></div>
 
-<div id="loginOverlay">
-    <div class="login-card">
+<div id="loginOverlay" style="position:fixed; inset:0; background:var(--blue); z-index:10000; display:flex; align-items:center; justify-content:center;">
+    <div style="background:white; padding:40px; border-radius:24px; width:350px; text-align:center;">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80">
-        <h2 style="color:var(--blue); margin: 20px 0;">TI Maestro</h2>
-        <input type="text" id="u_input" placeholder="Usuario" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
-        <input type="password" id="p_input" placeholder="Contraseña" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px;">
+        <h2 style="color:var(--blue); margin: 20px 0;">Acceso TI Maestro</h2>
+        <input type="text" id="u_input" placeholder="Usuario" style="width:100%; padding:12px; margin-bottom:12px; border:1px solid #ddd; border-radius:10px;">
+        <input type="password" id="p_input" placeholder="Contraseña" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:10px;">
         <button onclick="intentarAcceso()" style="background:var(--blue); color:white; border:none; padding:15px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold;">INGRESAR</button>
     </div>
 </div>
 
 <div id="sidebar">
-    <div class="logo-box"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png"></div>
+    <div class="logo-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png">
+    </div>
     
     <nav>
-        <button class="nav-btn active" onclick="showTab('home', this)"><i class="fas fa-chart-pie"></i> Dashboard</button>
-        <button class="nav-btn" onclick="showTab('inventory', this)"><i class="fas fa-users"></i> Hojas de Vida</button>
+        <button class="nav-btn active" onclick="showTab('home', this)"><i class="fas fa-chart-line"></i> Dashboard</button>
+        <button class="nav-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-card"></i> Hojas de Vida</button>
     </nav>
     
     <div class="user-center-box">
-        <small>Sesión Activa</small>
+        <small>Usuario Conectado</small>
         <strong id="role_display">---</strong>
         <span class="logout-link" onclick="salir()">Cerrar Sesión</span>
     </div>
 
     <div class="super-only hidden">
-        <button class="nav-btn" style="background: var(--green); margin-bottom:5px;" onclick="document.getElementById('csvInput').click()"><i class="fas fa-sync"></i> CARGAR CSV</button>
+        <button class="nav-btn" style="background: var(--green); margin-bottom:5px;" onclick="document.getElementById('csvInput').click()"><i class="fas fa-upload"></i> CARGAR SHAREPOINT</button>
         <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="iniciarMapeo(this)">
-        <button class="nav-btn" style="background: rgba(227, 24, 55, 0.4);" onclick="eliminarTodo()"><i class="fas fa-trash-alt"></i> LIMPIAR DB</button>
+        <button class="nav-btn" style="background: rgba(255,255,255,0.15);" onclick="eliminarTodo()"><i class="fas fa-trash-alt"></i> LIMPIAR BASE DE DATOS</button>
     </div>
 
     <div class="minimal-watermark">
         ENGINEERED BY MILO DROGUETT
         <div class="gemini-mini">
-            <svg width="8" height="8" viewBox="0 0 24 24"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="white"/></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="white"/></svg>
             <span>GEMINI AI</span>
         </div>
     </div>
@@ -96,21 +136,22 @@
 
 <div class="main-view">
     <div id="home" class="tab-pane" style="display:block;">
-        <h1 style="color:var(--blue); margin-bottom:20px;">Dashboard de Flota</h1>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        <h1 style="color:var(--blue); margin-bottom:20px;">Resumen de Operaciones</h1>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
             <div class="panel"><h4>Colaboradores</h4><h2 id="k-c">0</h2></div>
-            <div class="panel"><h4>Total Activos</h4><h2 id="k-a">0</h2></div>
+            <div class="panel"><h4>Equipos Registrados</h4><h2 id="k-a">0</h2></div>
+            <div class="panel"><h4>Pendientes de Acta</h4><h2 id="k-p" style="color:var(--red)">0</h2></div>
         </div>
     </div>
 
     <div id="inventory" class="tab-pane">
-        <div style="display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
+        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px;">
             <div class="panel">
-                <input type="text" id="userSearch" onkeyup="renderLista()" placeholder="Buscar..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
-                <div id="listaPersonas" style="height:450px; overflow-y:auto;"></div>
+                <input type="text" id="userSearch" onkeyup="renderLista()" placeholder="Buscar colaborador..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
+                <div id="listaPersonas" style="height:500px; overflow-y:auto;"></div>
             </div>
             <div class="panel" id="fichaContent">
-                <div style="text-align:center; padding:100px; color:#ccc;"><i class="fas fa-user-tag fa-4x"></i><p>Seleccione un colaborador</p></div>
+                <div style="text-align:center; padding:100px; color:#ccc;"><i class="fas fa-user-shield fa-4x"></i><p style="margin-top:15px;">Seleccione un colaborador para ver su ficha técnica completa</p></div>
             </div>
         </div>
     </div>
@@ -118,9 +159,10 @@
 
 <div id="mapperModal">
     <div class="mapper-card">
-        <h3>Mapear Columnas</h3>
-        <div id="mapperFields" style="margin: 15px 0;"></div>
-        <button onclick="procesarCargaFinal()" style="width:100%; padding:15px; background:var(--green); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">CONFIRMAR Y SUBIR</button>
+        <h3>Sincronizar Columnas</h3>
+        <p style="font-size:0.75rem; color:#666; margin-bottom:15px;">Asegure que los datos del CSV coincidan con el sistema:</p>
+        <div id="mapperFields"></div>
+        <button onclick="procesarCargaFinal()" style="width:100%; padding:15px; background:var(--green); color:white; border:none; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;">INICIAR CARGA MASIVA</button>
     </div>
 </div>
 
@@ -131,6 +173,7 @@
     
     let masterData = [], rawActivos = [], rawCSV = [], csvHeaders = [];
 
+    // --- SEGURIDAD ---
     function intentarAcceso() {
         const u = document.getElementById('u_input').value.trim();
         const p = document.getElementById('p_input').value.trim();
@@ -138,7 +181,7 @@
             sessionStorage.setItem('auth_ok', 'true');
             sessionStorage.setItem('role_ok', u.toUpperCase());
             window.location.reload();
-        } else alert("Error de acceso");
+        } else alert("Datos incorrectos");
     }
 
     function verificarSesion() {
@@ -150,25 +193,26 @@
         }
     }
 
+    // --- DATOS ---
     async function fetchData() {
         setLoading(true);
-        try {
-            const [rC, rA] = await Promise.all([
-                fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }),
-                fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
-            ]);
-            rawActivos = await rA.json();
-            masterData = (await rC.json()).map(c => ({
-                ...c, eqs: rawActivos.filter(a => a.rut_responsable === c.rut)
-            })).sort((a,b) => a.nombre.localeCompare(b.nombre));
-            document.getElementById('k-c').innerText = masterData.length;
-            document.getElementById('k-a').innerText = rawActivos.length;
-            renderLista();
-        } catch(e) { console.error(e); }
+        const [rC, rA] = await Promise.all([
+            fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }),
+            fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
+        ]);
+        rawActivos = await rA.json();
+        masterData = (await rC.json()).map(c => ({
+            ...c, eqs: rawActivos.filter(a => a.rut_responsable === c.rut)
+        })).sort((a,b) => a.nombre.localeCompare(b.nombre));
+        
+        document.getElementById('k-c').innerText = masterData.length;
+        document.getElementById('k-a').innerText = rawActivos.length;
+        document.getElementById('k-p').innerText = rawActivos.filter(a => a.doc_firmado !== 'Si').length;
+        renderLista();
         setLoading(false);
     }
 
-    // --- CARGA ---
+    // --- CARGA Y MAPEO ---
     function iniciarMapeo(input) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -176,14 +220,15 @@
             csvHeaders = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
             rawCSV = lines.slice(1);
             const campos = [
-                {id:'rut', n:'RUT'}, {id:'nom', n:'Nombre'}, {id:'tienda', n:'Tienda'},
-                {id:'serie', n:'Nº Serie'}, {id:'marca', n:'Marca'}, {id:'modelo', n:'Modelo'},
-                {id:'mochila', n:'Mochila'}, {id:'cargador', n:'Cargador'}, {id:'firmado', n:'Firmado'}
+                {id:'rut', n:'RUT'}, {id:'nom', n:'Nombre Completo'}, {id:'correo', n:'Correo'}, {id:'tienda', n:'Área/Tienda'},
+                {id:'serie', n:'Número de Serie'}, {id:'marca', n:'Marca'}, {id:'modelo', n:'Modelo'},
+                {id:'mochila', n:'Mochila'}, {id:'cargador', n:'Cargador'}, {id:'fecha_e', n:'Fecha Entrega'},
+                {id:'estado', n:'Estado Físico'}, {id:'firmado', n:'Doc Firmado (Si/No)'}
             ];
             document.getElementById('mapperFields').innerHTML = campos.map(f => `
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                    <strong>${f.n}:</strong>
-                    <select id="sel_${f.id}">${csvHeaders.map((h,i) => `<option value="${i}">${h}</option>`).join('')}</select>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
+                    <strong style="font-size:0.8rem;">${f.n}:</strong>
+                    <select id="sel_${f.id}" style="padding:4px; border-radius:5px;">${csvHeaders.map((h,i) => `<option value="${i}">${h}</option>`).join('')}</select>
                 </div>`).join('');
             document.getElementById('mapperModal').style.display = 'flex';
         };
@@ -201,7 +246,7 @@
 
             await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
                 method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify({ rut, nombre: clean(c[getI('nom')]), tienda: clean(c[getI('tienda')]) })
+                body: JSON.stringify({ rut, nombre: clean(c[getI('nom')]), correo: clean(c[getI('correo')]), tienda: clean(c[getI('tienda')]) })
             });
 
             if (clean(c[getI('serie')])) {
@@ -210,7 +255,8 @@
                     body: JSON.stringify({
                         rut_responsable: rut, serie: clean(c[getI('serie')]), marca: clean(c[getI('marca')]),
                         modelo: clean(c[getI('modelo')]), mochila: clean(c[getI('mochila')]),
-                        cargador: clean(c[getI('cargador')]), doc_firmado: clean(c[getI('firmado')])
+                        cargador: clean(c[getI('cargador')]), doc_firmado: clean(c[getI('firmado')]),
+                        fecha_entrega: clean(c[getI('fecha_e')]), estado: clean(c[getI('estado')])
                     })
                 });
             }
@@ -218,17 +264,52 @@
         location.reload();
     }
 
-    // --- LIMPIEZA DB CORREGIDA ---
+    // --- FICHA TÉCNICA 360° ---
+    function verFicha(rut) {
+        const u = masterData.find(x => x.rut === rut);
+        let html = `
+            <div class="ficha-header">
+                <h1 style="color:var(--blue); margin-bottom:5px;">${u.nombre}</h1>
+                <div style="display:flex; gap:10px;">
+                    <span class="tag tag-blue"><i class="fas fa-id-card"></i> ${u.rut}</span>
+                    <span class="tag tag-green"><i class="fas fa-store"></i> ${u.tienda}</span>
+                </div>
+            </div>
+
+            <div class="ficha-seccion-titulo"><i class="fas fa-laptop"></i> Inventario de Equipos Asignados</div>
+        `;
+
+        if (u.eqs.length === 0) html += `<p style="padding:20px; color:#999;">Sin activos asignados.</p>`;
+
+        u.eqs.forEach(eq => {
+            html += `
+            <div class="panel" style="background:#fcfcfc; border-left:4px solid ${eq.doc_firmado === 'Si' ? 'var(--green)' : 'var(--red)'};">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                    <strong>${eq.marca} ${eq.modelo}</strong>
+                    <span class="tag ${eq.doc_firmado==='Si'?'tag-green':'tag-red'}">${eq.doc_firmado==='Si'?'DOCUMENTO OK':'ACTA PENDIENTE'}</span>
+                </div>
+                
+                <div class="grid-ficha">
+                    <div class="info-card"><label>Nº de Serie</label><span>${eq.serie}</span></div>
+                    <div class="info-card"><label>Mochila</label><span>${eq.mochila || '-'}</span></div>
+                    <div class="info-card"><label>Cargador</label><span>${eq.cargador || '-'}</span></div>
+                    <div class="info-card"><label>Fecha Entrega</label><span>${eq.fecha_entrega || '-'}</span></div>
+                    <div class="info-card"><label>Estado Físico</label><span>${eq.estado || '-'}</span></div>
+                    <div class="info-card" style="background:var(--blue); color:white; cursor:pointer; text-align:center;" onclick="alert('Generando Acta...')">
+                        <label style="color:rgba(255,255,255,0.7)">Acción</label><span>IMPRIMIR ACTA</span>
+                    </div>
+                </div>
+            </div>`;
+        });
+        document.getElementById('fichaContent').innerHTML = html;
+    }
+
     async function eliminarTodo() {
-        const pass = prompt("⚠️ ADVERTENCIA: Se borrarán todos los datos.\nEscriba: DOMINOS");
-        if (pass !== "DOMINOS") return;
+        if (prompt("Escriba DOMINOS para borrar todo:") !== "DOMINOS") return;
         setLoading(true);
-        try {
-            await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { method: 'DELETE', headers: HEADERS });
-            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { method: 'DELETE', headers: HEADERS });
-            location.reload();
-        } catch(e) { alert("Error"); }
-        setLoading(false);
+        await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { method: 'DELETE', headers: HEADERS });
+        await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { method: 'DELETE', headers: HEADERS });
+        location.reload();
     }
 
     function renderLista() {
@@ -236,27 +317,6 @@
         document.getElementById('listaPersonas').innerHTML = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
             <div class="user-item" onclick="verFicha('${c.rut}')"><strong>${c.nombre}</strong><br><small>${c.rut}</small></div>
         `).join('');
-    }
-
-    function verFicha(rut) {
-        const u = masterData.find(x => x.rut === rut);
-        let html = `<div style="border-left:5px solid var(--blue); padding-left:15px; margin-bottom:20px;">
-            <h2 style="color:var(--blue)">${u.nombre}</h2><p>${u.rut} | ${u.tienda}</p></div>`;
-        u.eqs.forEach(eq => {
-            html += `
-            <div class="panel" style="background:#f9f9f9;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <strong>${eq.marca} ${eq.modelo}</strong>
-                    <span class="tag ${eq.doc_firmado==='Si'?'success':'alert'}">${eq.doc_firmado==='Si'?'CON ACTA':'SIN ACTA'}</span>
-                </div>
-                <div class="grid-3">
-                    <div class="info-box"><small>Serie</small><br><strong>${eq.serie}</strong></div>
-                    <div class="info-box"><small>Mochila</small><br><strong>${eq.mochila||'No'}</strong></div>
-                    <div class="info-box"><small>Cargador</small><br><strong>${eq.cargador||'No'}</strong></div>
-                </div>
-            </div>`;
-        });
-        document.getElementById('fichaContent').innerHTML = html;
     }
 
     function showTab(id, btn) {
