@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v7.8 - Domino's Pizza Chile</title>
+    <title>TI Maestro v8.2 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -18,40 +18,27 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar Azul */
         #sidebar { width: 280px; background: var(--dark-blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         
-        /* Logo centrado y sin fondo blanco */
-        .logo-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-bottom: 40px;
-        }
-        .logo-wrapper img {
-            width: 120px;
-            height: auto;
-            /* Eliminamos cualquier filtro previo */
-            filter: none !important; 
-        }
+        /* Logo centrado y visible */
+        .logo-wrapper { width: 100%; display: flex; justify-content: center; margin-bottom: 35px; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .logo-wrapper img { width: 100px; height: auto; filter: none !important; }
 
         .side-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 500; transition: 0.2s; }
-        .side-btn:hover { background: rgba(255,255,255,0.2); }
-        .side-btn.active { background: var(--dominos-red); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .side-btn.active { background: var(--dominos-red); }
 
         .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
-        .tab-pane { display: none; animation: fadeIn 0.3s ease-out; }
-        .tab-pane.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .panel { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; border: 1px solid #f0f0e0; }
         .app-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; height: calc(100vh - 220px); }
-        .scroll-panel { background: white; border-radius: 16px; padding: 15px; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .scroll-panel { background: white; border-radius: 16px; padding: 15px; overflow-y: auto; border: 1px solid #eef2f6; }
         
-        .user-item { padding: 14px; border-radius: 12px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; margin-bottom: 6px; position: relative; }
-        .user-item:hover { background: #f0f7ff; }
+        .user-item { padding: 14px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; margin-bottom: 6px; }
         .user-item.active { background: #eef6fb; border-color: var(--dominos-blue); }
-        .badge-count { position: absolute; right: 12px; top: 18px; background: var(--dominos-blue); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; }
+        .badge-count { float: right; background: var(--dominos-blue); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; }
 
         .btn-action { background: var(--dominos-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .hidden { display: none !important; }
@@ -81,7 +68,7 @@
     <button class="side-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
     
     <div id="admin-tools" class="hidden" style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.2);">
-        <button onclick="document.getElementById('csvInput').click()" class="side-btn" style="background:var(--green);">
+        <button onclick="document.getElementById('csvInput').click()" class="side-btn" style="background:var(--green); font-size:0.75rem;">
             <i class="fas fa-file-csv"></i> CARGAR CSV SHAREPOINT
         </button>
         <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="handleCSV(this)">
@@ -89,18 +76,18 @@
 
     <div style="margin-top:auto; padding:15px; border-radius:12px; background: rgba(0,0,0,0.1); font-size: 0.8rem;">
         <strong id="roleDisplay">---</strong><br>
-        <span onclick="logout()" style="color: #ffcccc; cursor: pointer; font-size: 0.75rem;">Cerrar Sesión</span>
+        <span onclick="logout()" style="color: #ffcccc; cursor: pointer; font-size: 0.75rem; display:inline-block; margin-top:8px;">Cerrar Sesión</span>
     </div>
 </div>
 
 <div class="main-content">
     <div id="home" class="tab-pane active">
-        <h1 style="color:var(--dominos-blue)">Dashboard Operativo</h1>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 30px;">
-            <div class="panel"><h4>Personal</h4><h2 id="kpi-users">0</h2></div>
-            <div class="panel"><h4>Equipos</h4><h2 id="kpi-assets">0</h2></div>
-            <div class="panel"><h4>Sin Firma</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
-            <div class="panel"><h4>Otros</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
+        <h1 style="color:var(--dominos-blue); margin-bottom:30px;">Dashboard de Activos</h1>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+            <div class="panel"><h4>Personal</h4><h2 id="kpi-users" style="color:var(--dominos-blue)">0</h2></div>
+            <div class="panel"><h4>Total Equipos</h4><h2 id="kpi-assets">0</h2></div>
+            <div class="panel"><h4>Por Firmar</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
+            <div class="panel"><h4>Accesorios</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
         </div>
         <div class="panel" style="height: 380px;"><canvas id="mainChart"></canvas></div>
     </div>
@@ -108,18 +95,18 @@
     <div id="inventory" class="tab-pane">
         <div class="app-grid">
             <div class="scroll-panel" id="colaboradoresList">
-                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
+                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar por Nombre o RUT..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
                 <div id="userItemsContainer"></div>
             </div>
             <div class="scroll-panel" id="detailPanel">
                 <div id="emptyState" style="text-align:center; padding-top:120px; color:#ccc;">
                     <i class="fas fa-id-card-alt fa-5x"></i>
-                    <p style="margin-top:20px;">Seleccione un colaborador</p>
+                    <p style="margin-top:20px;">Seleccione un colaborador del listado</p>
                 </div>
                 <div id="userDetails" class="hidden">
                     <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f1f5f9; padding-bottom:20px; margin-bottom:25px;">
-                        <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut"></p></div>
-                        <button onclick="alert('Asignación Manual')" class="btn-action" style="background:var(--green)">+ ASIGNAR MANUAL</button>
+                        <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut" style="font-weight:bold;"></p></div>
+                        <button onclick="alert('Asignación manual habilitada en próxima versión')" class="btn-action" style="background:var(--green)">+ ASIGNAR MANUAL</button>
                     </div>
                     <div id="activosContainer"></div>
                 </div>
@@ -142,7 +129,7 @@
             sessionStorage.setItem('isLogged', 'true');
             sessionStorage.setItem('userRole', u.toUpperCase());
             location.reload();
-        } else { alert("Credenciales incorrectas"); }
+        } else { alert("Usuario o clave incorrectos"); }
     }
 
     window.onload = () => {
@@ -155,8 +142,6 @@
         }
     };
 
-    function logout() { sessionStorage.clear(); location.reload(); }
-
     async function fetchData() {
         setLoading(true);
         try {
@@ -164,10 +149,8 @@
                 fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers }),
                 fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers })
             ]);
-            const colabs = await rC.json();
-            rawActivos = await rA.json();
-            masterData = colabs.map(c => ({
-                ...c, equipos: rawActivos.filter(a => a.rut_responsable === c.rut)
+            masterData = (await rC.json()).map(c => ({
+                ...c, equipos: (rawActivos = (await rA.json())).filter(a => a.rut_responsable === c.rut)
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
             renderList();
             updateDashboard();
@@ -175,8 +158,8 @@
         setLoading(false);
     }
 
+    // LÓGICA DE MAPEO CSV SEGÚN TU ESTRUCTURA EXACTA
     function handleCSV(input) {
-        const file = input.files[0];
         const reader = new FileReader();
         reader.onload = async function(e) {
             const text = e.target.result;
@@ -184,25 +167,31 @@
             setLoading(true);
 
             for (let row of rows) {
-                const delimiter = row.includes(';') ? ';' : ',';
-                const cols = row.split(delimiter);
-                if (cols.length < 3) continue;
+                const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
+                if (cols.length < 2) continue;
 
-                const nombre = cols[0]?.trim();
-                const rut = cols[1]?.trim();
-                const tienda = cols[2]?.trim();
-                const serie = cols[3]?.trim();
-                const marca = cols[4]?.trim() || 'Genérica';
+                // Limpiar comillas
+                const clean = (val) => val?.replace(/"/g, '').trim();
+
+                const rut = clean(cols[0]);       // Rut
+                const persona = clean(cols[1]);   // Persona
+                const area = clean(cols[5]);      // Área
+                const marca = clean(cols[7]);     // Marca
+                const modelo = clean(cols[8]);    // Modelo
+                const serie = clean(cols[9]);     // Nº de Serie
+                const firmado = clean(cols[10]);  // Documento Firmado
 
                 if (!rut) continue;
 
+                // 1. Upsert Colaborador
                 await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
                     method: 'POST',
                     headers: { ...headers, "Prefer": "resolution=merge-duplicates" },
-                    body: JSON.stringify({ rut, nombre, tienda })
+                    body: JSON.stringify({ rut, nombre: persona, tienda: area })
                 });
 
-                if (serie) {
+                // 2. Upsert Activo (basado en Serie)
+                if (serie && serie !== "N/A" && serie !== "") {
                     await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
                         method: 'POST',
                         headers: { ...headers, "Prefer": "resolution=merge-duplicates", "on_conflict": "serie" },
@@ -210,33 +199,35 @@
                             rut_responsable: rut,
                             serie: serie,
                             marca: marca,
-                            tipo_activo: cols[5] || 'Notebook',
-                            estado: 'Operativo',
-                            extras: { Doc_Firmado: 'No' }
+                            modelo: modelo,
+                            tipo_activo: 'Hardware',
+                            estado: clean(cols[3]) || 'Entregado',
+                            extras: { Doc_Firmado: firmado, Ubicacion: clean(cols[6]) }
                         })
                     });
                 }
             }
-            alert("CSV Procesado con éxito");
+            alert("CSV cargado con éxito. Datos mapeados correctamente.");
             fetchData();
         };
-        reader.readAsText(file);
+        reader.readAsText(input.files[0]);
     }
 
     function renderList() {
         const q = document.getElementById('searchBox').value.toLowerCase();
-        const html = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
+        document.getElementById('userItemsContainer').innerHTML = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
             <div class="user-item" onclick="selectColaborador('${c.rut}')" id="user-${c.rut}">
-                <strong>${c.nombre}</strong><br><small>${c.rut}</small>
                 <span class="badge-count">${c.equipos.length}</span>
+                <strong>${c.nombre}</strong><br><small>${c.rut}</small>
             </div>
         `).join('');
-        document.getElementById('userItemsContainer').innerHTML = html;
     }
 
     function selectColaborador(rut) {
         document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
-        document.getElementById(`user-${rut}`).classList.add('active');
+        const el = document.getElementById(`user-${rut}`);
+        if(el) el.classList.add('active');
+        
         const u = masterData.find(x => x.rut === rut);
         document.getElementById('emptyState').classList.add('hidden');
         document.getElementById('userDetails').classList.remove('hidden');
@@ -244,32 +235,32 @@
         document.getElementById('d-rut').innerText = `RUT: ${u.rut}`;
         
         document.getElementById('activosContainer').innerHTML = u.equipos.map(eq => `
-            <div class="panel" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:#f9f9f9;">
-                <div><strong>${eq.tipo_activo} - ${eq.marca}</strong><br><small>S/N: ${eq.serie}</small></div>
-                <button class="btn-action" onclick="generatePDF('${u.rut}', '${eq.serie}')">ACTA</button>
+            <div class="panel" style="display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; margin-bottom:10px;">
+                <div><strong>${eq.marca} ${eq.modelo || ''}</strong><br><small>S/N: ${eq.serie}</small></div>
+                <button class="btn-action" onclick="generatePDF('${u.rut}', '${eq.serie}')">GENERAR ACTA</button>
             </div>
         `).join('');
     }
 
     function generatePDF(rut, serie) {
-        const u = masterData.find(x => x.rut === rut);
-        const a = u.equipos.find(x => x.serie === serie);
+        const u = masterData.find(x => x.rut === rut), a = u.equipos.find(x => x.serie === serie);
         const win = window.open('', '_blank');
         win.document.write(`<html><body style="font-family:sans-serif; padding:50px;">
-            <div style="border-bottom:4px solid #0066CC; padding-bottom:10px; margin-bottom:30px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="border-bottom:3px solid #0066CC; padding-bottom:10px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
                 <h1 style="color:#0066CC">ACTA DE ENTREGA</h1>
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80">
             </div>
-            <p><b>Colaborador:</b> ${u.nombre}</p><p><b>RUT:</b> ${u.rut}</p>
-            <hr><p><b>Aparato:</b> ${a.tipo_activo} ${a.marca}</p><p><b>Serie:</b> ${a.serie}</p>
+            <p><b>Colaborador:</b> ${u.nombre} | <b>RUT:</b> ${u.rut}</p><hr>
+            <p><b>Marca/Modelo:</b> ${a.marca} ${a.modelo || ''}</p><p><b>Serie:</b> ${a.serie}</p>
+            <p style="margin-top:50px;">Firma conforme: __________________________</p>
             <script>window.print();<\/script></body></html>`);
     }
 
     function updateDashboard() {
         document.getElementById('kpi-users').innerText = masterData.length;
         document.getElementById('kpi-assets').innerText = rawActivos.length;
-        document.getElementById('kpi-pending').innerText = rawActivos.filter(a => a.extras?.Doc_Firmado !== 'Si').length;
-        document.getElementById('kpi-mobile').innerText = rawActivos.filter(a => a.tipo_activo !== 'Notebook').length;
+        document.getElementById('kpi-pending').innerText = rawActivos.filter(a => a.extras?.Doc_Firmado !== 'S' && a.extras?.Doc_Firmado !== 'Si').length;
+        document.getElementById('kpi-mobile').innerText = rawActivos.filter(a => a.tipo_activo !== 'Hardware').length;
     }
 
     function showTab(id, btn) {
@@ -279,6 +270,7 @@
         btn.classList.add('active');
     }
 
+    function logout() { sessionStorage.clear(); location.reload(); }
     function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
 </script>
 </body>
