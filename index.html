@@ -3,98 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v19.1 - Domino's Pizza Chile</title>
+    <title>TI Maestro v19.2 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    
     <script>
-        // --- CONFIGURACIÓN Y ACCESO ---
+        // --- CONFIGURACIÓN ---
         const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
         const HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
         
-        let masterData = [], rawActivos = [];
+        let masterData = [], rawCSV = [], csvHeaders = [];
 
+        // --- ACCESO ---
         function intentarAcceso() {
             const u = document.getElementById('u_input').value.trim();
             const p = document.getElementById('p_input').value.trim();
-            
             if ((u === "edc_admin" && p === "dominos2026") || (u === "admin" && p === "123")) {
                 sessionStorage.setItem('auth_ok', 'true');
                 sessionStorage.setItem('user_role', u.toUpperCase());
                 window.location.reload();
-            } else {
-                alert("Error: Usuario o clave incorrectos.");
-            }
+            } else { alert("Error: Credenciales incorrectas."); }
         }
 
         function verificarSesion() {
             if (sessionStorage.getItem('auth_ok') === 'true') {
                 document.getElementById('loginOverlay').style.display = 'none';
-                const role = sessionStorage.getItem('user_role');
-                document.getElementById('role_display').innerText = role;
-                if(role === 'EDC_ADMIN') {
+                document.getElementById('role_display').innerText = sessionStorage.getItem('user_role');
+                if(sessionStorage.getItem('user_role') === 'EDC_ADMIN') {
                     document.querySelectorAll('.super-only').forEach(e => e.classList.remove('hidden'));
                 }
                 fetchData();
             }
         }
 
-        async function fetchData() {
-            setLoading(true);
-            try {
-                const [rC, rA] = await Promise.all([
-                    fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }),
-                    fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
-                ]);
-                rawActivos = await rA.json();
-                masterData = (await rC.json()).map(c => ({
-                    ...c, eqs: rawActivos.filter(a => a.rut_responsable === c.rut)
-                })).sort((a,b) => a.nombre.localeCompare(b.nombre));
+        // --- CARGA Y MAPEO DINÁMICO ---
+        function iniciarCargaCSV(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const lines = e.target.result.split(/\r?\n/).filter(l => l.trim() !== "");
+                csvHeaders = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+                rawCSV = lines.slice(1);
                 
-                actualizarKPIs();
-                renderLista();
-            } catch (e) { console.error(e); }
-            setLoading(false);
+                // Mapeo de los campos que mencionaste
+                const campos = [
+                    {id:'rut', n:'RUT'}, {id:'nom', n:'Persona'}, {id:'tienda', n:'Área/Tienda'},
+                    {id:'serie', n:'Nº Serie'}, {id:'marca', n:'Marca'}, {id:'modelo', n:'Modelo'},
+                    {id:'mochila', n:'Mochila'}, {id:'cargador', n:'Cargador'}, {id:'firmado', n:'Doc Firmado'}
+                ];
+
+                document.getElementById('mapperFields').innerHTML = campos.map(f => `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center; border-bottom:1px solid #eee; padding-bottom:5px;">
+                        <span style="font-size:0.9rem;"><strong>${f.n}:</strong></span>
+                        <select id="sel_${f.id}" style="padding:5px; border-radius:5px;">
+                            ${csvHeaders.map((h,i) => `<option value="${i}" ${h.toLowerCase().includes(f.id) ? 'selected' : ''}>${h}</option>`).join('')}
+                        </select>
+                    </div>
+                `).join('');
+                document.getElementById('mapperModal').style.display = 'flex';
+            };
+            reader.readAsText(input.files[0]);
         }
 
-        function actualizarKPIs() {
+        async function procesarFinal() {
+            document.getElementById('mapperModal').style.display = 'none';
+            setLoading(true);
+            const getI = (id) => document.getElementById(`sel_${id}`).value;
+
+            for (let row of rawCSV) {
+                const c = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
+                const clean = (v) => v?.replace(/"/g, '').trim();
+                const rut = clean(c[getI('rut')]); if(!rut) continue;
+
+                // 1. Guardar/Actualizar Colaborador
+                await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
+                    method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ rut, nombre: clean(c[getI('nom')]), tienda: clean(c[getI('tienda')]) })
+                });
+
+                // 2. Guardar/Actualizar Activo
+                if (clean(c[getI('serie')])) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
+                        method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates", "on_conflict": "serie" },
+                        body: JSON.stringify({
+                            rut_responsable: rut, serie: clean(c[getI('serie')]), marca: clean(c[getI('marca')]),
+                            modelo: clean(c[getI('modelo')]), mochila: clean(c[getI('mochila')]),
+                            cargador: clean(c[getI('cargador')]), doc_firmado: clean(c[getI('firmado')])
+                        })
+                    });
+                }
+            }
+            location.reload();
+        }
+
+        // --- DATOS Y UI ---
+        async function fetchData() {
+            setLoading(true);
+            const [rC, rA] = await Promise.all([
+                fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }),
+                fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
+            ]);
+            const activos = await rA.json();
+            masterData = (await rC.json()).map(c => ({
+                ...c, eqs: activos.filter(a => a.rut_responsable === c.rut)
+            })).sort((a,b) => a.nombre.localeCompare(b.nombre));
+            
             document.getElementById('k-c').innerText = masterData.length;
-            document.getElementById('k-a').innerText = rawActivos.length;
-            document.getElementById('k-p').innerText = rawActivos.filter(a => a.doc_firmado !== 'Si').length;
+            document.getElementById('k-a').innerText = activos.length;
+            renderLista();
+            setLoading(false);
         }
 
         function renderLista() {
             const q = document.getElementById('userSearch').value.toLowerCase();
             document.getElementById('listaPersonas').innerHTML = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
-                <div class="user-item" onclick="verFicha('${c.rut}')">
-                    <strong>${c.nombre}</strong><br><small>${c.rut}</small>
-                </div>
+                <div class="user-item" onclick="verPerfil('${c.rut}')"><strong>${c.nombre}</strong><br><small>${c.rut}</small></div>
             `).join('');
         }
 
-        function verFicha(rut) {
+        function verPerfil(rut) {
             const u = masterData.find(x => x.rut === rut);
             document.getElementById('msgEmpty').classList.add('hidden');
             document.getElementById('fichaContent').classList.remove('hidden');
-
-            let html = `<div class="ficha-header"><h2>${u.nombre}</h2><p>RUT: ${u.rut} | Área: ${u.tienda}</p></div>`;
+            let html = `<h3>${u.nombre}</h3><p style="font-size:0.8rem; margin-bottom:15px;">RUT: ${u.rut} | Área: ${u.tienda}</p>`;
             u.eqs.forEach(eq => {
                 html += `
-                <div class="panel" style="border-left: 5px solid var(--blue);">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                        <strong style="color:var(--blue);">${eq.marca} ${eq.modelo}</strong>
-                        <span class="tag ${eq.doc_firmado === 'Si' ? 'success' : 'alert'}">${eq.doc_firmado === 'Si' ? 'FIRMADO' : 'PENDIENTE'}</span>
+                <div class="panel" style="background:#f8fafc; border-left:4px solid var(--blue);">
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
+                        <div><small>Equipo</small><br><strong>${eq.marca} ${eq.modelo}</strong></div>
+                        <div><small>Serie</small><br><strong>${eq.serie}</strong></div>
+                        <div><small>Firma</small><br><strong>${eq.doc_firmado}</strong></div>
+                        <div><small>Mochila</small><br><strong>${eq.mochila || 'No'}</strong></div>
+                        <div><small>Cargador</small><br><strong>${eq.cargador || 'No'}</strong></div>
                     </div>
-                    <div class="grid-3">
-                        <div class="data-box"><p class="label">Serie</p><p class="val">${eq.serie}</p></div>
-                        <div class="data-box"><p class="label">Mochila</p><p class="val">${eq.mochila || 'No'}</p></div>
-                        <div class="data-box"><p class="label">Cargador</p><p class="val">${eq.cargador || 'No'}</p></div>
-                        <div class="data-box"><p class="label">Estado</p><p class="val">${eq.estado || 'S/I'}</p></div>
-                        <div class="data-box"><p class="label">Fecha Entrega</p><p class="val">${eq.fecha_entrega || 'S/F'}</p></div>
-                        <div class="data-box"><p class="label">Acción</p><button class="btn-sm" onclick="alert('Generando Acta...')">IMPRIMIR</button></div>
-                    </div>
-                    <div class="data-box" style="margin-top:10px;"><p class="label">Observaciones</p><p class="val">${eq.observaciones || '-'}</p></div>
                 </div>`;
             });
             document.getElementById('fichaContent').innerHTML = html;
@@ -106,7 +146,6 @@
             document.getElementById(id).style.display = 'block';
             btn.classList.add('active');
         }
-
         function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
         function salir() { sessionStorage.clear(); location.reload(); }
     </script>
@@ -115,45 +154,19 @@
         :root { --blue: #0066CC; --red: #E31837; --bg: #FFFFF5; --green: #22c55e; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
         #sidebar { width: 280px; background: var(--blue); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo-box { margin-bottom: 30px; text-align: center; }
-        .logo-box img { width: 110px; }
-        
         .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; text-align: left; width: 100%; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
         .nav-btn.active { background: var(--red); }
-
-        /* Créditos en Sidebar */
-        .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); }
-        .credit-text { font-size: 0.65rem; color: rgba(255,255,255,0.7); font-weight: bold; letter-spacing: 0.5px; line-height: 1.4; }
-        .gemini-tag { display: flex; align-items: center; gap: 5px; margin-top: 5px; color: white; }
-
-        /* Main */
         .main-view { flex-grow: 1; padding: 30px; overflow-y: auto; }
         .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #eee; }
-        .user-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
+        .user-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
         .user-item:hover { background: #f0f7ff; }
-        
-        /* Ficha */
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .data-box { background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
-        .label { font-size: 0.6rem; color: #64748b; text-transform: uppercase; font-weight: bold; }
-        .val { font-size: 0.8rem; font-weight: 600; }
-        .btn-sm { background: var(--blue); color: white; border: none; padding: 5px; border-radius: 4px; width: 100%; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
-
-        .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; color: white; font-weight: bold; }
-        .tag.success { background: var(--green); }
-        .tag.alert { background: var(--red); }
-
-        /* Login */
         #loginOverlay { position: fixed; inset: 0; background: var(--blue); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 40px; border-radius: 24px; width: 350px; text-align: center; }
-        .login-card input { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 10px; outline: none; }
-        .login-card button { background: var(--blue); color: white; border: none; padding: 16px; width: 100%; border-radius: 10px; cursor: pointer; font-weight: bold; }
-
+        #mapperModal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 20000; display: none; align-items: center; justify-content: center; }
+        .mapper-card { background: white; padding: 30px; border-radius: 20px; width: 450px; }
         .hidden { display: none !important; }
         #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--red); width: 0; transition: width 0.3s; z-index: 21000; }
+        .sidebar-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 0.65rem; color: rgba(255,255,255,0.7); font-weight: bold; }
     </style>
 </head>
 <body onload="verificarSesion()">
@@ -161,49 +174,41 @@
 <div id="loadingBar"></div>
 
 <div id="loginOverlay">
-    <div class="login-card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="85">
-        <h2 style="color:var(--blue); margin: 25px 0;">TI Maestro Chile</h2>
-        <input type="text" id="u_input" placeholder="Usuario">
-        <input type="password" id="p_input" placeholder="Contraseña">
-        <button onclick="intentarAcceso()">INGRESAR AL PANEL</button>
+    <div style="background:white; padding:40px; border-radius:24px; width:340px; text-align:center;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80">
+        <h2 style="color:var(--blue); margin: 20px 0;">Acceso TI</h2>
+        <input type="text" id="u_input" placeholder="Usuario" style="width:100%; padding:12px; margin-bottom:12px; border:1px solid #ddd; border-radius:10px;">
+        <input type="password" id="p_input" placeholder="Contraseña" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:10px;">
+        <button onclick="intentarAcceso()" style="background:var(--blue); color:white; border:none; padding:15px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold;">INGRESAR</button>
     </div>
 </div>
 
 <div id="sidebar">
-    <div class="logo-box">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png">
+    <div style="margin-bottom:30px; text-align:center;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="110">
     </div>
-    
-    <button class="nav-btn active" onclick="showTab('home', this)"><i class="fas fa-home"></i> Inicio</button>
-    <button class="nav-btn" onclick="showTab('inventory', this)"><i class="fas fa-user-friends"></i> Hojas de Vida</button>
+    <button class="nav-btn active" onclick="showTab('home', this)"><i class="fas fa-home"></i> Dashboard</button>
+    <button class="nav-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
     
     <div class="super-only hidden" style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.2);">
-        <button class="nav-btn" style="background: var(--green);" onclick="alert('Carga habilitada')"><i class="fas fa-file-csv"></i> CARGAR SHAREPOINT</button>
+        <button class="nav-btn" style="background: var(--green);" onclick="document.getElementById('csvInput').click()"><i class="fas fa-file-csv"></i> CARGAR SHAREPOINT</button>
+        <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="iniciarCargaCSV(this)">
     </div>
 
     <div class="sidebar-footer">
-        <div class="credit-text">
-            ENGINEERED BY <br>
-            MILO DROGUETT
-            <div class="gemini-tag">
-                <svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#g)"/><defs><linearGradient id="g"><stop stop-color="#4285F4"/><stop offset="1" stop-color="#9B72CB"/></linearGradient></defs></svg>
-                <span>+ GEMINI AI</span>
-            </div>
-        </div>
-        <div style="margin-top:10px; font-size:0.7rem;">
-            <strong id="role_display">---</strong> | <span onclick="salir()" style="color:#ffcccc; cursor:pointer;">Salir</span>
+        ENGINEERED BY <br> MILO DROGUETT + GEMINI AI
+        <div style="margin-top:8px;">
+            <strong id="role_display">---</strong> | <span onclick="salir()" style="color:#ffcccc; cursor:pointer;">Cerrar</span>
         </div>
     </div>
 </div>
 
 <div class="main-view">
     <div id="home" class="tab-pane" style="display:block;">
-        <h1 style="color:var(--blue); margin-bottom:20px;">Estado de Flota</h1>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-            <div class="panel"><h4>Personal</h4><h2 id="k-c">0</h2></div>
-            <div class="panel"><h4>Equipos</h4><h2 id="k-a">0</h2></div>
-            <div class="panel"><h4>Sin Acta</h4><h2 id="k-p" style="color:var(--red)">0</h2></div>
+        <h1 style="color:var(--blue); margin-bottom:20px;">Dashboard</h1>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            <div class="panel"><h4>Colaboradores</h4><h2 id="k-c">0</h2></div>
+            <div class="panel"><h4>Total Activos</h4><h2 id="k-a">0</h2></div>
         </div>
     </div>
 
@@ -214,10 +219,18 @@
                 <div id="listaPersonas" style="height:400px; overflow-y:auto;"></div>
             </div>
             <div class="panel">
-                <div id="msgEmpty" style="text-align:center; padding:100px; color:#ccc;">Seleccione un colaborador</div>
+                <div id="msgEmpty" style="text-align:center; padding:50px; color:#ccc;">Seleccione un usuario</div>
                 <div id="fichaContent" class="hidden"></div>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="mapperModal">
+    <div class="mapper-card">
+        <h3 style="color:var(--blue); margin-bottom:15px;">Mapear Columnas</h3>
+        <div id="mapperFields"></div>
+        <button onclick="procesarFinal()" style="width:100%; padding:15px; background:var(--green); color:white; border:none; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;">INICIAR CARGA</button>
     </div>
 </div>
 
