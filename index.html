@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro Pro v7.1 - Domino's Pizza</title>
+    <title>TI Maestro v7.6 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -13,29 +13,24 @@
             --bg: #FFFFF5; 
             --white: #ffffff; 
             --green: #22c55e; 
-            --dark-blue: #0066CC; /* Cambiado a tu azul Domino's */
+            --dark-blue: #0066CC; 
             --slate: #475569; 
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar Azul Domino's */
+        /* Sidebar Personalizado */
         #sidebar { width: 280px; background: var(--dark-blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
-        .side-btn { background: rgba(255,255,255,0.1); color: #ffffff; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 500; transition: 0.2s; }
+        .side-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 500; transition: 0.2s; }
         .side-btn:hover { background: rgba(255,255,255,0.2); }
-        .side-btn.active { background: var(--dominos-red); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .side-btn.active { background: var(--dominos-red); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* Sync Button Sidebar */
-        #btn-sync { width: 100%; background: rgba(0,0,0,0.2); color: #ffffff; border: 1px solid rgba(255,255,255,0.3); padding: 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; font-weight: 600; transition: 0.3s; }
-        #btn-sync:hover { background: rgba(0,0,0,0.4); }
-
-        /* Contenido Principal */
+        /* Área de Contenido */
         .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; animation: fadeIn 0.3s ease-out; }
+        .tab-pane { display: none; animation: fadeIn 0.3s ease-out; }
+        .tab-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Paneles */
         .panel { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; border: 1px solid #f0f0e0; }
         .app-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; height: calc(100vh - 220px); }
         .scroll-panel { background: white; border-radius: 16px; padding: 15px; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #eef2f6; }
@@ -45,10 +40,9 @@
         .user-item.active { background: #eef6fb; border-color: var(--dominos-blue); }
         .badge-count { position: absolute; right: 12px; top: 18px; background: var(--dominos-blue); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; }
 
-        .btn-acta { background: var(--dominos-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-action { background: var(--dominos-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-action:hover { opacity: 0.9; transform: scale(1.02); }
         
-        .footer-credits { margin-top: auto; padding: 15px; background: rgba(0,0,0,0.1); border-radius: 12px; }
-        .gemini-tag { color: #4facfe; font-weight: 800; }
         .hidden { display: none !important; }
         #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--dominos-red); width: 0; transition: width 0.3s; z-index: 10000; }
     </style>
@@ -58,12 +52,12 @@
 <div id="loadingBar"></div>
 
 <div id="loginOverlay" style="position:fixed; inset:0; background:var(--dominos-blue); z-index:9999; display:flex; align-items:center; justify-content:center;">
-    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center; box-shadow: 0 25px 50px rgba(0,0,0,0.2);">
+    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="90" style="margin-bottom:20px;">
-        <h2 style="color:var(--dominos-blue); margin-bottom:25px;">Acceso TI Maestro</h2>
+        <h2 style="color:var(--dominos-blue); margin-bottom:25px;">Gestión TI Domino's</h2>
         <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ddd; border-radius:10px; outline:none;">
         <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #ddd; border-radius:10px; outline:none;">
-        <button onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1rem;">INGRESAR AL SISTEMA</button>
+        <button onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold;">INGRESAR</button>
     </div>
 </div>
 
@@ -73,38 +67,33 @@
     <button class="side-btn active" onclick="showTab('home', this)"><i class="fas fa-chart-pie"></i> Dashboard</button>
     <button class="side-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
     
-    <div id="sync-container" class="hidden">
-        <button onclick="triggerFullSync()" id="btn-sync"><i class="fas fa-sync" id="sync-icon"></i> <span id="sync-text">SINCRO TOTAL SP</span></button>
+    <div id="admin-tools" class="hidden" style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.2);">
+        <p style="font-size:0.6rem; color:rgba(255,255,255,0.6); text-transform:uppercase; margin-bottom:10px; letter-spacing:1px;">Administración</p>
+        <button onclick="document.getElementById('csvInput').click()" class="side-btn" style="background:var(--green); font-size:0.75rem;">
+            <i class="fas fa-upload"></i> CARGAR CSV SHAREPOINT
+        </button>
+        <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="handleCSV(this)">
     </div>
 
-    <div style="margin-top:20px; padding:15px; border-radius:12px; background: rgba(0,0,0,0.1); font-size: 0.8rem;">
-        <p style="color: rgba(255,255,255,0.6); font-size:0.6rem; text-transform:uppercase;">Operador</p>
+    <div style="margin-top:auto; padding:15px; border-radius:12px; background: rgba(0,0,0,0.1); font-size: 0.8rem;">
+        <p style="color:rgba(255,255,255,0.5); font-size:0.6rem;">USUARIO:</p>
         <strong id="roleDisplay">---</strong><br>
-        <span onclick="logout()" style="color: #ffcccc; cursor: pointer; font-size: 0.75rem; margin-top:8px; display:inline-block;">Cerrar Sesión</span>
+        <span onclick="logout()" style="color: #ffcccc; cursor: pointer; font-size: 0.75rem; display:inline-block; margin-top:8px;">Cerrar Sesión</span>
     </div>
 
-    <div class="footer-credits">
-        <span style="font-size:0.6rem; color:rgba(255,255,255,0.5); text-transform:uppercase;">Engineered by</span>
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; margin-top:6px;">
-            <span>Milo Droguett</span>
-            <span class="gemini-tag">Gemini AI</span>
-        </div>
+    <div style="padding-top:15px; font-size:0.7rem; color:rgba(255,255,255,0.4); text-align:center;">
+        Milo Droguett + Gemini AI
     </div>
 </div>
 
 <div class="main-content">
     <div id="home" class="tab-pane active">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h1 style="color:var(--dominos-blue)">Dashboard Operativo</h1>
-            <div id="last-sync-label" style="display:none; background:white; padding:8px 16px; border-radius:12px; font-size:0.8rem; border:1px solid #eee;">
-                Última Sincro SP: <span id="last-sync-time">---</span>
-            </div>
-        </div>
+        <h1 style="color:var(--dominos-blue); margin-bottom:30px;">Estado de la Infraestructura</h1>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
             <div class="panel"><h4>Personal</h4><h2 id="kpi-users" style="color:var(--dominos-blue)">0</h2></div>
-            <div class="panel"><h4>Activos</h4><h2 id="kpi-assets">0</h2></div>
-            <div class="panel"><h4>Pendientes</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
-            <div class="panel"><h4>Móviles</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
+            <div class="panel"><h4>Total Activos</h4><h2 id="kpi-assets">0</h2></div>
+            <div class="panel"><h4>Sin Firma</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
+            <div class="panel"><h4>Móviles/Otros</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
         </div>
         <div class="panel" style="height: 400px;"><canvas id="mainChart"></canvas></div>
     </div>
@@ -112,18 +101,21 @@
     <div id="inventory" class="tab-pane">
         <div class="app-grid">
             <div class="scroll-panel" id="colaboradoresList">
-                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
+                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar por Nombre o RUT..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; outline:none;">
                 <div id="userItemsContainer"></div>
             </div>
             <div class="scroll-panel" id="detailPanel">
-                <div id="emptyState" style="text-align:center; padding-top:120px; color:#ccc;">
-                    <i class="fas fa-id-card-alt fa-5x"></i>
-                    <p style="margin-top:20px;">Seleccione un colaborador</p>
+                <div id="emptyState" style="text-align:center; padding-top:120px; color:#cbd5e1;">
+                    <i class="fas fa-user-tag fa-5x"></i>
+                    <p style="margin-top:20px; font-size:1.1rem;">Seleccione un colaborador para ver sus equipos</p>
                 </div>
                 <div id="userDetails" class="hidden">
                     <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f1f5f9; padding-bottom:20px; margin-bottom:25px;">
-                        <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut"></p></div>
-                        <button onclick="toggleManualForm()" style="background:var(--green); color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer;">+ ASIGNAR MANUAL</button>
+                        <div>
+                            <h2 id="d-nombre" style="color: var(--dominos-blue)"></h2>
+                            <p id="d-rut" style="font-weight:bold; color:var(--slate);"></p>
+                        </div>
+                        <button onclick="alert('Función de asignación manual en desarrollo')" class="btn-action" style="background:var(--green)">+ ASIGNAR MANUAL</button>
                     </div>
                     <div id="activosContainer"></div>
                 </div>
@@ -135,23 +127,9 @@
 <script>
     const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
-    const WEBHOOK_URL = "https://default796cb01d582441999177a82623fb5e.38.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/71fc6f057a624006a7795bab2aa28160/triggers/manual/paths/invoke?api-version=1";
     const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
 
-    let masterData = [], rawActivos = [], mainChart = null;
-
-    window.onload = () => {
-        if (sessionStorage.getItem('isLogged') === 'true') {
-            document.getElementById('loginOverlay').style.display = 'none';
-            const role = sessionStorage.getItem('userRole');
-            document.getElementById('roleDisplay').innerText = role;
-            if(role === 'EDC_ADMIN') {
-                document.getElementById('sync-container').classList.remove('hidden');
-                document.getElementById('last-sync-label').style.display = 'block';
-            }
-            fetchData();
-        }
-    };
+    let masterData = [], rawActivos = [];
 
     function handleLogin() {
         const u = document.getElementById('userInput').value;
@@ -160,8 +138,18 @@
             sessionStorage.setItem('isLogged', 'true');
             sessionStorage.setItem('userRole', u.toUpperCase());
             location.reload();
-        } else { alert("Usuario o contraseña incorrectos"); }
+        } else { alert("Credenciales incorrectas"); }
     }
+
+    window.onload = () => {
+        if (sessionStorage.getItem('isLogged') === 'true') {
+            document.getElementById('loginOverlay').style.display = 'none';
+            const role = sessionStorage.getItem('userRole');
+            document.getElementById('roleDisplay').innerText = role;
+            if(role === 'EDC_ADMIN') document.getElementById('admin-tools').classList.remove('hidden');
+            fetchData();
+        }
+    };
 
     function logout() { sessionStorage.clear(); location.reload(); }
 
@@ -174,13 +162,69 @@
             ]);
             const colabs = await rC.json();
             rawActivos = await rA.json();
+            
+            // Lógica para agrupar múltiples activos por colaborador
             masterData = colabs.map(c => ({
-                ...c, equipos: rawActivos.filter(a => a.rut_responsable === c.rut)
+                ...c, 
+                equipos: rawActivos.filter(a => a.rut_responsable === c.rut)
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
+            
             renderList();
             updateDashboard();
         } catch (e) { console.error(e); }
         setLoading(false);
+    }
+
+    // CARGA DE CSV OPTIMIZADA PARA DUPLICADOS (VARIOS EQUIPOS POR RUT)
+    function handleCSV(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const text = e.target.result;
+            const rows = text.split('\n').filter(r => r.trim() !== "").slice(1);
+            setLoading(true);
+
+            for (let row of rows) {
+                const delimiter = row.includes(';') ? ';' : ',';
+                const cols = row.split(delimiter);
+                if (cols.length < 3) continue;
+
+                const nombre = cols[0]?.trim();
+                const rut = cols[1]?.trim();
+                const tienda = cols[2]?.trim();
+                const serie = cols[3]?.trim();
+                const marca = cols[4]?.trim() || 'Genérica';
+                const tipo = cols[5]?.trim() || 'Notebook';
+
+                if (!rut) continue;
+
+                // 1. Upsert Colaborador (Si existe, lo actualiza. Si no, lo crea)
+                await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
+                    method: 'POST',
+                    headers: { ...headers, "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify({ rut, nombre, tienda })
+                });
+
+                // 2. Upsert Activo (Usa la serie como clave única para no duplicar aparatos)
+                if (serie && serie !== "") {
+                    await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
+                        method: 'POST',
+                        headers: { ...headers, "Prefer": "resolution=merge-duplicates", "on_conflict": "serie" },
+                        body: JSON.stringify({
+                            rut_responsable: rut,
+                            serie: serie,
+                            marca: marca,
+                            tipo_activo: tipo,
+                            estado: 'Operativo',
+                            extras: { Doc_Firmado: 'No' }
+                        })
+                    });
+                }
+            }
+            alert("✅ Proceso masivo finalizado. Equipos sincronizados.");
+            fetchData();
+        };
+        reader.readAsText(file);
     }
 
     function renderList() {
@@ -204,31 +248,14 @@
         document.getElementById('d-rut').innerText = `RUT: ${u.rut}`;
         
         document.getElementById('activosContainer').innerHTML = u.equipos.map(eq => `
-            <div class="asset-card" style="border-left: 6px solid ${eq.tipo_activo === 'Celular' ? 'var(--green)' : 'var(--dominos-blue)'}; padding:15px; background:#f9f9f9; margin-bottom:10px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div class="panel" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:#f9f9f9;">
                 <div>
-                    <strong>${eq.tipo_activo} - ${eq.marca}</strong><br>
-                    <small>S/N: ${eq.serie}</small>
+                    <strong style="color:var(--dominos-blue)">${eq.tipo_activo} - ${eq.marca}</strong><br>
+                    <small>Serie: ${eq.serie} | Estado: ${eq.estado}</small>
                 </div>
-                <button class="btn-acta" onclick="generatePDF('${u.rut}', '${eq.serie}')">ACTA</button>
+                <button class="btn-action" onclick="generatePDF('${u.rut}', '${eq.serie}')">GENERAR ACTA</button>
             </div>
-        `).join('');
-    }
-
-    async function triggerFullSync() {
-        const icon = document.getElementById('sync-icon');
-        icon.classList.add('fa-spin');
-        try {
-            const res = await fetch(WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ requester: "EDC_ADMIN_WEB", timestamp: new Date().toISOString() })
-            });
-            if(res.ok) {
-                document.getElementById('last-sync-time').innerText = new Date().toLocaleTimeString();
-                alert("Sincronización iniciada");
-            }
-        } catch (e) { alert("Error al conectar"); }
-        icon.classList.remove('fa-spin');
+        `).join('') || '<p>No hay equipos registrados.</p>';
     }
 
     function generatePDF(rut, serie) {
@@ -236,17 +263,25 @@
         const a = u.equipos.find(x => x.serie === serie);
         const win = window.open('', '_blank');
         win.document.write(`<html><body style="font-family:sans-serif; padding:50px;">
-            <div style="border-bottom:3px solid #0066CC; padding-bottom:10px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <h1 style="color:#0066CC">ACTA DE ENTREGA</h1>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80">
+            <div style="border-bottom:4px solid #0066CC; padding-bottom:20px; margin-bottom:30px; display:flex; justify-content:space-between; align-items:center;">
+                <h1 style="color:#0066CC">ACTA DE ENTREGA DE EQUIPO</h1>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="90">
             </div>
-            <p><b>Colaborador:</b> ${u.nombre}</p><p><b>RUT:</b> ${u.rut}</p>
-            <hr><p><b>Equipo:</b> ${a.tipo_activo} ${a.marca}</p><p><b>Serie:</b> ${a.serie}</p>
+            <p><b>Colaborador:</b> ${u.nombre}</p><p><b>RUT:</b> ${u.rut}</p><p><b>Tienda/Área:</b> ${u.tienda}</p>
+            <hr><p><b>Aparato:</b> ${a.tipo_activo} ${a.marca}</p><p><b>Nº Serie:</b> ${a.serie}</p>
             <div style="margin-top:100px; display:flex; justify-content:space-around;">
-                <div style="border-top:1px solid #000; width:200px; text-align:center;">Firma TI</div>
-                <div style="border-top:1px solid #000; width:200px; text-align:center;">Firma Colaborador</div>
+                <div style="border-top:1px solid #000; width:220px; text-align:center; padding-top:10px;">Responsable TI</div>
+                <div style="border-top:1px solid #000; width:220px; text-align:center; padding-top:10px;">Firma Colaborador</div>
             </div>
+            <p style="font-size:0.7rem; color:#999; margin-top:50px; text-align:center;">DOMINO'S PIZZA CHILE - TI MAESTRO v7.6</p>
             <script>window.print();<\/script></body></html>`);
+    }
+
+    function updateDashboard() {
+        document.getElementById('kpi-users').innerText = masterData.length;
+        document.getElementById('kpi-assets').innerText = rawActivos.length;
+        document.getElementById('kpi-pending').innerText = rawActivos.filter(a => a.extras?.Doc_Firmado !== 'Si').length;
+        document.getElementById('kpi-mobile').innerText = rawActivos.filter(a => a.tipo_activo !== 'Notebook').length;
     }
 
     function showTab(id, btn) {
