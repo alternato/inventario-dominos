@@ -3,63 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro Pro v6.0 - Domino's Pizza</title>
+    <title>TI Maestro Pro v6.8 - Domino's Pizza</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --dominos-blue: #006491; --dominos-red: #E31837; --bg: #f0f2f5; --white: #ffffff; --green: #27ae60; --dark: #1e293b; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        :root { --dominos-blue: #006491; --dominos-red: #E31837; --bg: #f1f5f9; --white: #ffffff; --green: #22c55e; --dark: #0f172a; --slate: #475569; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar Renovado */
-        #sidebar { width: 280px; background: var(--dark); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+        /* Sidebar Professional */
+        #sidebar { width: 280px; background: var(--dark); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .side-btn { background: transparent; color: #94a3b8; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 500; transition: 0.2s; }
         .side-btn:hover { background: rgba(255,255,255,0.05); color: white; }
         .side-btn.active { background: var(--dominos-blue); color: white; }
 
-        /* Firma Autoría Minimalista */
-        .footer-credits { margin-top: auto; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .dev-brand { font-size: 0.6rem; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; display: block; }
-        .dev-names { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 500; }
-        .gemini-tag { background: linear-gradient(45deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        /* Sync Button for EDC_ADMIN */
+        #btn-sync { width: 100%; background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; font-weight: 600; transition: 0.3s; }
+        #btn-sync:hover { background: #334155; color: white; border-color: var(--dominos-blue); }
 
-        /* Contenido */
+        /* Content Area */
         .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
         .tab-pane { display: none; }
-        .tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .tab-pane.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .panel { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; }
-        .app-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; height: calc(100vh - 200px); }
-        .scroll-panel { background: white; border-radius: 16px; padding: 15px; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .app-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; height: calc(100vh - 220px); }
+        .scroll-panel { background: white; border-radius: 16px; padding: 15px; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #eef2f6; }
         
-        .user-item { padding: 15px; border-radius: 12px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; margin-bottom: 5px; }
+        .user-item { padding: 14px; border-radius: 12px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; margin-bottom: 6px; position: relative; }
         .user-item:hover { background: #f8fafc; }
         .user-item.active { background: #f1f5f9; border-color: var(--dominos-blue); }
+        .badge-count { position: absolute; right: 12px; top: 18px; background: var(--dominos-blue); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; }
 
+        .asset-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 15px; transition: 0.2s; }
+        .asset-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+
+        .footer-credits { margin-top: auto; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .gemini-tag { background: linear-gradient(45deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
         .hidden { display: none !important; }
+        #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--dominos-red); width: 0; transition: width 0.3s; z-index: 10000; }
     </style>
 </head>
 <body>
 
+<div id="loadingBar"></div>
+
+<div id="loginOverlay" style="position:fixed; inset:0; background:var(--dark); z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="90" style="margin-bottom:20px;">
+        <h2 style="color:var(--dark); margin-bottom:10px;">Acceso TI Maestro</h2>
+        <p style="color:var(--slate); font-size:0.9rem; margin-bottom:30px;">Inicie sesión para gestionar activos</p>
+        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #e2e8f0; border-radius:10px; outline:none; font-size:1rem;">
+        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #e2e8f0; border-radius:10px; outline:none; font-size:1rem;">
+        <button onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1rem; transition:0.3s;">INGRESAR AL SISTEMA</button>
+    </div>
+</div>
+
 <div id="sidebar">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="100" style="margin-bottom:40px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="110" style="margin-bottom:40px; align-self:center; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
     
-    <button class="side-btn active" onclick="showTab('home', this)"><i class="fas fa-grid-2"></i> Dashboard</button>
-    <button class="side-btn" onclick="showTab('inventory', this)"><i class="fas fa-laptop-medical"></i> Hojas de Vida</button>
-    <button id="btn-admin-access" class="side-btn hidden" onclick="showTab('access-mgmt', this)"><i class="fas fa-key"></i> Usuarios Web</button>
+    <button class="side-btn active" onclick="showTab('home', this)"><i class="fas fa-chart-pie"></i> Dashboard</button>
+    <button class="side-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
+    <button id="btn-admin-access" class="side-btn hidden" onclick="showTab('access-mgmt', this)"><i class="fas fa-users-cog"></i> Usuarios Web</button>
     
-    <div style="margin-top:20px; padding:15px; border-radius:12px; background: rgba(0,0,0,0.2); font-size: 0.8rem;">
-        <p style="color: #64748b; margin-bottom: 5px;">SESIÓN ACTIVA</p>
-        <strong id="roleDisplay">EDC_ADMIN</strong><br>
-        <span onclick="logout()" style="color: var(--dominos-red); cursor: pointer; font-size: 0.75rem;">Cerrar Sesión</span>
+    <div id="sync-container" class="hidden">
+        <button onclick="triggerFullSync()" id="btn-sync">
+            <i class="fas fa-sync" id="sync-icon"></i> 
+            <span id="sync-text">SINCRO TOTAL SP</span>
+        </button>
+    </div>
+
+    <div style="margin-top:20px; padding:15px; border-radius:12px; background: rgba(255,255,255,0.05); font-size: 0.75rem;">
+        <p style="color: #64748b; margin-bottom: 5px; text-transform:uppercase; letter-spacing:1px; font-size:0.6rem;">Operador</p>
+        <strong id="roleDisplay" style="color:#e2e8f0;">---</strong><br>
+        <span onclick="logout()" style="color: var(--dominos-red); cursor: pointer; font-size: 0.75rem; margin-top:8px; display:inline-block;">Cerrar Sesión</span>
     </div>
 
     <div class="footer-credits">
-        <span class="dev-brand">Engineered by</span>
-        <div class="dev-names">
+        <span style="font-size:0.6rem; color:#64748b; text-transform:uppercase; letter-spacing:1.5px;">Engineered by</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; margin-top:6px;">
             <span>Milo Droguett</span>
-            <span style="opacity: 0.3;">|</span>
             <span class="gemini-tag">Gemini AI</span>
         </div>
     </div>
@@ -68,14 +92,20 @@
 <div class="main-content">
     
     <div id="home" class="tab-pane active">
-        <h1 style="color: var(--dark); margin-bottom: 30px;">Dashboard Operativo</h1>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-            <div class="panel"><h4>Personal</h4><h2 id="kpi-users" style="color:var(--dominos-blue)">0</h2></div>
-            <div class="panel"><h4>Equipos</h4><h2 id="kpi-assets">0</h2></div>
-            <div class="panel"><h4>Pendientes</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
-            <div class="panel"><h4>Cuentas Web</h4><h2 id="kpi-web-users">0</h2></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <h1>Dashboard Operativo</h1>
+            <div id="last-sync-label" style="display:none; background:var(--white); padding:8px 16px; border-radius:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); font-size:0.8rem; color:var(--slate);">
+                <i class="fas fa-history" style="color:var(--dominos-blue); margin-right:5px;"></i>
+                Última Sincro SP: <span id="last-sync-time" style="font-weight:bold;">Nunca</span>
+            </div>
         </div>
-        <div class="panel" style="height: 350px;">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom:30px;">
+            <div class="panel"><h4>Personal Activo</h4><h2 id="kpi-users" style="color:var(--dominos-blue); font-size:2.2rem; margin-top:10px;">0</h2></div>
+            <div class="panel"><h4>Activos TI</h4><h2 id="kpi-assets" style="font-size:2.2rem; margin-top:10px;">0</h2></div>
+            <div class="panel"><h4>Sin Acta Firmada</h4><h2 id="kpi-pending" style="color:var(--dominos-red); font-size:2.2rem; margin-top:10px;">0</h2></div>
+            <div class="panel"><h4>Móviles/Otros</h4><h2 id="kpi-mobile" style="color:var(--green); font-size:2.2rem; margin-top:10px;">0</h2></div>
+        </div>
+        <div class="panel" style="height: 400px;">
             <canvas id="mainChart"></canvas>
         </div>
     </div>
@@ -83,55 +113,73 @@
     <div id="inventory" class="tab-pane">
         <div class="app-grid">
             <div class="scroll-panel" id="colaboradoresList">
-                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar colaborador..." style="width:100%; padding:12px; border-radius:10px; border:1px solid #eee; margin-bottom:15px;">
-                <div id="userItems"></div>
+                <div style="position:sticky; top:0; background:white; padding-bottom:15px; z-index:10;">
+                    <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar colaborador o serie..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #e2e8f0; outline:none; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                </div>
+                <div id="userItemsContainer"></div>
             </div>
             <div class="scroll-panel" id="detailPanel">
-                <div id="userDetails">
-                    <h2 id="d-nombre" style="color: var(--dominos-blue)"></h2>
-                    <p id="d-rut" style="margin-bottom:20px;"></p>
+                <div id="emptyState" style="text-align:center; padding-top:120px; color:#cbd5e1;">
+                    <i class="fas fa-id-card-alt fa-5x"></i>
+                    <p style="margin-top:20px; font-size:1.1rem;">Seleccione un colaborador para ver su historial</p>
+                </div>
+                <div id="userDetails" class="hidden">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #f1f5f9; padding-bottom:20px; margin-bottom:25px;">
+                        <div>
+                            <h2 id="d-nombre" style="color: var(--dominos-blue); font-size:1.8rem;"></h2>
+                            <p id="d-rut" style="color:var(--slate); font-weight:bold; font-size:1.1rem; margin-top:4px;"></p>
+                            <p id="d-tienda" style="color:#94a3b8; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;"></p>
+                        </div>
+                        <button onclick="toggleManualForm()" style="background:var(--green); color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-plus"></i> ASIGNAR MANUAL
+                        </button>
+                    </div>
+
+                    <div id="manualForm" class="hidden" style="background:#f8fafc; border:2px dashed #e2e8f0; padding:25px; border-radius:16px; margin-bottom:30px;">
+                        <h4 style="margin-bottom:20px; color:var(--dark)">Registrar Nuevo Equipo/Accesorio</h4>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-bottom:20px;">
+                            <div><label style="font-size:0.75rem; color:var(--slate);">Tipo</label><select id="m-tipo" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;"><option value="Celular">Celular</option><option value="Mochila">Mochila</option><option value="Tablet">Tablet</option><option value="Periférico">Periférico</option></select></div>
+                            <div><label style="font-size:0.75rem; color:var(--slate);">Marca / Modelo</label><input type="text" id="m-marca" placeholder="Ej: Samsung A54" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;"></div>
+                            <div><label style="font-size:0.75rem; color:var(--slate);">Nº Serie / IMEI</label><input type="text" id="m-serie" placeholder="Ej: 354678..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;"></div>
+                        </div>
+                        <div style="display:flex; gap:12px;">
+                            <button onclick="saveManualAsset()" style="flex-grow:1; background:var(--dominos-blue); color:white; border:none; padding:14px; border-radius:8px; cursor:pointer; font-weight:bold;">GUARDAR EN FICHA</button>
+                            <button onclick="toggleManualForm()" style="background:#e2e8f0; color:var(--slate); border:none; padding:14px 20px; border-radius:8px; cursor:pointer;">Cancelar</button>
+                        </div>
+                    </div>
+
                     <div id="activosContainer"></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div id="access-mgmt" class="tab-pane">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-            <h1>Cuentas de Acceso Web</h1>
-            <button onclick="openWebUserModal()" style="background:var(--green); color:white; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
-                <i class="fas fa-plus"></i> Crear Usuario Web
-            </button>
-        </div>
-        <div class="panel">
-            <table style="width:100%; text-align:left; border-collapse:collapse;">
-                <thead>
-                    <tr style="color:#64748b; font-size:0.85rem; text-transform:uppercase;">
-                        <th style="padding:15px; border-bottom:2px solid #f1f5f9;">Usuario</th>
-                        <th style="padding:15px; border-bottom:2px solid #f1f5f9;">Rol</th>
-                        <th style="padding:15px; border-bottom:2px solid #f1f5f9;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="webUserTable">
-                    <tr>
-                        <td style="padding:15px; border-bottom:1px solid #f1f5f9;">admin</td>
-                        <td style="padding:15px; border-bottom:1px solid #f1f5f9;"><span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:20px; font-size:0.75rem;">ADMIN_TI</span></td>
-                        <td style="padding:15px; border-bottom:1px solid #f1f5f9;"><button style="color:var(--dominos-red); border:none; background:none; cursor:pointer;"><i class="fas fa-trash"></i></button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 
 <script>
-    // La lógica de login se expande para validar contra una futura tabla 'usuarios_web' en Supabase
-    // Por ahora mantenemos las credenciales estáticas pero funcionales con la nueva visual
-    
+    const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
+    const WEBHOOK_URL = "https://default796cb01d582441999177a82623fb5e.38.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/71fc6f057a624006a7795bab2aa28160/triggers/manual/paths/invoke?api-version=1";
+    const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
+
+    let masterData = [], rawActivos = [], mainChart = null;
+
+    window.onload = () => {
+        if (sessionStorage.getItem('isLogged') === 'true') {
+            document.getElementById('loginOverlay').style.display = 'none';
+            const role = sessionStorage.getItem('userRole');
+            document.getElementById('roleDisplay').innerText = role;
+            if(role === 'EDC_ADMIN') {
+                document.getElementById('btn-admin-access').classList.remove('hidden');
+                document.getElementById('sync-container').classList.remove('hidden');
+                document.getElementById('last-sync-label').style.display = 'block';
+            }
+            fetchData();
+        }
+    };
+
     function handleLogin() {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
-
         if (u === 'edc_admin' && p === 'dominos2026') {
             sessionStorage.setItem('isLogged', 'true');
             sessionStorage.setItem('userRole', 'EDC_ADMIN');
@@ -140,31 +188,161 @@
             sessionStorage.setItem('isLogged', 'true');
             sessionStorage.setItem('userRole', 'ADMIN_TI');
             location.reload();
-        } else { alert("Error de acceso"); }
+        } else { alert("Acceso denegado"); }
     }
 
-    // Al iniciar, verificamos permisos para mostrar u ocultar la pestaña de Gestión Web
-    window.onload = () => {
-        if (sessionStorage.getItem('isLogged') === 'true') {
-            document.getElementById('loginOverlay').style.display = 'none';
-            const role = sessionStorage.getItem('userRole');
-            document.getElementById('roleDisplay').innerText = role;
-            if(role === 'EDC_ADMIN') document.getElementById('btn-admin-access').classList.remove('hidden');
-            fetchData();
-        }
-    };
+    function logout() { sessionStorage.clear(); location.reload(); }
 
+    async function fetchData() {
+        setLoading(true);
+        try {
+            const [rC, rA] = await Promise.all([
+                fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers }),
+                fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers })
+            ]);
+            const colabs = await rC.json();
+            rawActivos = await rA.json();
+            masterData = colabs.map(c => ({
+                ...c,
+                equipos: rawActivos.filter(a => a.rut_responsable === c.rut)
+            })).sort((a,b) => a.nombre.localeCompare(b.nombre));
+            
+            renderList();
+            updateDashboard();
+        } catch (e) { console.error(e); }
+        setLoading(false);
+    }
+
+    function renderList() {
+        const q = document.getElementById('searchBox').value.toLowerCase();
+        const html = masterData.filter(c => 
+            c.nombre.toLowerCase().includes(q) || c.rut.includes(q) || c.equipos.some(e => e.serie.toLowerCase().includes(q))
+        ).map(c => `
+            <div class="user-item" onclick="selectColaborador('${c.rut}')" id="user-${c.rut}">
+                <strong>${c.nombre}</strong><br><small style="color:var(--slate)">${c.rut} | ${c.tienda}</small>
+                <span class="badge-count">${c.equipos.length}</span>
+            </div>
+        `).join('');
+        document.getElementById('userItemsContainer').innerHTML = html;
+    }
+
+    function selectColaborador(rut) {
+        document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(`user-${rut}`).classList.add('active');
+        const u = masterData.find(x => x.rut === rut);
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('userDetails').classList.remove('hidden');
+        document.getElementById('d-nombre').innerText = u.nombre;
+        document.getElementById('d-rut').innerText = `RUT: ${u.rut}`;
+        document.getElementById('d-tienda').innerText = u.tienda;
+
+        document.getElementById('activosContainer').innerHTML = u.equipos.map(eq => `
+            <div class="asset-card" style="border-left: 6px solid ${eq.tipo_activo === 'Celular' ? 'var(--green)' : 'var(--dominos-blue)'}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong><i class="fas ${eq.tipo_activo === 'Celular' ? 'fa-mobile-alt' : 'fa-laptop'}"></i> ${eq.tipo_activo} - ${eq.marca}</strong>
+                    <button class="btn-acta" onclick="generatePDF('${u.rut}', '${eq.serie}')" style="background:var(--dominos-blue); color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-weight:bold;"><i class="fas fa-file-pdf"></i> ACTA</button>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.85rem; margin-top:12px; color:var(--slate);">
+                    <span>S/N: <b>${eq.serie}</b></span>
+                    <span>Estado: <b style="color:${eq.estado === 'Excelente' ? 'var(--green)' : 'orange'}">${eq.estado}</b></span>
+                </div>
+            </div>
+        `).join('') || '<p style="text-align:center; color:#94a3b8; padding:40px;">No hay activos registrados para este usuario.</p>';
+    }
+
+    async function triggerFullSync() {
+        if(!confirm("¿Ejecutar sincronización masiva desde SharePoint?")) return;
+        const btn = document.getElementById('btn-sync');
+        const icon = document.getElementById('sync-icon');
+        const text = document.getElementById('sync-text');
+        
+        btn.disabled = true;
+        icon.classList.add('fa-spin');
+        text.innerText = "SINCRO EN CURSO...";
+
+        try {
+            const res = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requester: "EDC_ADMIN_WEB", timestamp: new Date().toISOString() })
+            });
+            if(res.ok) {
+                document.getElementById('last-sync-time').innerText = new Date().toLocaleTimeString();
+                alert("✅ Webhook disparado. Power Automate está procesando la lista.");
+                setTimeout(fetchData, 8000);
+            }
+        } catch (e) { alert("❌ Error de comunicación con el flujo."); }
+        
+        btn.disabled = false;
+        icon.classList.remove('fa-spin');
+        text.innerText = "SINCRO TOTAL SP";
+    }
+
+    async function saveManualAsset() {
+        const rut = document.getElementById('d-rut').innerText.replace('RUT: ', '').trim();
+        const payload = {
+            rut_responsable: rut,
+            tipo_activo: document.getElementById('m-tipo').value,
+            marca: document.getElementById('m-marca').value,
+            serie: document.getElementById('m-serie').value,
+            estado: 'Operativo', modelo: 'Manual Web', extras: { Doc_Firmado: 'No' }
+        };
+        if(!payload.marca || !payload.serie) return alert("Complete los campos");
+        
+        setLoading(true);
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
+            method: 'POST', headers: { ...headers, "Prefer": "resolution=merge-duplicates" },
+            body: JSON.stringify(payload)
+        });
+        if(r.ok) { alert("Asignación Exitosa"); fetchData(); toggleManualForm(); }
+        setLoading(false);
+    }
+
+    function generatePDF(rut, serie) {
+        const u = masterData.find(x => x.rut === rut);
+        const a = u.equipos.find(x => x.serie === serie);
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <html><head><title>Acta ${a.serie}</title><style>
+                body { font-family: 'Inter', sans-serif; padding: 50px; color: #1e293b; }
+                .header { border-bottom: 5px solid #006491; display: flex; justify-content: space-between; padding-bottom: 25px; align-items: center; }
+                table { width: 100%; border-collapse: collapse; margin: 40px 0; }
+                table td { border: 1px solid #e2e8f0; padding: 18px; }
+                .footer { margin-top: 120px; display: flex; justify-content: space-around; }
+                .sig { border-top: 2px solid #000; width: 250px; text-align: center; padding-top: 15px; font-weight: bold; }
+                .cr { position: fixed; bottom: 15px; width: 100%; text-align: center; font-size: 10px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; }
+            </style></head><body>
+                <div class="header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="120">
+                    <h1 style="color:#006491">ACTA DE ENTREGA TECNOLÓGICA</h1>
+                </div>
+                <table>
+                    <tr><td style="background:#f8fafc"><b>Colaborador</b></td><td>${u.nombre}</td><td style="background:#f8fafc"><b>RUT</b></td><td>${u.rut}</td></tr>
+                    <tr><td style="background:#f8fafc"><b>Equipo</b></td><td>${a.tipo_activo} ${a.marca}</td><td style="background:#f8fafc"><b>Serie / IMEI</b></td><td>${a.serie}</td></tr>
+                </table>
+                <p>El colaborador declara recibir el equipamiento en óptimas condiciones y acepta la responsabilidad de su custodia según las normativas de Domino's Pizza Chile.</p>
+                <div class="footer"><div class="sig">Responsable TI</div><div class="sig">Firma Colaborador</div></div>
+                <div class="cr">ENGINEERED BY MILO DROGUETT + GEMINI AI ENGINE</div>
+                <script>window.print();<\/script>
+            </body></html>
+        `);
+    }
+
+    function updateDashboard() {
+        document.getElementById('kpi-users').innerText = masterData.length;
+        document.getElementById('kpi-assets').innerText = rawActivos.length;
+        document.getElementById('kpi-pending').innerText = rawActivos.filter(a => a.extras.Doc_Firmado !== 'Si').length;
+        document.getElementById('kpi-mobile').innerText = rawActivos.filter(a => a.tipo_activo !== 'Notebook').length;
+    }
+
+    function toggleManualForm() { document.getElementById('manualForm').classList.toggle('hidden'); }
     function showTab(id, btn) {
         document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         btn.classList.add('active');
     }
-
-    function logout() { sessionStorage.clear(); location.reload(); }
-    
-    // El resto de la lógica de FetchData, RenderList y PDF se mantiene igual que en la v5.5
+    function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
 </script>
-
 </body>
 </html>
