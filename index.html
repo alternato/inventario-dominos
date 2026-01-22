@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v7.7 - Domino's Pizza Chile</title>
+    <title>TI Maestro v7.8 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -14,23 +14,25 @@
             --white: #ffffff; 
             --green: #22c55e; 
             --dark-blue: #0066CC; 
-            --slate: #475569; 
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar con el color que pediste */
+        /* Sidebar Azul */
         #sidebar { width: 280px; background: var(--dark-blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         
-        /* Contenedor del Logo para que no sea transparente */
-        .logo-container {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 30px;
+        /* Logo centrado y sin fondo blanco */
+        .logo-wrapper {
+            width: 100%;
             display: flex;
             justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .logo-wrapper img {
+            width: 120px;
+            height: auto;
+            /* Eliminamos cualquier filtro previo */
+            filter: none !important; 
         }
 
         .side-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 500; transition: 0.2s; }
@@ -71,8 +73,8 @@
 </div>
 
 <div id="sidebar">
-    <div class="logo-container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="100">
+    <div class="logo-wrapper">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png">
     </div>
     
     <button class="side-btn active" onclick="showTab('home', this)"><i class="fas fa-chart-pie"></i> Dashboard</button>
@@ -93,7 +95,7 @@
 
 <div class="main-content">
     <div id="home" class="tab-pane active">
-        <h1 style="color:var(--dominos-blue)">Dashboard de Activos</h1>
+        <h1 style="color:var(--dominos-blue)">Dashboard Operativo</h1>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 30px;">
             <div class="panel"><h4>Personal</h4><h2 id="kpi-users">0</h2></div>
             <div class="panel"><h4>Equipos</h4><h2 id="kpi-assets">0</h2></div>
@@ -117,7 +119,7 @@
                 <div id="userDetails" class="hidden">
                     <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f1f5f9; padding-bottom:20px; margin-bottom:25px;">
                         <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut"></p></div>
-                        <button onclick="alert('Función Manual')" class="btn-action" style="background:var(--green)">+ ASIGNAR MANUAL</button>
+                        <button onclick="alert('Asignación Manual')" class="btn-action" style="background:var(--green)">+ ASIGNAR MANUAL</button>
                     </div>
                     <div id="activosContainer"></div>
                 </div>
@@ -182,7 +184,8 @@
             setLoading(true);
 
             for (let row of rows) {
-                const cols = row.split(';'); // Asegúrate de que el CSV use ;
+                const delimiter = row.includes(';') ? ';' : ',';
+                const cols = row.split(delimiter);
                 if (cols.length < 3) continue;
 
                 const nombre = cols[0]?.trim();
@@ -193,14 +196,12 @@
 
                 if (!rut) continue;
 
-                // Registro Colaborador
                 await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
                     method: 'POST',
                     headers: { ...headers, "Prefer": "resolution=merge-duplicates" },
                     body: JSON.stringify({ rut, nombre, tienda })
                 });
 
-                // Registro Activo
                 if (serie) {
                     await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
                         method: 'POST',
@@ -216,7 +217,7 @@
                     });
                 }
             }
-            alert("CSV Procesado");
+            alert("CSV Procesado con éxito");
             fetchData();
         };
         reader.readAsText(file);
