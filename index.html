@@ -3,48 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v14.0 - Domino's Pizza Chile</title>
-    
+    <title>TI Maestro v15.0 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        :root { --blue: #0066CC; --red: #E31837; --bg: #FFFFF5; --green: #22c55e; --white: #ffffff; }
+        :root { --blue: #0066CC; --red: #E31837; --bg: #FFFFF5; --green: #22c55e; --dark: #1e293b; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar */
         #sidebar { width: 280px; background: var(--blue); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo-box { padding: 10px; margin-bottom: 30px; display: flex; justify-content: center; }
-        .logo-box img { width: 120px; }
-        
         .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; text-align: left; width: 100%; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
         .nav-btn.active { background: var(--red); }
-        .nav-btn:hover { background: rgba(255,255,255,0.2); }
 
-        /* Main */
-        .main-view { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .main-view { flex-grow: 1; padding: 30px; overflow-y: auto; }
         .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #eee; }
-        .tab-pane { display: none; animation: fadeIn 0.3s; }
+        
+        /* Ficha Técnica Detallada */
+        .ficha-header { border-left: 6px solid var(--blue); padding-left: 20px; margin-bottom: 25px; }
+        .grid-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .info-box { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .info-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: bold; }
+        .info-value { font-size: 0.9rem; color: var(--dark); font-weight: 600; }
 
-        /* Utilities */
+        /* Modal de Mapeo */
+        #mapperModal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 20000; display: none; align-items: center; justify-content: center; }
+        .mapper-card { background: white; padding: 30px; border-radius: 20px; width: 600px; max-height: 80vh; overflow-y: auto; }
+        .map-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        
         .hidden { display: none !important; }
-        .card-equipo { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
-        .tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 10px; color: white; font-weight: bold; }
-        .tag.success { background: var(--green); }
-        .tag.alert { background: var(--red); }
+        .tag { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; color: white; }
+        .tag-blue { background: var(--blue); }
+        .tag-red { background: var(--red); }
+        #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--red); width: 0; transition: width 0.3s; z-index: 21000; }
         
-        /* Watermark */
-        .watermark { position: fixed; bottom: 20px; right: 25px; display: flex; align-items: center; gap: 10px; background: white; padding: 10px 18px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 0.75rem; color: #334155; font-weight: 800; z-index: 9999; }
-        
-        #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--red); width: 0; transition: width 0.3s; z-index: 10001; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Login */
         #loginOverlay { position: fixed; inset: 0; background: var(--blue); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 40px; border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-        .login-card button { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .watermark { position: fixed; bottom: 20px; right: 25px; display: flex; align-items: center; gap: 10px; background: white; padding: 10px 18px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 0.75rem; color: #334155; font-weight: 800; z-index: 9999; }
     </style>
 </head>
 <body onload="verificarSesion()">
@@ -53,94 +47,71 @@
 
 <div class="watermark">
     <span>ENGINEERED BY MILO DROGUETT +</span>
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#gemGrad)"/>
-        <defs><linearGradient id="gemGrad" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse"><stop stop-color="#4285F4"/><stop offset="1" stop-color="#9B72CB"/></linearGradient></defs>
-    </svg>
+    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#g)"/><defs><linearGradient id="g"><stop stop-color="#4285F4"/><stop offset="1" stop-color="#9B72CB"/></linearGradient></defs></svg>
     <span>GEMINI AI</span>
 </div>
 
+<div id="mapperModal">
+    <div class="mapper-card">
+        <h2 style="color:var(--blue); margin-bottom:10px;">Validación de Mapeo CSV</h2>
+        <p style="font-size:0.85rem; margin-bottom:20px;">Asigne las columnas de su archivo a los campos del sistema:</p>
+        <div id="mapperContainer"></div>
+        <div style="margin-top:25px; display:flex; gap:10px;">
+            <button onclick="confirmarCarga()" style="flex-grow:1; background:var(--green); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">INICIAR IMPORTACIÓN</button>
+            <button onclick="document.getElementById('mapperModal').style.display='none'" style="background:#ddd; border:none; padding:15px; border-radius:10px; cursor:pointer;">CANCELAR</button>
+        </div>
+    </div>
+</div>
+
 <div id="loginOverlay">
-    <div class="login-card">
+    <div style="background:white; padding:40px; border-radius:20px; width:350px; text-align:center;">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80" style="margin-bottom:20px;">
-        <h2 style="color:var(--blue); margin-bottom:20px;">Acceso TI Maestro</h2>
-        <input type="text" id="u_input" placeholder="Usuario">
-        <input type="password" id="p_input" placeholder="Contraseña">
-        <button onclick="intentarLogin()">INGRESAR AL SISTEMA</button>
+        <h2 style="color:var(--blue); margin-bottom:20px;">TI Maestro v15</h2>
+        <input type="text" id="u_input" placeholder="Usuario" style="width:100%; padding:12px; margin-bottom:12px; border:1px solid #ddd; border-radius:8px;">
+        <input type="password" id="p_input" placeholder="Contraseña" style="width:100%; padding:12px; margin-bottom:25px; border:1px solid #ddd; border-radius:8px;">
+        <button onclick="intentarLogin()" style="background:var(--blue); color:white; border:none; padding:15px; width:100%; border-radius:8px; cursor:pointer; font-weight:bold;">INGRESAR</button>
     </div>
 </div>
 
 <div id="sidebar">
-    <div class="logo-box">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png">
-    </div>
-    <button class="nav-btn active" onclick="showTab('home', this)"><i class="fas fa-home"></i> Dashboard</button>
-    <button class="nav-btn" onclick="showTab('inventory', this)"><i class="fas fa-users"></i> Hojas de Vida</button>
-    <button class="nav-btn" onclick="showTab('analytics', this)"><i class="fas fa-chart-line"></i> Analítica</button>
+    <div style="display:flex; justify-content:center; margin-bottom:30px;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="110"></div>
+    <button class="nav-btn active" onclick="showTab('home', this)"><i class="fas fa-home"></i> Inicio</button>
+    <button class="nav-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
     
     <div class="super-only hidden" style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.2);">
-        <button class="nav-btn" style="background: var(--green);" onclick="document.getElementById('csvInput').click()"><i class="fas fa-upload"></i> CARGAR CSV</button>
-        <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="procesarCSV(this)">
-        <button class="nav-btn" style="background: var(--red); margin-top:8px;" onclick="limpiarBase()"><i class="fas fa-trash-alt"></i> VACIAR BD</button>
+        <button class="nav-btn" style="background: var(--green);" onclick="document.getElementById('csvInput').click()"><i class="fas fa-file-import"></i> CARGAR CSV</button>
+        <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="analizarCSV(this)">
     </div>
-
+    
     <div style="margin-top:auto; padding:15px; background: rgba(0,0,0,0.1); border-radius:10px;">
         <strong id="role_display">---</strong><br>
-        <span onclick="salir()" style="color:#ffcccc; cursor:pointer; font-size:0.8rem; display:block; margin-top:5px;">Cerrar Sesión</span>
+        <span onclick="salir()" style="color:#ffcccc; cursor:pointer; font-size:0.8rem;">Cerrar Sesión</span>
     </div>
 </div>
 
 <div class="main-view">
-    
     <div id="home" class="tab-pane" style="display:block;">
-        <h1 style="color:var(--blue); margin-bottom:20px;">Resumen Operativo</h1>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px;">
-            <div class="panel"><h4>Colaboradores</h4><h2 id="kpi-c">0</h2></div>
-            <div class="panel"><h4>Equipos</h4><h2 id="kpi-a">0</h2></div>
-            <div class="panel"><h4>Pendientes Firma</h4><h2 id="kpi-p" style="color:var(--red)">0</h2></div>
-            <div class="panel"><h4>Áreas/Tiendas</h4><h2 id="kpi-t" style="color:var(--green)">0</h2></div>
-        </div>
-        
-        <div class="panel" style="background: var(--blue); color: white;">
-            <h3>🔍 Buscador Global de Serie</h3>
-            <div style="display:flex; gap:10px; margin-top:10px;">
-                <input type="text" id="globalSearch" placeholder="Ej: THINKPAD-1234..." style="flex-grow:1; padding:12px; border-radius:8px; border:none;">
-                <button onclick="buscarSerie()" style="background:var(--red); color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer;">LOCALIZAR</button>
-            </div>
+        <h1 style="color:var(--blue); margin-bottom:20px;">Dashboard de Activos</h1>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+            <div class="panel"><h4>Personal</h4><h2 id="k-c">0</h2></div>
+            <div class="panel"><h4>Equipos</h4><h2 id="k-a">0</h2></div>
+            <div class="panel"><h4>Pendientes</h4><h2 id="k-p" style="color:var(--red)">0</h2></div>
+            <div class="panel"><h4>Áreas</h4><h2 id="k-t" style="color:var(--green)">0</h2></div>
         </div>
     </div>
 
     <div id="inventory" class="tab-pane">
         <div style="display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
             <div class="panel">
-                <input type="text" id="searchUser" onkeyup="renderLista()" placeholder="Buscar por Nombre o RUT..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
+                <input type="text" id="searchUser" onkeyup="renderLista()" placeholder="Buscar..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
                 <div id="listaPersonas" style="height:calc(100vh - 350px); overflow-y:auto;"></div>
             </div>
-            <div class="panel" id="detalleArea">
-                <div id="msgEmpty" style="text-align:center; padding:100px; color:#ccc;"><i class="fas fa-user-tag fa-4x"></i><p>Seleccione un colaborador del listado</p></div>
-                <div id="colabInfo" class="hidden">
-                    <div id="colabHeader"></div>
-                    <hr style="margin:20px 0;">
-                    <div id="colabEquipos"></div>
-                    <div id="colabHistorial"></div>
-                </div>
+            <div class="panel" id="fichaDetalle">
+                <div id="msgEmpty" style="text-align:center; padding:100px; color:#ccc;"><i class="fas fa-user-shield fa-4x"></i><p>Seleccione un colaborador</p></div>
+                <div id="fichaContent" class="hidden"></div>
             </div>
         </div>
     </div>
-
-    <div id="analytics" class="tab-pane">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-            <h1 style="color:var(--blue);">Centro de Inteligencia</h1>
-            <select id="filtroTienda" onchange="actualizarGraficos()" style="padding:10px; border-radius:8px; border:1px solid #ddd; font-weight:bold;">
-                <option value="TODAS">TODAS LAS TIENDAS</option>
-            </select>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="panel"><h3>Distribución de Activos</h3><canvas id="chart1" height="250"></canvas></div>
-            <div class="panel"><h3>Estado de Firmas</h3><canvas id="chart2" height="250"></canvas></div>
-        </div>
-    </div>
-
 </div>
 
 <script>
@@ -148,199 +119,171 @@
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
     const HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
     
-    let masterData = [], rawActivos = [], chart1, chart2;
+    let masterData = [], rawCSVRows = [], csvHeaders = [];
 
-    // --- ACCESO ---
-    function intentarLogin() {
-        const u = document.getElementById('u_input').value.trim();
-        const p = document.getElementById('p_input').value.trim();
-        if ((u === "edc_admin" && p === "dominos2026") || (u === "admin" && p === "123")) {
-            sessionStorage.setItem('session', 'active');
-            sessionStorage.setItem('role', u.toUpperCase());
-            location.reload();
-        } else alert("Acceso denegado.");
+    // --- LOGICA DE MAPEO MANUAL ---
+    function analizarCSV(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const lines = e.target.result.split(/\r?\n/).filter(l => l.trim() !== "");
+            csvHeaders = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+            rawCSVRows = lines.slice(1);
+            
+            const camposRequeridos = [
+                { id: 'rut', label: 'RUT' },
+                { id: 'nombre', label: 'Nombre Persona' },
+                { id: 'area', label: 'Área / Tienda' },
+                { id: 'serie', label: 'Nº de Serie' },
+                { id: 'marca', label: 'Marca' },
+                { id: 'modelo', label: 'Modelo' },
+                { id: 'firmado', label: 'Doc. Firmado' },
+                { id: 'mochila', label: 'Mochila' },
+                { id: 'cargador', label: 'Cargador' },
+                { id: 'obs', label: 'Observaciones' }
+            ];
+
+            let html = "";
+            camposRequeridos.forEach(campo => {
+                html += `
+                <div class="map-row">
+                    <strong>${campo.label}:</strong>
+                    <select id="map_${campo.id}" style="padding:5px; border-radius:5px;">
+                        ${csvHeaders.map((h, i) => `<option value="${i}" ${h.toLowerCase().includes(campo.id.toLowerCase()) ? 'selected' : ''}>${h}</option>`).join('')}
+                    </select>
+                </div>`;
+            });
+
+            document.getElementById('mapperContainer').innerHTML = html;
+            document.getElementById('mapperModal').style.display = 'flex';
+        };
+        reader.readAsText(input.files[0]);
     }
 
-    function verificarSesion() {
-        if (sessionStorage.getItem('session') === 'active') {
-            document.getElementById('loginOverlay').style.display = 'none';
-            const r = sessionStorage.getItem('role');
-            document.getElementById('role_display').innerText = r;
-            if (r === 'EDC_ADMIN') document.querySelectorAll('.super-only').forEach(e => e.classList.remove('hidden'));
-            fetchMaster();
+    async function confirmarCarga() {
+        document.getElementById('mapperModal').style.display = 'none';
+        setLoading(true);
+        
+        // Obtener índices elegidos por el usuario
+        const idx = {
+            rut: document.getElementById('map_rut').value,
+            nombre: document.getElementById('map_nombre').value,
+            area: document.getElementById('map_area').value,
+            serie: document.getElementById('map_serie').value,
+            marca: document.getElementById('map_marca').value,
+            modelo: document.getElementById('map_modelo').value,
+            firmado: document.getElementById('map_firmado').value,
+            mochila: document.getElementById('map_mochila').value,
+            cargador: document.getElementById('map_cargador').value,
+            obs: document.getElementById('map_obs').value
+        };
+
+        for (let row of rawCSVRows) {
+            const c = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
+            const clean = (v) => v?.replace(/"/g, '').trim();
+            const rut = clean(c[idx.rut]); if (!rut) continue;
+
+            // 1. Upsert Colaborador
+            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
+                method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify({ rut, nombre: clean(c[idx.nombre]), tienda: clean(c[idx.area]) })
+            });
+
+            // 2. Upsert Activo
+            if (clean(c[idx.serie])) {
+                await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
+                    method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates", "on_conflict": "serie" },
+                    body: JSON.stringify({
+                        rut_responsable: rut, serie: clean(c[idx.serie]), marca: clean(c[idx.marca]), 
+                        modelo: clean(c[idx.modelo]), doc_firmado: clean(c[idx.firmado]),
+                        mochila: clean(c[idx.mochila]), cargador: clean(c[idx.cargador]), observaciones: clean(c[idx.obs])
+                    })
+                });
+            }
         }
+        setLoading(false);
+        alert("Carga finalizada con mapeo manual.");
+        location.reload();
     }
 
-    function salir() { sessionStorage.clear(); location.reload(); }
+    // --- FICHA TÉCNICA 360 ---
+    async function verDetalle(rut) {
+        const u = masterData.find(x => x.rut === rut);
+        document.getElementById('msgEmpty').classList.add('hidden');
+        document.getElementById('fichaContent').classList.remove('hidden');
 
-    // --- DATOS ---
+        let html = `
+            <div class="ficha-header">
+                <h1 style="color:var(--blue)">${u.nombre}</h1>
+                <p><strong>RUT:</strong> ${u.rut} | <strong>Tienda:</strong> ${u.tienda}</p>
+            </div>
+            
+            <h3 style="margin-bottom:15px; border-bottom:2px solid #eee; padding-bottom:5px;">Detalle de Activos</h3>
+        `;
+
+        u.eqs.forEach(eq => {
+            html += `
+                <div class="panel" style="background:#fcfcfc;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                        <span class="tag tag-blue">${eq.marca} ${eq.modelo}</span>
+                        <span class="tag ${eq.doc_firmado === 'Si' ? 'tag-blue' : 'tag-red'}">${eq.doc_firmado === 'Si' ? 'CON ACTA' : 'SIN ACTA'}</span>
+                    </div>
+                    <div class="grid-info">
+                        <div class="info-box"><p class="info-label">Nº Serie</p><p class="info-value">${eq.serie}</p></div>
+                        <div class="info-box"><p class="info-label">Mochila</p><p class="info-value">${eq.mochila}</p></div>
+                        <div class="info-box"><p class="info-label">Cargador</p><p class="info-value">${eq.cargador}</p></div>
+                    </div>
+                    <div class="info-box" style="width:100%;"><p class="info-label">Observaciones TI</p><p class="info-value">${eq.observaciones || 'Sin comentarios registrados.'}</p></div>
+                    <button onclick="alert('Generando Acta Oficial...')" style="margin-top:15px; width:100%; padding:10px; background:var(--blue); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">IMPRIMIR ACTA DE RESPONSABILIDAD</button>
+                </div>
+            `;
+        });
+
+        document.getElementById('fichaContent').innerHTML = html;
+    }
+
+    // --- FUNCIONES CORE ---
     async function fetchMaster() {
         setLoading(true);
-        try {
-            const [rC, rA] = await Promise.all([
-                fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }),
-                fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
-            ]);
-            rawActivos = await rA.json();
-            masterData = (await rC.json()).map(c => ({
-                ...c, eqs: rawActivos.filter(a => a.rut_responsable === c.rut)
-            })).sort((a,b) => a.nombre.localeCompare(b.nombre));
-            
-            renderLista();
-            actualizarDashboard();
-            poblarFiltroTiendas();
-        } catch (e) { console.error(e); }
+        const [rC, rA] = await Promise.all([
+            fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }),
+            fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
+        ]);
+        const activos = await rA.json();
+        masterData = (await rC.json()).map(c => ({
+            ...c, eqs: activos.filter(a => a.rut_responsable === c.rut)
+        }));
+        document.getElementById('k-c').innerText = masterData.length;
+        document.getElementById('k-a').innerText = activos.length;
+        renderLista();
         setLoading(false);
     }
 
-    // --- CSV (MAPEADO DE 17 CAMPOS) ---
-    async function procesarCSV(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        setLoading(true);
-        reader.onload = async (e) => {
-            const rows = e.target.result.split(/\r?\n/).filter(r => r.trim() !== "").slice(1);
-            for (let row of rows) {
-                const c = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
-                const clean = (v) => v?.replace(/"/g, '').trim();
-                const rut = clean(c[0]); if (!rut) continue;
-
-                await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
-                    method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
-                    body: JSON.stringify({ rut, nombre: clean(c[1]), correo: clean(c[4]), tienda: clean(c[5]), ubicacion: clean(c[6]) })
-                });
-
-                if (clean(c[9])) {
-                    await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
-                        method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates", "on_conflict": "serie" },
-                        body: JSON.stringify({
-                            rut_responsable: rut, serie: clean(c[9]), marca: clean(c[7]), modelo: clean(c[8]),
-                            fecha_entrega: clean(c[2]), estado: clean(c[3]), doc_firmado: clean(c[10]),
-                            mochila: clean(c[11]), cargador: clean(c[12]), observaciones: clean(c[15])
-                        })
-                    });
-                }
-            }
-            fetchMaster(); alert("Sincronización finalizada.");
-        };
-        reader.readAsText(file);
-    }
-
-    // --- UI ---
     function renderLista() {
         const q = document.getElementById('searchUser').value.toLowerCase();
         document.getElementById('listaPersonas').innerHTML = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
-            <div class="user-item" onclick="verPerfil('${c.rut}')" style="padding:12px; cursor:pointer; border-bottom:1px solid #eee;">
+            <div style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;" onclick="verDetalle('${c.rut}')">
                 <strong>${c.nombre}</strong><br><small>${c.rut}</small>
             </div>
         `).join('');
     }
 
-    async function verPerfil(rut) {
-        const u = masterData.find(x => x.rut === rut);
-        document.getElementById('msgEmpty').classList.add('hidden');
-        document.getElementById('colabInfo').classList.remove('hidden');
-        
-        // Consultar Historial
-        const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_activos?rut_anterior=eq.${rut}`, { headers: HEADERS });
-        const historial = await resH.json();
-
-        document.getElementById('colabHeader').innerHTML = `<h2 style="color:var(--blue)">${u.nombre}</h2><p>RUT: ${u.rut} | Tienda: ${u.tienda}</p>`;
-        
-        let eqsHTML = `<h3><i class="fas fa-laptop"></i> Equipos Actuales</h3>`;
-        eqsHTML += u.eqs.map(e => `
-            <div class="card-equipo">
-                <div style="display:flex; justify-content:space-between;">
-                    <strong>${e.marca} ${e.modelo}</strong>
-                    <span class="tag ${e.doc_firmado === 'Si' ? 'success' : 'alert'}">${e.doc_firmado === 'Si' ? 'FIRMADO' : 'PENDIENTE'}</span>
-                </div>
-                <p style="font-size:0.8rem; margin:10px 0;">S/N: ${e.serie} | Entrega: ${e.fecha_entrega}</p>
-                <button class="btn-acta" onclick="imprimirActa('${u.rut}', '${e.serie}')">GENERAR ACTA PDF</button>
-            </div>
-        `).join('') || '<p>Sin activos actuales.</p>';
-        
-        let histHTML = `<h3 style="margin-top:20px; opacity:0.7;"><i class="fas fa-history"></i> Equipos que tuvo antes</h3>`;
-        histHTML += historial.map(h => `<div style="padding:10px; background:#f4f4f4; border-radius:8px; margin-bottom:5px; font-size:0.8rem;">Devolvió Serie: ${h.serie_activo} el ${new Date(h.fecha_cambio).toLocaleDateString()}</div>`).join('') || '<p>Sin historial de cambios.</p>';
-        
-        document.getElementById('colabEquipos').innerHTML = eqsHTML;
-        document.getElementById('colabHistorial').innerHTML = histHTML;
+    function intentarLogin() {
+        const u = document.getElementById('u_input').value;
+        const p = document.getElementById('p_input').value;
+        if ((u === 'edc_admin' && p === 'dominos2026') || (u === 'admin' && p === '123')) {
+            sessionStorage.setItem('auth', 'ok');
+            sessionStorage.setItem('role', u.toUpperCase());
+            location.reload();
+        } else alert("Error");
     }
 
-    async function imprimirActa(rut, serie) {
-        const u = masterData.find(x => x.rut === rut);
-        const eq = u.eqs.find(e => e.serie === serie);
-
-        // Registrar Emisión en DB
-        await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${serie}`, {
-            method: 'PATCH', headers: HEADERS, body: JSON.stringify({ doc_firmado: 'Si' })
-        });
-
-        const win = window.open('', '_blank');
-        win.document.write(`<html><body style="font-family:sans-serif; padding:50px;">
-            <div style="display:flex; justify-content:space-between; border-bottom:3px solid #0066CC; padding-bottom:10px;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="100">
-                <h2>ACTA DE RESPONSABILIDAD DE ACTIVOS TI</h2>
-            </div>
-            <p style="margin-top:30px;">Yo, <b>${u.nombre}</b>, RUT <b>${u.rut}</b>, recibo conforme el equipo <b>${eq.marca} ${eq.modelo}</b> (Serie: <b>${eq.serie}</b>)...</p>
-            <div style="margin-top:100px; display:flex; justify-content:space-around;">
-                <div style="border-top:1px solid #000; width:200px; text-align:center;">Firma Colaborador</div>
-                <div style="border-top:1px solid #000; width:200px; text-align:center;">Firma TI Chile</div>
-            </div>
-            <script>window.print();<\/script></body></html>`);
-        fetchMaster();
-    }
-
-    // --- ANALÍTICA ---
-    function poblarFiltroTiendas() {
-        const tiendas = [...new Set(masterData.map(c => c.tienda))].filter(t => t);
-        const select = document.getElementById('filtroTienda');
-        tiendas.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t; opt.innerText = t;
-            select.appendChild(opt);
-        });
-    }
-
-    function actualizarGraficos() {
-        const t = document.getElementById('filtroTienda').value;
-        const filtrados = (t === 'TODAS') ? rawActivos : rawActivos.filter(a => {
-            const c = masterData.find(x => x.rut === a.rut_responsable);
-            return c && c.tienda === t;
-        });
-
-        const n = filtrados.filter(a => a.modelo.toLowerCase().includes('notebook')).length;
-        const c = filtrados.filter(a => a.modelo.toLowerCase().includes('celular')).length;
-        const o = filtrados.length - (n + c);
-        
-        const firm = filtrados.filter(a => a.doc_firmado === 'Si' || a.doc_firmado === 'S').length;
-        const pend = filtrados.length - firm;
-
-        renderChart('chart1', ['Notebooks', 'Celulares', 'Otros'], [n, c, o], ['#0066CC', '#E31837', '#22c55e']);
-        renderChart('chart2', ['Firmados', 'Pendientes'], [firm, pend], ['#22c55e', '#E31837']);
-    }
-
-    function renderChart(id, labels, data, colors) {
-        const ctx = document.getElementById(id);
-        if (id === 'chart1' && chart1) chart1.destroy();
-        if (id === 'chart2' && chart2) chart2.destroy();
-        
-        const config = {
-            type: 'doughnut',
-            data: { labels: labels, datasets: [{ data: data, backgroundColor: colors }] },
-            options: { responsive: true, maintainAspectRatio: false }
-        };
-
-        if (id === 'chart1') chart1 = new Chart(ctx, config);
-        else chart2 = new Chart(ctx, config);
-    }
-
-    async function buscarSerie() {
-        const s = document.getElementById('globalSearch').value.trim();
-        const a = rawActivos.find(x => x.serie === s);
-        if (!a) return alert("Serie no encontrada.");
-        const u = masterData.find(x => x.rut === a.rut_responsable);
-        alert(`EQUIPO: ${a.marca} ${a.modelo}\nRESPONSABLE: ${u.nombre}\nESTADO: ${a.estado}`);
+    function verificarSesion() {
+        if (sessionStorage.getItem('auth') === 'ok') {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('role_display').innerText = sessionStorage.getItem('role');
+            if(sessionStorage.getItem('role') === 'EDC_ADMIN') document.querySelectorAll('.super-only').forEach(e => e.classList.remove('hidden'));
+            fetchMaster();
+        }
     }
 
     function showTab(id, btn) {
@@ -348,24 +291,10 @@
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).style.display = 'block';
         btn.classList.add('active');
-        if (id === 'analytics') actualizarGraficos();
-    }
-
-    function actualizarDashboard() {
-        document.getElementById('kpi-c').innerText = masterData.length;
-        document.getElementById('kpi-a').innerText = rawActivos.length;
-        document.getElementById('kpi-p').innerText = rawActivos.filter(a => a.doc_firmado !== 'Si' && a.doc_firmado !== 'S').length;
-        document.getElementById('kpi-t').innerText = [...new Set(masterData.map(c => c.tienda))].length;
-    }
-
-    async function limpiarBase() {
-        if (prompt("Escriba DOMINOS para borrar todo:") !== "DOMINOS") return;
-        await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { method: 'DELETE', headers: HEADERS });
-        await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { method: 'DELETE', headers: HEADERS });
-        location.reload();
     }
 
     function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
+    function salir() { sessionStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
