@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v8.9 - Domino's Pizza Chile</title>
+    <title>TI Maestro v9.0 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -24,8 +24,6 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 const role = sessionStorage.getItem('user_rol');
                 document.getElementById('role_text').innerText = role;
-                
-                // Si es EDC_ADMIN, habilitar herramientas de Superusuario
                 if(role === 'EDC_ADMIN') {
                     document.querySelectorAll('.super-only').forEach(el => el.classList.remove('hidden'));
                 }
@@ -40,12 +38,15 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
+        /* Sidebar Corregido: Logo sin fondo blanco */
         #sidebar { width: 280px; background: var(--blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo-box { background: white; padding: 15px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: center; }
+        .logo-box { padding: 10px; margin-bottom: 30px; display: flex; justify-content: center; background: transparent; }
+        .logo-box img { width: 120px; height: auto; filter: none; }
         
         .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
         .nav-btn.active { background: var(--red); }
 
+        /* Marca de Agua con Icono Gemini SVG */
         .watermark { position: fixed; bottom: 20px; right: 25px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.95); padding: 10px 18px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #ddd; font-size: 0.75rem; color: #334155; font-weight: 800; z-index: 9999; }
 
         #loginOverlay { position: fixed; inset: 0; background: var(--blue); z-index: 10000; display: flex; align-items: center; justify-content: center; }
@@ -54,7 +55,6 @@
 
         .main-view { flex-grow: 1; padding: 30px; overflow-y: auto; }
         .panel { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; border: 1px solid #eee; }
-        .app-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; height: calc(100vh - 220px); }
         .scroll-panel { background: white; border-radius: 16px; padding: 15px; overflow-y: auto; border: 1px solid #eef2f6; }
         
         .user-item { padding: 14px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; margin-bottom: 6px; }
@@ -94,13 +94,15 @@
 </div>
 
 <div id="sidebar">
-    <div class="logo-box"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="100"></div>
+    <div class="logo-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png">
+    </div>
     <button class="nav-btn active" onclick="showTab('home', this)"><i class="fas fa-chart-pie"></i> Dashboard</button>
     <button class="nav-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
     <button class="nav-btn super-only hidden" onclick="showTab('admin', this)"><i class="fas fa-database"></i> Gestión DB</button>
     
     <div class="super-only hidden" style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.2);">
-        <button class="nav-btn" style="background: var(--green);" onclick="document.getElementById('csvInput').click()"><i class="fas fa-file-csv"></i> CARGAR CSV SP</button>
+        <button class="nav-btn" style="background: var(--green);" onclick="triggerCSV()"><i class="fas fa-file-csv"></i> CARGAR CSV SP</button>
         <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="handleCSV(this)">
     </div>
 
@@ -112,44 +114,39 @@
 
 <div class="main-view">
     <div id="home" class="tab-pane active">
-        <h1 style="color:var(--blue); margin-bottom:30px;">Dashboard de Infraestructura</h1>
+        <h1 style="color:var(--blue); margin-bottom:30px;">Dashboard TI</h1>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
             <div class="panel"><h4>Personal</h4><h2 id="kpi-users" style="color:var(--blue)">0</h2></div>
             <div class="panel"><h4>Equipos</h4><h2 id="kpi-assets">0</h2></div>
             <div class="panel"><h4>Sin Firma</h4><h2 id="kpi-pending" style="color:var(--red)">0</h2></div>
             <div class="panel"><h4>Áreas</h4><h2 id="kpi-areas" style="color:var(--green)">0</h2></div>
         </div>
-        <div class="panel" style="height: 380px;"><canvas id="mainChart"></canvas></div>
     </div>
 
     <div id="inventory" class="tab-pane">
-        <div class="app-grid">
+        <div style="display: grid; grid-template-columns: 350px 1fr; gap: 24px;">
             <div class="scroll-panel" id="colaboradoresList">
-                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar colaborador..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
+                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
                 <div id="userItemsContainer"></div>
             </div>
-            <div class="scroll-panel" id="detailPanel">
+            <div class="scroll-panel" id="userDetailsPanel">
                 <div id="emptyState" style="text-align:center; padding-top:100px; color:#ccc;"><i class="fas fa-search fa-4x"></i><p>Seleccione un colaborador</p></div>
                 <div id="userDetails" class="hidden">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                        <div><h2 id="d-nombre" style="color: var(--blue)"></h2><p id="d-rut"></p></div>
-                        <button onclick="alert('Formulario de edición manual')" class="btn-green">+ NUEVO ACTIVO</button>
-                    </div>
-                    <hr>
-                    <div id="activosContainer" style="margin-top:20px;"></div>
+                    <h2 id="d-nombre" style="color: var(--blue)"></h2><p id="d-rut"></p><hr style="margin:20px 0;">
+                    <div id="activosContainer"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="admin" class="tab-pane">
-        <h1 style="color:var(--blue); margin-bottom:20px;">Supervisión de Base de Datos</h1>
+        <h1 style="color:var(--blue); margin-bottom:20px;">Supervisión Base de Datos</h1>
         <div class="panel">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3>Eliminación Masiva y Limpieza</h3>
-                <button onclick="clearAllData()" class="btn-red"><i class="fas fa-trash-alt"></i> LIMPIAR TODA LA BASE DE DATOS</button>
+                <h3>Eliminación Masiva</h3>
+                <button onclick="clearAllData()" class="btn-red"><i class="fas fa-trash-alt"></i> LIMPIAR TODA LA BD</button>
             </div>
-            <table id="adminTable">
+            <table>
                 <thead><tr><th>Nombre</th><th>RUT</th><th>Acciones</th></tr></thead>
                 <tbody id="adminBody"></tbody>
             </table>
@@ -180,33 +177,17 @@
         setLoading(false);
     }
 
-    // ELIMINACIÓN MASIVA SEGURA
-    async function clearAllData() {
-        const pass = prompt("⚠️ ADVERTENCIA: Se borrarán todos los registros. Para confirmar escriba la palabra: DOMINOS");
-        if(pass !== "DOMINOS") return alert("Confirmación fallida.");
+    function triggerCSV() { document.getElementById('csvInput').click(); }
 
+    async function clearAllData() {
+        const pass = prompt("⚠️ ADVERTENCIA: Se borrarán todos los registros. Escriba la palabra: DOMINOS");
+        if(pass !== "DOMINOS") return alert("Confirmación fallida.");
         setLoading(true);
-        // Borrar activos primero
         await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { method: 'DELETE', headers: {...headers, "Range": "0-999"} });
         await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { method: 'DELETE', headers: {...headers, "Range": "0-999"} });
         fetchData();
-        alert("Base de datos limpia.");
     }
 
-    async function deleteSingle(rut) {
-        if(!confirm(`¿Borrar a ${rut} de la base de datos?`)) return;
-        setLoading(true);
-        await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?rut=eq.${rut}`, { method: 'DELETE', headers });
-        fetchData();
-    }
-
-    function renderAdminView() {
-        document.getElementById('adminBody').innerHTML = masterData.map(c => `
-            <tr><td>${c.nombre}</td><td>${c.rut}</td><td><button class="btn-red" onclick="deleteSingle('${c.rut}')"><i class="fas fa-trash"></i></button></td></tr>
-        `).join('');
-    }
-
-    // LÓGICA CSV
     function handleCSV(input) {
         const reader = new FileReader();
         reader.onload = async (e) => {
@@ -235,12 +216,11 @@
                 }
             }
             fetchData();
-            alert("Sincronización masiva finalizada.");
+            alert("CSV Sincronizado.");
         };
         reader.readAsText(input.files[0]);
     }
 
-    // UI Funciones
     function renderList() {
         const q = document.getElementById('searchBox').value.toLowerCase();
         document.getElementById('userItemsContainer').innerHTML = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
@@ -257,11 +237,23 @@
         document.getElementById('d-nombre').innerText = u.nombre;
         document.getElementById('d-rut').innerText = `RUT: ${u.rut}`;
         document.getElementById('activosContainer').innerHTML = u.equipos.map(eq => `
-            <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-                <div><strong>${eq.marca} ${eq.modelo}</strong><br><small>S/N: ${eq.serie}</small></div>
-                <button onclick="alert('Generando Acta...')" class="btn-green">GENERAR ACTA</button>
+            <div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:10px;">
+                <strong>${eq.marca} ${eq.modelo}</strong><br><small>S/N: ${eq.serie}</small>
             </div>
         `).join('');
+    }
+
+    function renderAdminView() {
+        document.getElementById('adminBody').innerHTML = masterData.map(c => `
+            <tr><td>${c.nombre}</td><td>${c.rut}</td><td><button class="btn-red" onclick="deleteUser('${c.rut}')">X</button></td></tr>
+        `).join('');
+    }
+
+    async function deleteUser(rut) {
+        if(!confirm(`¿Borrar a ${rut}?`)) return;
+        setLoading(true);
+        await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?rut=eq.${rut}`, { method: 'DELETE', headers });
+        fetchData();
     }
 
     function updateDashboard() {
