@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v8.2 - Domino's Pizza Chile</title>
+    <title>TI Maestro v8.3 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -20,8 +20,8 @@
         
         #sidebar { width: 280px; background: var(--dark-blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         
-        /* Logo centrado y visible */
-        .logo-wrapper { width: 100%; display: flex; justify-content: center; margin-bottom: 35px; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* Logo con fondo blanco para que resalte */
+        .logo-wrapper { width: 100%; display: flex; justify-content: center; margin-bottom: 35px; background: white; padding: 15px; border-radius: 15px; }
         .logo-wrapper img { width: 100px; height: auto; filter: none !important; }
 
         .side-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 500; transition: 0.2s; }
@@ -50,12 +50,12 @@
 <div id="loadingBar"></div>
 
 <div id="loginOverlay" style="position:fixed; inset:0; background:var(--dominos-blue); z-index:9999; display:flex; align-items:center; justify-content:center;">
-    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center;">
+    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="90">
-        <h2 style="color:var(--dominos-blue); margin-top:20px;">Acceso TI Maestro</h2>
-        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin:15px 0 10px; border:1px solid #ddd; border-radius:10px;">
-        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #ddd; border-radius:10px;">
-        <button onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold;">INGRESAR</button>
+        <h2 style="color:var(--dominos-blue); margin-top:20px; margin-bottom:20px;">Acceso TI Maestro</h2>
+        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ddd; border-radius:10px; outline:none;">
+        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #ddd; border-radius:10px; outline:none;">
+        <button id="btnLogin" onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1rem;">INGRESAR AL SISTEMA</button>
     </div>
 </div>
 
@@ -84,10 +84,10 @@
     <div id="home" class="tab-pane active">
         <h1 style="color:var(--dominos-blue); margin-bottom:30px;">Dashboard de Activos</h1>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
-            <div class="panel"><h4>Personal</h4><h2 id="kpi-users" style="color:var(--dominos-blue)">0</h2></div>
-            <div class="panel"><h4>Total Equipos</h4><h2 id="kpi-assets">0</h2></div>
+            <div class="panel"><h4>Colaboradores</h4><h2 id="kpi-users" style="color:var(--dominos-blue)">0</h2></div>
+            <div class="panel"><h4>Equipos Registrados</h4><h2 id="kpi-assets">0</h2></div>
             <div class="panel"><h4>Por Firmar</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
-            <div class="panel"><h4>Accesorios</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
+            <div class="panel"><h4>Ubicaciones</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
         </div>
         <div class="panel" style="height: 380px;"><canvas id="mainChart"></canvas></div>
     </div>
@@ -106,7 +106,7 @@
                 <div id="userDetails" class="hidden">
                     <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f1f5f9; padding-bottom:20px; margin-bottom:25px;">
                         <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut" style="font-weight:bold;"></p></div>
-                        <button onclick="alert('Asignación manual habilitada en próxima versión')" class="btn-action" style="background:var(--green)">+ ASIGNAR MANUAL</button>
+                        <button onclick="alert('Módulo manual disponible en v9.0')" class="btn-action" style="background:var(--green)">+ ASIGNAR MANUAL</button>
                     </div>
                     <div id="activosContainer"></div>
                 </div>
@@ -122,16 +122,27 @@
 
     let masterData = [], rawActivos = [];
 
+    // FUNCIÓN DE LOGIN CORREGIDA
     function handleLogin() {
-        const u = document.getElementById('userInput').value;
-        const p = document.getElementById('passInput').value;
+        const u = document.getElementById('userInput').value.trim();
+        const p = document.getElementById('passInput').value.trim();
+        
         if ((u === 'edc_admin' && p === 'dominos2026') || (u === 'admin' && p === '123')) {
             sessionStorage.setItem('isLogged', 'true');
             sessionStorage.setItem('userRole', u.toUpperCase());
-            location.reload();
-        } else { alert("Usuario o clave incorrectos"); }
+            document.getElementById('loginOverlay').style.display = 'none';
+            
+            // Forzar carga de datos al entrar
+            const role = sessionStorage.getItem('userRole');
+            document.getElementById('roleDisplay').innerText = role;
+            if(role === 'EDC_ADMIN') document.getElementById('admin-tools').classList.remove('hidden');
+            fetchData();
+        } else { 
+            alert("Usuario o clave incorrectos. Intente de nuevo."); 
+        }
     }
 
+    // Persistencia del Login al Recargar
     window.onload = () => {
         if (sessionStorage.getItem('isLogged') === 'true') {
             document.getElementById('loginOverlay').style.display = 'none';
@@ -154,11 +165,11 @@
             })).sort((a,b) => a.nombre.localeCompare(b.nombre));
             renderList();
             updateDashboard();
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Error cargando datos:", e); }
         setLoading(false);
     }
 
-    // LÓGICA DE MAPEO CSV SEGÚN TU ESTRUCTURA EXACTA
+    // LÓGICA DE CSV SHAREPOINT ACTUALIZADA
     function handleCSV(input) {
         const reader = new FileReader();
         reader.onload = async function(e) {
@@ -167,30 +178,30 @@
             setLoading(true);
 
             for (let row of rows) {
+                // Regex para manejar comas dentro de comillas
                 const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
                 if (cols.length < 2) continue;
 
-                // Limpiar comillas
                 const clean = (val) => val?.replace(/"/g, '').trim();
 
-                const rut = clean(cols[0]);       // Rut
-                const persona = clean(cols[1]);   // Persona
-                const area = clean(cols[5]);      // Área
-                const marca = clean(cols[7]);     // Marca
-                const modelo = clean(cols[8]);    // Modelo
-                const serie = clean(cols[9]);     // Nº de Serie
-                const firmado = clean(cols[10]);  // Documento Firmado
+                // MAPEO BASADO EN TU ESTRUCTURA: Rut (0), Persona (1), Área (5), Marca (7), Modelo (8), Serie (9), Firmado (10)
+                const rut = clean(cols[0]);       
+                const persona = clean(cols[1]);   
+                const area = clean(cols[5]);      
+                const marca = clean(cols[7]);     
+                const modelo = clean(cols[8]);    
+                const serie = clean(cols[9]);     
 
-                if (!rut) continue;
+                if (!rut || rut === "Rut") continue;
 
-                // 1. Upsert Colaborador
+                // 1. Guardar Colaborador
                 await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
                     method: 'POST',
                     headers: { ...headers, "Prefer": "resolution=merge-duplicates" },
                     body: JSON.stringify({ rut, nombre: persona, tienda: area })
                 });
 
-                // 2. Upsert Activo (basado en Serie)
+                // 2. Guardar Activo
                 if (serie && serie !== "N/A" && serie !== "") {
                     await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
                         method: 'POST',
@@ -201,13 +212,13 @@
                             marca: marca,
                             modelo: modelo,
                             tipo_activo: 'Hardware',
-                            estado: clean(cols[3]) || 'Entregado',
-                            extras: { Doc_Firmado: firmado, Ubicacion: clean(cols[6]) }
+                            estado: clean(cols[3]) || 'Activo',
+                            extras: { Doc_Firmado: clean(cols[10]), Ubicacion: clean(cols[6]) }
                         })
                     });
                 }
             }
-            alert("CSV cargado con éxito. Datos mapeados correctamente.");
+            alert("CSV Sincronizado Correctamente.");
             fetchData();
         };
         reader.readAsText(input.files[0]);
@@ -237,9 +248,9 @@
         document.getElementById('activosContainer').innerHTML = u.equipos.map(eq => `
             <div class="panel" style="display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; margin-bottom:10px;">
                 <div><strong>${eq.marca} ${eq.modelo || ''}</strong><br><small>S/N: ${eq.serie}</small></div>
-                <button class="btn-action" onclick="generatePDF('${u.rut}', '${eq.serie}')">GENERAR ACTA</button>
+                <button class="btn-action" onclick="generatePDF('${u.rut}', '${eq.serie}')">ACTA PDF</button>
             </div>
-        `).join('');
+        `).join('') || '<p style="text-align:center; padding:20px; color:#999;">Sin activos asignados.</p>';
     }
 
     function generatePDF(rut, serie) {
@@ -247,12 +258,12 @@
         const win = window.open('', '_blank');
         win.document.write(`<html><body style="font-family:sans-serif; padding:50px;">
             <div style="border-bottom:3px solid #0066CC; padding-bottom:10px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                <h1 style="color:#0066CC">ACTA DE ENTREGA</h1>
+                <h1 style="color:#0066CC">ACTA DE ENTREGA TI</h1>
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80">
             </div>
             <p><b>Colaborador:</b> ${u.nombre} | <b>RUT:</b> ${u.rut}</p><hr>
-            <p><b>Marca/Modelo:</b> ${a.marca} ${a.modelo || ''}</p><p><b>Serie:</b> ${a.serie}</p>
-            <p style="margin-top:50px;">Firma conforme: __________________________</p>
+            <p><b>Equipo:</b> ${a.marca} ${a.modelo || ''} | <b>Serie:</b> ${a.serie}</p>
+            <p style="margin-top:100px;">Firma Colaborador: __________________________</p>
             <script>window.print();<\/script></body></html>`);
     }
 
@@ -260,7 +271,7 @@
         document.getElementById('kpi-users').innerText = masterData.length;
         document.getElementById('kpi-assets').innerText = rawActivos.length;
         document.getElementById('kpi-pending').innerText = rawActivos.filter(a => a.extras?.Doc_Firmado !== 'S' && a.extras?.Doc_Firmado !== 'Si').length;
-        document.getElementById('kpi-mobile').innerText = rawActivos.filter(a => a.tipo_activo !== 'Hardware').length;
+        document.getElementById('kpi-mobile').innerText = [...new Set(masterData.map(c => c.tienda))].length;
     }
 
     function showTab(id, btn) {
