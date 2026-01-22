@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v20.0 - Domino's Pizza Chile</title>
+    <title>TI Maestro v20.1 - Domino's Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
@@ -35,27 +35,40 @@
             }
         }
 
-        // --- CARGA CON MAPEO MANUAL (Para evitar desorden) ---
+        // --- GESTIÓN DE BASE DE DATOS (ELIMINACIÓN MASIVA) ---
+        async function eliminarTodo() {
+            const pass = prompt("⚠️ ADVERTENCIA: Se borrarán todos los registros de la base de datos.\nPara confirmar, escriba: DOMINOS");
+            if (pass !== "DOMINOS") return alert("Acción cancelada.");
+            
+            setLoading(true);
+            try {
+                // Borrar Activos primero por integridad referencial
+                await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { method: 'DELETE', headers: HEADERS });
+                // Borrar Colaboradores
+                await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { method: 'DELETE', headers: HEADERS });
+                alert("Base de datos vaciada con éxito.");
+                location.reload();
+            } catch (e) { alert("Error al eliminar datos."); }
+            setLoading(false);
+        }
+
+        // --- CARGA Y MAPEO ---
         function iniciarMapeo(input) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const lines = e.target.result.split(/\r?\n/).filter(l => l.trim() !== "");
                 csvHeaders = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
                 rawCSV = lines.slice(1);
-                
                 const campos = [
-                    {id:'rut', n:'RUT (Columna 0)'}, {id:'nom', n:'Persona (Columna 1)'}, 
-                    {id:'tienda', n:'Área/Tienda (Columna 5)'}, {id:'serie', n:'Nº Serie (Columna 9)'}, 
-                    {id:'marca', n:'Marca (Columna 7)'}, {id:'modelo', n:'Modelo (Columna 8)'},
+                    {id:'rut', n:'RUT'}, {id:'nom', n:'Nombre'}, {id:'tienda', n:'Área/Tienda'},
+                    {id:'serie', n:'Nº Serie'}, {id:'marca', n:'Marca'}, {id:'modelo', n:'Modelo'},
                     {id:'mochila', n:'Mochila'}, {id:'cargador', n:'Cargador'}, {id:'firmado', n:'Doc Firmado'}
                 ];
-
                 document.getElementById('mapperFields').innerHTML = campos.map(f => `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                         <span><strong>${f.n}:</strong></span>
-                        <select id="sel_${f.id}">${csvHeaders.map((h,i) => `<option value="${i}">${h}</option>`).join('')}</select>
-                    </div>
-                `).join('');
+                        <select id="sel_${f.id}">${csvHeaders.map((h,i) => `<option value="${i}" ${h.toLowerCase().includes(f.id)?'selected':''}>${h}</option>`).join('')}</select>
+                    </div>`).join('');
                 document.getElementById('mapperModal').style.display = 'flex';
             };
             reader.readAsText(input.files[0]);
@@ -65,7 +78,6 @@
             document.getElementById('mapperModal').style.display = 'none';
             setLoading(true);
             const getI = (id) => document.getElementById(`sel_${id}`).value;
-
             for (let row of rawCSV) {
                 const c = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
                 const clean = (v) => v?.replace(/"/g, '').trim();
@@ -90,7 +102,7 @@
             location.reload();
         }
 
-        // --- FETCH Y RENDER ---
+        // --- FETCH Y UI ---
         async function fetchData() {
             setLoading(true);
             const [rC, rA] = await Promise.all([
@@ -120,12 +132,8 @@
             document.getElementById('msgEmpty').classList.add('hidden');
             document.getElementById('fichaContent').classList.remove('hidden');
 
-            let html = `
-                <div style="border-left: 5px solid var(--blue); padding-left: 15px; margin-bottom: 20px;">
-                    <h2 style="color:var(--blue)">${u.nombre}</h2>
-                    <p>RUT: ${u.rut} | Área: ${u.tienda}</p>
-                </div>
-            `;
+            let html = `<div style="border-left:5px solid var(--blue); padding-left:15px; margin-bottom:20px;">
+                <h2 style="color:var(--blue)">${u.nombre}</h2><p>RUT: ${u.rut} | Área: ${u.tienda}</p></div>`;
 
             u.eqs.forEach(eq => {
                 html += `
@@ -158,27 +166,18 @@
         :root { --blue: #0066CC; --red: #E31837; --bg: #FFFFF5; --green: #22c55e; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
-        
         #sidebar { width: 280px; background: var(--blue); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; text-align: left; width: 100%; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
         .nav-btn.active { background: var(--red); }
-
-        /* Marca de Agua en Sidebar */
         .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); }
-        .credit { font-size: 0.65rem; color: rgba(255,255,255,0.7); font-weight: bold; }
-        .gemini-box { display: flex; align-items: center; gap: 5px; margin-top: 5px; color: white; }
-
         .main-view { flex-grow: 1; padding: 30px; overflow-y: auto; }
         .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
         .user-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .user-item:hover { background: #f0f7ff; }
-
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .box { background: white; padding: 8px; border-radius: 6px; border: 1px solid #eee; }
         .tag { padding: 2px 8px; border-radius: 10px; color: white; font-size: 0.7rem; font-weight: bold; }
         .tag.ok { background: var(--green); }
         .tag.pending { background: var(--red); }
-
         #loginOverlay { position: fixed; inset: 0; background: var(--blue); z-index: 10000; display: flex; align-items: center; justify-content: center; }
         #mapperModal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 20000; display: none; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
@@ -192,7 +191,7 @@
 <div id="loginOverlay">
     <div style="background:white; padding:40px; border-radius:24px; width:340px; text-align:center;">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80">
-        <h2 style="color:var(--blue); margin: 25px 0;">TI Maestro</h2>
+        <h2 style="color:var(--blue); margin: 25px 0;">Acceso TI</h2>
         <input type="text" id="u_input" placeholder="Usuario">
         <input type="password" id="p_input" placeholder="Contraseña">
         <button onclick="intentarAcceso()" style="background:var(--blue); color:white; border:none; padding:15px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold;">INGRESAR</button>
@@ -209,11 +208,12 @@
     <div class="super-only hidden" style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.2);">
         <button class="nav-btn" style="background: var(--green);" onclick="document.getElementById('csvInput').click()"><i class="fas fa-file-csv"></i> CARGAR SHAREPOINT</button>
         <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="iniciarMapeo(this)">
+        <button class="nav-btn" style="background: var(--red); margin-top:8px;" onclick="eliminarTodo()"><i class="fas fa-trash-alt"></i> ELIMINACIÓN MASIVA</button>
     </div>
 
     <div class="sidebar-footer">
-        <div class="credit">ENGINEERED BY <br> MILO DROGUETT</div>
-        <div class="gemini-box">
+        <div style="font-size:0.65rem; color:rgba(255,255,255,0.7); font-weight:bold;">ENGINEERED BY <br> MILO DROGUETT</div>
+        <div style="display:flex; align-items:center; gap:5px; margin-top:5px; color:white;">
             <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#g)"/><defs><linearGradient id="g"><stop stop-color="#4285F4"/><stop offset="1" stop-color="#9B72CB"/></linearGradient></defs></svg>
             <span style="font-size:0.7rem;">+ GEMINI AI</span>
         </div>
@@ -225,7 +225,7 @@
 
 <div class="main-view">
     <div id="home" class="tab-pane" style="display:block;">
-        <h1 style="color:var(--blue); margin-bottom:20px;">Métricas</h1>
+        <h1 style="color:var(--blue); margin-bottom:20px;">Dashboard</h1>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
             <div class="panel"><h4>Colaboradores</h4><h2 id="k-c">0</h2></div>
             <div class="panel"><h4>Total Activos</h4><h2 id="k-a">0</h2></div>
@@ -238,8 +238,9 @@
                 <input type="text" id="userSearch" onkeyup="renderLista()" placeholder="Buscar..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
                 <div id="listaPersonas" style="height:400px; overflow-y:auto;"></div>
             </div>
-            <div class="panel" id="fichaContent">
+            <div class="panel">
                 <div id="msgEmpty" style="text-align:center; padding:100px; color:#ccc;">Seleccione un usuario para ver su ficha técnica</div>
+                <div id="fichaContent" class="hidden"></div>
             </div>
         </div>
     </div>
@@ -247,7 +248,7 @@
 
 <div id="mapperModal">
     <div style="background:white; padding:30px; border-radius:20px; width:450px;">
-        <h3 style="color:var(--blue); margin-bottom:15px;">Confirmar Mapeo de Columnas</h3>
+        <h3 style="color:var(--blue); margin-bottom:15px;">Validar Columnas del CSV</h3>
         <div id="mapperFields"></div>
         <button onclick="procesarFinal()" style="width:100%; padding:15px; background:var(--green); color:white; border:none; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;">INICIAR CARGA</button>
     </div>
