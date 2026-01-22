@@ -3,38 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v8.4 - Domino's Pizza Chile</title>
-    
+    <title>TI Maestro v8.5 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        :root { 
-            --dominos-blue: #0066CC; 
-            --dominos-red: #E31837; 
-            --bg: #FFFFF5; 
-            --white: #ffffff; 
-            --dark-blue: #0066CC; 
-        }
+        :root { --dominos-blue: #0066CC; --dominos-red: #E31837; --bg: #FFFFF5; --white: #ffffff; --dark-blue: #0066CC; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
         /* Sidebar */
-        #sidebar { width: 280px; background: var(--dark-blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; position: relative; }
-        
+        #sidebar { width: 280px; background: var(--dark-blue); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; z-index: 100; }
         .logo-wrapper { width: 100%; display: flex; justify-content: center; margin-bottom: 35px; background: white; padding: 15px; border-radius: 15px; }
-        .logo-wrapper img { width: 100px; height: auto; }
-
+        
         .side-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 600; }
         .side-btn.active { background: var(--dominos-red); }
 
-        /* Marca de Agua / Créditos */
+        /* Marca de Agua con Icono de Gemini */
         .watermark { 
-            position: fixed; bottom: 15px; right: 20px; 
-            font-size: 0.65rem; color: #cbd5e1; font-weight: bold;
-            letter-spacing: 1px; text-transform: uppercase; z-index: 100;
-            pointer-events: none; opacity: 0.6;
+            position: fixed; bottom: 20px; right: 25px; 
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.8); padding: 8px 15px; border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+            font-size: 0.7rem; color: #475569; font-weight: 800; letter-spacing: 0.5px; z-index: 9999;
         }
+        .gemini-icon { width: 16px; height: 16px; }
 
         .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
         .tab-pane { display: none; }
@@ -47,58 +39,59 @@
         .user-item { padding: 14px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; margin-bottom: 6px; }
         .user-item.active { background: #eef6fb; border-color: var(--dominos-blue); }
 
-        .hidden { display: none !important; }
-        #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--dominos-red); width: 0; transition: width 0.3s; }
-        
-        /* Overlay Login */
         #loginOverlay { position: fixed; inset: 0; background: var(--dominos-blue); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--dominos-red); width: 0; transition: width 0.3s; }
     </style>
 </head>
 <body>
 
 <div id="loadingBar"></div>
-<div class="watermark">ENGINEERED BY MILO DROGUETT + GEMINI AI</div>
+
+<div class="watermark">
+    <span>ENGINEERED BY MILO DROGUETT +</span>
+    <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d47353039331e6224457.svg" class="gemini-icon">
+    <span>GEMINI AI</span>
+</div>
 
 <div id="loginOverlay">
-    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+    <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center;">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="90">
-        <h2 style="color:var(--dominos-blue); margin: 20px 0;">Acceso Seguro TI</h2>
-        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ddd; border-radius:10px; font-size: 1rem;">
-        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #ddd; border-radius:10px; font-size: 1rem;">
-        <button onclick="ejecutarLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1rem;">INGRESAR</button>
+        <h2 style="color:var(--dominos-blue); margin: 25px 0 15px;">Acceso TI Maestro</h2>
+        <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #ddd; border-radius:10px; font-size: 1rem; outline:none;">
+        <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #ddd; border-radius:10px; font-size: 1rem; outline:none;">
+        <button onclick="intentarLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:18px; width:100%; border-radius:12px; cursor:pointer; font-weight:bold; font-size:1rem; transition: 0.3s;">INGRESAR AL SISTEMA</button>
     </div>
 </div>
 
 <div id="sidebar">
     <div class="logo-wrapper">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="100">
     </div>
-    
     <button class="side-btn active" onclick="showTab('home', this)"><i class="fas fa-chart-pie"></i> Dashboard</button>
     <button class="side-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
     
     <div id="admin-tools" class="hidden" style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.2);">
-        <button onclick="document.getElementById('csvInput').click()" class="side-btn" style="background:var(--green); font-size: 0.7rem;">
-            <i class="fas fa-file-csv"></i> CARGAR CSV SHAREPOINT
+        <button onclick="document.getElementById('csvInput').click()" class="side-btn" style="background:var(--green); font-size: 0.75rem;">
+            <i class="fas fa-file-csv"></i> CARGAR CSV SP
         </button>
         <input type="file" id="csvInput" class="hidden" accept=".csv" onchange="handleCSV(this)">
     </div>
 
     <div style="margin-top:auto; padding:15px; border-radius:12px; background: rgba(0,0,0,0.1); font-size: 0.8rem;">
-        <p style="font-size: 0.6rem; color: rgba(255,255,255,0.5);">OPERADOR:</p>
+        <p style="color:rgba(255,255,255,0.5); font-size:0.6rem;">USUARIO:</p>
         <strong id="roleDisplay">---</strong><br>
-        <span onclick="cerrarSesion()" style="color: #ffcccc; cursor: pointer; display:inline-block; margin-top:10px;">Cerrar Sesión</span>
+        <span onclick="salir()" style="color: #ffcccc; cursor: pointer; display:inline-block; margin-top:10px;">Cerrar Sesión</span>
     </div>
 </div>
 
 <div class="main-content">
     <div id="home" class="tab-pane active">
-        <h1 style="color:var(--dominos-blue); margin-bottom:30px;">Estado General de Activos</h1>
+        <h1 style="color:var(--dominos-blue); margin-bottom:30px;">Dashboard de Infraestructura</h1>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
             <div class="panel"><h4>Colaboradores</h4><h2 id="kpi-users" style="color:var(--dominos-blue)">0</h2></div>
-            <div class="panel"><h4>Total Equipos</h4><h2 id="kpi-assets">0</h2></div>
-            <div class="panel"><h4>Sin Acta</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
-            <div class="panel"><h4>Áreas/Áreas</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
+            <div class="panel"><h4>Total Activos</h4><h2 id="kpi-assets">0</h2></div>
+            <div class="panel"><h4>Pendientes Firma</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
+            <div class="panel"><h4>Áreas Activas</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
         </div>
         <div class="panel" style="height: 380px;"><canvas id="mainChart"></canvas></div>
     </div>
@@ -106,18 +99,15 @@
     <div id="inventory" class="tab-pane">
         <div class="app-grid">
             <div class="scroll-panel" id="colaboradoresList">
-                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
+                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Filtrar por nombre o RUT..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px;">
                 <div id="userItemsContainer"></div>
             </div>
             <div class="scroll-panel" id="detailPanel">
-                <div id="emptyState" style="text-align:center; padding-top:120px; color:#ccc;">
-                    <i class="fas fa-id-card-alt fa-5x"></i>
-                    <p style="margin-top:20px;">Seleccione un colaborador</p>
-                </div>
+                <div id="emptyState" style="text-align:center; padding-top:120px; color:#ccc;"><i class="fas fa-id-badge fa-5x"></i><p style="margin-top:20px;">Seleccione un colaborador</p></div>
                 <div id="userDetails" class="hidden">
                     <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f1f5f9; padding-bottom:20px;">
-                        <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut"></p></div>
-                        <button onclick="alert('Disponible en v9.0')" class="side-btn" style="background:var(--green); width:auto;">+ MANUAL</button>
+                        <div><h2 id="d-nombre" style="color: var(--dominos-blue)"></h2><p id="d-rut" style="font-weight:bold;"></p></div>
+                        <button onclick="alert('Módulo Manual v9.0')" class="side-btn" style="background:var(--green); width:auto;">+ MANUAL</button>
                     </div>
                     <div id="activosContainer" style="margin-top:20px;"></div>
                 </div>
@@ -127,39 +117,35 @@
 </div>
 
 <script>
-    // Configuración Base
-    const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
-    const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
-    let masterData = [], rawActivos = [];
-
-    // LÓGICA DE LOGIN (CORREGIDA AL 100%)
-    function ejecutarLogin() {
+    // LÓGICA DE LOGIN INMEDIATA
+    function intentarLogin() {
         const u = document.getElementById('userInput').value.trim();
         const p = document.getElementById('passInput').value.trim();
-        
         if ((u === 'edc_admin' && p === 'dominos2026') || (u === 'admin' && p === '123')) {
-            sessionStorage.setItem('sesionActiva', 'true');
-            sessionStorage.setItem('usuarioRol', u.toUpperCase());
-            location.reload(); // Recargamos para aplicar cambios de UI
-        } else {
-            alert("Credenciales incorrectas. Verifique usuario y clave.");
-        }
+            sessionStorage.setItem('auth', 'true');
+            sessionStorage.setItem('rol', u.toUpperCase());
+            location.reload();
+        } else { alert("Error: Credenciales no válidas."); }
     }
 
+    function salir() { sessionStorage.clear(); location.reload(); }
+
     window.onload = () => {
-        if (sessionStorage.getItem('sesionActiva') === 'true') {
+        if (sessionStorage.getItem('auth') === 'true') {
             document.getElementById('loginOverlay').style.display = 'none';
-            const role = sessionStorage.getItem('usuarioRol');
+            const role = sessionStorage.getItem('rol');
             document.getElementById('roleDisplay').innerText = role;
             if(role === 'EDC_ADMIN') document.getElementById('admin-tools').classList.remove('hidden');
             fetchData();
         }
     };
 
-    function cerrarSesion() { sessionStorage.clear(); location.reload(); }
+    // Configuración Supabase
+    const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
+    const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
+    let masterData = [], rawActivos = [];
 
-    // FETCH DATA
     async function fetchData() {
         setLoading(true);
         try {
@@ -176,7 +162,6 @@
         setLoading(false);
     }
 
-    // CARGA CSV MAPEADA SEGÚN TU ESTRUCTURA
     function handleCSV(input) {
         const reader = new FileReader();
         reader.onload = async (e) => {
@@ -186,7 +171,6 @@
                 const c = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
                 if (c.length < 2) continue;
                 const clean = (v) => v?.replace(/"/g, '').trim();
-
                 const rut = clean(c[0]), nombre = clean(c[1]), area = clean(c[5]);
                 if (!rut) continue;
 
@@ -195,7 +179,7 @@
                     body: JSON.stringify({ rut, nombre, tienda: area })
                 });
 
-                if (clean(c[9])) { // Nº de Serie
+                if (clean(c[9])) { 
                     await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
                         method: 'POST', headers: { ...headers, "Prefer": "resolution=merge-duplicates", "on_conflict": "serie" },
                         body: JSON.stringify({
@@ -206,17 +190,16 @@
                 }
             }
             fetchData();
-            alert("Sincronización finalizada.");
+            alert("CSV Sincronizado.");
         };
         reader.readAsText(input.files[0]);
     }
 
-    // Funciones de UI
     function renderList() {
         const q = document.getElementById('searchBox').value.toLowerCase();
         document.getElementById('userItemsContainer').innerHTML = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
             <div class="user-item" onclick="selectColaborador('${c.rut}')" id="user-${c.rut}">
-                <strong style="font-size:0.9rem;">${c.nombre}</strong><br><small>${c.rut}</small>
+                <strong>${c.nombre}</strong><br><small>${c.rut}</small>
             </div>
         `).join('');
     }
@@ -232,7 +215,7 @@
         document.getElementById('activosContainer').innerHTML = u.equipos.map(eq => `
             <div class="panel" style="display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; padding:15px; border-radius:10px;">
                 <div><strong>${eq.marca} ${eq.modelo || ''}</strong><br><small>S/N: ${eq.serie}</small></div>
-                <button onclick="alert('Generando Acta...')" style="background:var(--dominos-blue); color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">ACTA</button>
+                <button onclick="alert('Cargando Vista de Acta...')" style="background:var(--dominos-blue); color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">VER ACTA</button>
             </div>
         `).join('');
     }
