@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro Pro v6.9 - Domino's Pizza</title>
+    <title>TI Maestro Pro v7.0 - Domino's Pizza</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -19,17 +19,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar Professional */
+        /* Sidebar */
         #sidebar { width: 280px; background: var(--dark); color: white; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .side-btn { background: transparent; color: #94a3b8; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 8px; font-weight: 500; transition: 0.2s; }
         .side-btn:hover { background: rgba(255,255,255,0.05); color: white; }
         .side-btn.active { background: var(--dominos-blue); color: white; }
 
-        /* Sync Button for EDC_ADMIN */
+        /* Sync Button */
         #btn-sync { width: 100%; background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; font-weight: 600; transition: 0.3s; }
         #btn-sync:hover { background: #334155; color: white; border-color: var(--dominos-blue); }
 
-        /* Content Area */
+        /* Contenido */
         .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
         .tab-pane { display: none; }
         .tab-pane.active { display: block; animation: fadeIn 0.3s ease-out; }
@@ -44,8 +44,9 @@
         .user-item.active { background: #f1f5f9; border-color: var(--dominos-blue); }
         .badge-count { position: absolute; right: 12px; top: 18px; background: var(--dominos-blue); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; }
 
-        .asset-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 15px; transition: 0.2s; }
-        .asset-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .asset-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 15px; }
+        .btn-acta { background: var(--dominos-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-acta:hover { background: #0055aa; }
 
         .footer-credits { margin-top: auto; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .gemini-tag { background: linear-gradient(45deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
@@ -61,35 +62,28 @@
     <div style="background:white; padding:45px; border-radius:24px; width:380px; text-align:center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="90" style="margin-bottom:20px;">
         <h2 style="color:var(--dark); margin-bottom:10px;">Acceso TI Maestro</h2>
-        <p style="color:var(--slate); font-size:0.9rem; margin-bottom:30px;">Inicie sesión para gestionar activos</p>
         <input type="text" id="userInput" placeholder="Usuario" style="width:100%; padding:14px; margin-bottom:12px; border:1px solid #e2e8f0; border-radius:10px; outline:none; font-size:1rem;">
         <input type="password" id="passInput" placeholder="Contraseña" style="width:100%; padding:14px; margin-bottom:25px; border:1px solid #e2e8f0; border-radius:10px; outline:none; font-size:1rem;">
-        <button onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1rem; transition:0.3s;">INGRESAR AL SISTEMA</button>
+        <button onclick="handleLogin()" style="background:var(--dominos-blue); color:white; border:none; padding:16px; width:100%; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1rem;">INGRESAR</button>
     </div>
 </div>
 
 <div id="sidebar">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="110" style="margin-bottom:40px; align-self:center; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
-    
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="110" style="margin-bottom:40px; align-self:center;">
     <button class="side-btn active" onclick="showTab('home', this)"><i class="fas fa-chart-pie"></i> Dashboard</button>
     <button class="side-btn" onclick="showTab('inventory', this)"><i class="fas fa-id-badge"></i> Hojas de Vida</button>
-    <button id="btn-admin-access" class="side-btn hidden" onclick="showTab('access-mgmt', this)"><i class="fas fa-users-cog"></i> Usuarios Web</button>
     
     <div id="sync-container" class="hidden">
-        <button onclick="triggerFullSync()" id="btn-sync">
-            <i class="fas fa-sync" id="sync-icon"></i> 
-            <span id="sync-text">SINCRO TOTAL SP</span>
-        </button>
+        <button onclick="triggerFullSync()" id="btn-sync"><i class="fas fa-sync" id="sync-icon"></i> <span id="sync-text">SINCRO TOTAL SP</span></button>
     </div>
 
     <div style="margin-top:20px; padding:15px; border-radius:12px; background: rgba(255,255,255,0.05); font-size: 0.75rem;">
-        <p style="color: #64748b; margin-bottom: 5px; text-transform:uppercase; letter-spacing:1px; font-size:0.6rem;">Operador</p>
         <strong id="roleDisplay" style="color:#e2e8f0;">---</strong><br>
         <span onclick="logout()" style="color: var(--dominos-red); cursor: pointer; font-size: 0.75rem; margin-top:8px; display:inline-block;">Cerrar Sesión</span>
     </div>
 
     <div class="footer-credits">
-        <span style="font-size:0.6rem; color:#64748b; text-transform:uppercase; letter-spacing:1.5px;">Engineered by</span>
+        <span style="font-size:0.6rem; color:#64748b; text-transform:uppercase;">Engineered by</span>
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; margin-top:6px;">
             <span>Milo Droguett</span>
             <span class="gemini-tag">Gemini AI</span>
@@ -101,27 +95,220 @@
     <div id="home" class="tab-pane active">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
             <h1>Dashboard Operativo</h1>
-            <div id="last-sync-label" style="display:none; background:var(--white); padding:8px 16px; border-radius:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); font-size:0.8rem; color:var(--slate);">
-                <i class="fas fa-history" style="color:var(--dominos-blue); margin-right:5px;"></i>
-                Última Sincro SP: <span id="last-sync-time" style="font-weight:bold;">Nunca</span>
+            <div id="last-sync-label" style="display:none; background:var(--white); padding:8px 16px; border-radius:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); font-size:0.8rem;">
+                Última Sincro SP: <span id="last-sync-time" style="font-weight:bold;">---</span>
             </div>
         </div>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom:30px;">
-            <div class="panel"><h4>Personal Activo</h4><h2 id="kpi-users" style="color:var(--dominos-blue); font-size:2.2rem; margin-top:10px;">0</h2></div>
-            <div class="panel"><h4>Activos TI</h4><h2 id="kpi-assets" style="font-size:2.2rem; margin-top:10px;">0</h2></div>
-            <div class="panel"><h4>Sin Acta Firmada</h4><h2 id="kpi-pending" style="color:var(--dominos-red); font-size:2.2rem; margin-top:10px;">0</h2></div>
-            <div class="panel"><h4>Móviles/Otros</h4><h2 id="kpi-mobile" style="color:var(--green); font-size:2.2rem; margin-top:10px;">0</h2></div>
+            <div class="panel"><h4>Personal</h4><h2 id="kpi-users" style="color:var(--dominos-blue)">0</h2></div>
+            <div class="panel"><h4>Activos</h4><h2 id="kpi-assets">0</h2></div>
+            <div class="panel"><h4>Pendientes</h4><h2 id="kpi-pending" style="color:var(--dominos-red)">0</h2></div>
+            <div class="panel"><h4>Móviles</h4><h2 id="kpi-mobile" style="color:var(--green)">0</h2></div>
         </div>
-        <div class="panel" style="height: 400px;">
-            <canvas id="mainChart"></canvas>
-        </div>
+        <div class="panel" style="height: 400px;"><canvas id="mainChart"></canvas></div>
     </div>
 
+    <div id="inventory" class="tab-pane">
+        <div class="app-grid">
+            <div class="scroll-panel" id="colaboradoresList">
+                <input type="text" id="searchBox" onkeyup="renderList()" placeholder="Buscar..." style="width:100%; padding:14px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
+                <div id="userItemsContainer"></div>
+            </div>
+            <div class="scroll-panel" id="detailPanel">
+                <div id="emptyState" style="text-align:center; padding-top:120px; color:#cbd5e1;">
+                    <i class="fas fa-id-card-alt fa-5x"></i>
+                    <p style="margin-top:20px;">Seleccione un colaborador</p>
+                </div>
+                <div id="userDetails" class="hidden">
+                    <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f1f5f9; padding-bottom:20px; margin-bottom:25px;">
+                        <div>
+                            <h2 id="d-nombre" style="color: var(--dominos-blue)"></h2>
+                            <p id="d-rut" style="font-weight:bold;"></p>
+                        </div>
+                        <button onclick="toggleManualForm()" style="background:var(--green); color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer;"><i class="fas fa-plus"></i> ASIGNAR MANUAL</button>
+                    </div>
+                    <div id="manualForm" class="hidden" style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #ddd; margin-bottom:20px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                            <select id="m-tipo" style="padding:10px; border-radius:8px;"><option value="Celular">Celular</option><option value="Mochila">Mochila</option></select>
+                            <input type="text" id="m-marca" placeholder="Marca" style="padding:10px; border-radius:8px;">
+                            <input type="text" id="m-serie" placeholder="Serie" style="padding:10px; border-radius:8px;">
+                        </div>
+                        <button onclick="saveManualAsset()" style="width:100%; margin-top:10px; background:var(--dominos-blue); color:white; border:none; padding:12px; border-radius:8px;">GUARDAR</button>
+                    </div>
+                    <div id="activosContainer"></div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
 <script>
-    // Se mantiene la lógica JavaScript de la v6.8 íntegra con las nuevas constantes de color
-    // ... (Logica de fetch, login y webhook) ...
+    const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
+    const WEBHOOK_URL = "https://default796cb01d582441999177a82623fb5e.38.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/71fc6f057a624006a7795bab2aa28160/triggers/manual/paths/invoke?api-version=1";
+    const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
+
+    let masterData = [], rawActivos = [], mainChart = null;
+
+    window.onload = () => {
+        if (sessionStorage.getItem('isLogged') === 'true') {
+            document.getElementById('loginOverlay').style.display = 'none';
+            const role = sessionStorage.getItem('userRole');
+            document.getElementById('roleDisplay').innerText = role;
+            if(role === 'EDC_ADMIN') {
+                document.getElementById('sync-container').classList.remove('hidden');
+                document.getElementById('last-sync-label').style.display = 'block';
+            }
+            fetchData();
+        }
+    };
+
+    function handleLogin() {
+        const u = document.getElementById('userInput').value;
+        const p = document.getElementById('passInput').value;
+        if (u === 'edc_admin' && p === 'dominos2026') {
+            sessionStorage.setItem('isLogged', 'true');
+            sessionStorage.setItem('userRole', 'EDC_ADMIN');
+            location.reload();
+        } else if (u === 'admin' && p === '123') {
+            sessionStorage.setItem('isLogged', 'true');
+            sessionStorage.setItem('userRole', 'ADMIN_TI');
+            location.reload();
+        } else { alert("Error de acceso"); }
+    }
+
+    function logout() { sessionStorage.clear(); location.reload(); }
+
+    async function fetchData() {
+        setLoading(true);
+        try {
+            const [rC, rA] = await Promise.all([
+                fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers }),
+                fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers })
+            ]);
+            const colabs = await rC.json();
+            rawActivos = await rA.json();
+            masterData = colabs.map(c => ({
+                ...c,
+                equipos: rawActivos.filter(a => a.rut_responsable === c.rut)
+            })).sort((a,b) => a.nombre.localeCompare(b.nombre));
+            renderList();
+            updateDashboard();
+        } catch (e) { console.error(e); }
+        setLoading(false);
+    }
+
+    function renderList() {
+        const q = document.getElementById('searchBox').value.toLowerCase();
+        const html = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
+            <div class="user-item" onclick="selectColaborador('${c.rut}')" id="user-${c.rut}">
+                <strong>${c.nombre}</strong><br><small>${c.rut}</small>
+                <span class="badge-count">${c.equipos.length}</span>
+            </div>
+        `).join('');
+        document.getElementById('userItemsContainer').innerHTML = html;
+    }
+
+    function selectColaborador(rut) {
+        document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(`user-${rut}`).classList.add('active');
+        const u = masterData.find(x => x.rut === rut);
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('userDetails').classList.remove('hidden');
+        document.getElementById('d-nombre').innerText = u.nombre;
+        document.getElementById('d-rut').innerText = `RUT: ${u.rut}`;
+        
+        document.getElementById('activosContainer').innerHTML = u.equipos.map(eq => `
+            <div class="asset-card" style="border-left: 6px solid ${eq.tipo_activo === 'Celular' ? 'var(--green)' : 'var(--dominos-blue)'}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong><i class="fas ${eq.tipo_activo === 'Celular' ? 'fa-mobile-alt' : 'fa-laptop'}"></i> ${eq.tipo_activo} - ${eq.marca}</strong>
+                    <button class="btn-acta" onclick="generatePDF('${u.rut}', '${eq.serie}')">ACTA</button>
+                </div>
+                <div style="font-size:0.85rem; margin-top:10px;">Serie: <b>${eq.serie}</b> | Estado: <b>${eq.estado}</b></div>
+            </div>
+        `).join('');
+    }
+
+    async function triggerFullSync() {
+        if(!confirm("¿Sincronizar?")) return;
+        const icon = document.getElementById('sync-icon');
+        icon.classList.add('fa-spin');
+        try {
+            const res = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requester: "EDC_ADMIN_WEB", timestamp: new Date().toISOString() })
+            });
+            if(res.ok) {
+                document.getElementById('last-sync-time').innerText = new Date().toLocaleTimeString();
+                alert("Sincronización iniciada");
+                setTimeout(fetchData, 5000);
+            }
+        } catch (e) { console.error(e); }
+        icon.classList.remove('fa-spin');
+    }
+
+    async function saveManualAsset() {
+        const rut = document.getElementById('d-rut').innerText.replace('RUT: ', '');
+        const payload = {
+            rut_responsable: rut,
+            tipo_activo: document.getElementById('m-tipo').value,
+            marca: document.getElementById('m-marca').value,
+            serie: document.getElementById('m-serie').value,
+            estado: 'Operativo', modelo: 'Manual Web', extras: { Doc_Firmado: 'No' }
+        };
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
+            method: 'POST', headers: { ...headers, "Prefer": "resolution=merge-duplicates" },
+            body: JSON.stringify(payload)
+        });
+        if(r.ok) { fetchData(); toggleManualForm(); }
+    }
+
+    function generatePDF(rut, serie) {
+        const u = masterData.find(x => x.rut === rut);
+        const a = u.equipos.find(x => x.serie === serie);
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <html><head><title>Acta ${a.serie}</title><style>
+                body { font-family: sans-serif; padding: 40px; }
+                .header { border-bottom: 5px solid #0066CC; display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                table td { border: 1px solid #ddd; padding: 15px; }
+                .footer { margin-top: 80px; display: flex; justify-content: space-around; }
+                .sig { border-top: 2px solid #000; width: 200px; text-align: center; padding-top: 10px; }
+                .cr { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 9px; color: #94a3b8; }
+            </style></head><body>
+                <div class="header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="100">
+                    <h1 style="color:#0066CC">ACTA DE ENTREGA</h1>
+                </div>
+                <table>
+                    <tr><td><b>Colaborador</b></td><td>${u.nombre}</td><td><b>RUT</b></td><td>${u.rut}</td></tr>
+                    <tr><td><b>Equipo</b></td><td>${a.tipo_activo} ${a.marca}</td><td><b>Serie</b></td><td>${a.serie}</td></tr>
+                </table>
+                <p>Recibo el equipo en conformidad.</p>
+                <div class="footer"><div class="sig">Firma TI</div><div class="sig">Firma Colaborador</div></div>
+                <div class="cr">ENGINEERED BY MILO DROGUETT + GEMINI AI ENGINE</div>
+                <script>window.print();<\/script>
+            </body></html>
+        `);
+    }
+
+    function updateDashboard() {
+        document.getElementById('kpi-users').innerText = masterData.length;
+        document.getElementById('kpi-assets').innerText = rawActivos.length;
+        document.getElementById('kpi-pending').innerText = rawActivos.filter(a => a.extras.Doc_Firmado !== 'Si').length;
+        document.getElementById('kpi-mobile').innerText = rawActivos.filter(a => a.tipo_activo !== 'Notebook').length;
+    }
+
+    function toggleManualForm() { document.getElementById('manualForm').classList.toggle('hidden'); }
+    function showTab(id, btn) {
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+    }
+    function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
 </script>
 </body>
 </html>
