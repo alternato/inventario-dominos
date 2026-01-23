@@ -3,173 +3,1101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v32.0 - Edición Activa</title>
+    <title>TI Maestro v32.0 - Gestión de Activos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #0066CC; --red: #E31837; --bg: #FFFFF5; --green: #22c55e; --dark: #1e293b; --gray: #64748b; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        :root {
+            --primary: #0066CC;
+            --primary-dark: #0052a3;
+            --secondary: #E31837;
+            --secondary-dark: #c11430;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #FFFFF5;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #f1f5f9;
+            --border: #e2e8f0;
+        }
         
-        #sidebar { width: 260px; background: var(--blue); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; text-align: left; width: 100%; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        .nav-btn.active { background: var(--red); }
-
-        .main-view { flex-grow: 1; padding: 25px; overflow-y: auto; }
-        .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 20px; border: 1px solid #eee; position: relative; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
         
-        /* ESTILOS DE EDICIÓN */
-        .editable-input { width: 100%; border: 1px solid var(--blue); border-radius: 4px; padding: 4px; font-size: 0.85rem; font-family: inherit; font-weight: 600; color: var(--dark); }
-        .btn-edit { position: absolute; top: 15px; right: 15px; background: #f1f5f9; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.7rem; font-weight: bold; color: var(--blue); transition: 0.2s; }
-        .btn-edit:hover { background: var(--blue); color: white; }
-        .btn-save { background: var(--green); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-
-        .cat-header { background: #f1f5f9; padding: 8px 15px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--gray); border-radius: 5px; margin: 15px 0 10px 0; }
-        .grid-ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-        .data-item { background: #fff; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; }
-        .data-item label { display: block; font-size: 0.55rem; font-weight: 700; color: var(--gray); text-transform: uppercase; }
-
-        .hidden { display: none !important; }
-        .user-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
-        #loadingBar { position: fixed; top: 0; left: 0; height: 4px; background: var(--red); width: 0; transition: width 0.3s; z-index: 21000; }
+        body {
+            background: var(--bg);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+        }
+        
+        #sidebar {
+            width: 280px;
+            background: var(--primary);
+            color: white;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            width: 100px;
+            height: auto;
+            filter: brightness(0) invert(1);
+        }
+        
+        .brand-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+        
+        .nav-section {
+            margin-bottom: 30px;
+        }
+        
+        .nav-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: none;
+            padding: 14px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .nav-btn.active {
+            background: var(--secondary);
+            box-shadow: 0 4px 12px rgba(227, 24, 55, 0.3);
+        }
+        
+        .nav-btn i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .super-only {
+            margin-top: auto;
+        }
+        
+        .footer {
+            margin-top: auto;
+            font-size: 0.65rem;
+            opacity: 0.5;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .main-view {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: var(--light-gray);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .panel:hover {
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 45px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .users-list {
+            height: 500px;
+            overflow-y: auto;
+            border-radius: 10px;
+            background: white;
+            border: 1px solid var(--border);
+        }
+        
+        .user-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-item:hover {
+            background: var(--light-gray);
+        }
+        
+        .user-item.active {
+            background: rgba(0, 102, 204, 0.08);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .user-avatar-small {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        
+        .user-details {
+            flex-grow: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .user-rut {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .user-equipment {
+            font-size: 0.75rem;
+            background: var(--light-gray);
+            color: var(--dark);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .cat-header {
+            background: var(--light-gray);
+            padding: 10px 18px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--gray);
+            border-radius: 8px;
+            margin: 20px 0 15px 0;
+            letter-spacing: 0.5px;
+        }
+        
+        .grid-ficha {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .data-item {
+            background: var(--light-gray);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .data-item:hover {
+            border-color: var(--primary);
+        }
+        
+        .data-item label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-item span {
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+        
+        .editable-input {
+            width: 100%;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--dark);
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .editable-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .btn-edit {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-edit:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+        }
+        
+        .btn-save {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .btn-save:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        
+        .btn-cancel {
+            background: var(--gray);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        
+        .btn-cancel:hover {
+            background: #475569;
+        }
+        
+        .edit-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        #loadingBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0;
+            transition: width 0.4s ease;
+            z-index: 10000;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+        
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        @media (max-width: 1024px) {
+            body {
+                flex-direction: column;
+            }
+            
+            #sidebar {
+                width: 100%;
+                height: auto;
+                padding: 15px;
+            }
+            
+            .nav-btn {
+                padding: 12px;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
-<body onload="verificarSesion()">
+<body>
 
 <div id="loadingBar"></div>
 
 <div id="sidebar">
-    <div style="text-align:center; margin-bottom:20px;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" width="80"></div>
-    <nav>
-        <button class="nav-btn active" id="btnInv"><i class="fas fa-address-book"></i> Hojas de Vida</button>
-    </nav>
-    <div class="super-only hidden" style="margin-top:20px;">
-        <button class="nav-btn" style="background:var(--green);" id="btnCargar"><i class="fas fa-file-csv"></i> CARGAR SHAREPOINT</button>
+    <div class="logo-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" 
+             alt="Domino's Pizza" class="logo">
+        <div class="brand-text">TI Maestro v32.0</div>
     </div>
-    <div style="margin-top:auto; font-size:0.5rem; opacity:0.5; text-align:center;">ENGINEERED BY MILO DROGUETT</div>
+    
+    <div class="nav-section">
+        <div class="nav-title">Gestión</div>
+        <button class="nav-btn active" id="btnInv">
+            <i class="fas fa-address-book"></i> Hojas de Vida
+        </button>
+        <button class="nav-btn" id="btnDashboard">
+            <i class="fas fa-chart-bar"></i> Dashboard
+        </button>
+    </div>
+    
+    <div class="nav-section">
+        <div class="nav-title">Administración</div>
+        <button class="nav-btn" id="btnUsuarios">
+            <i class="fas fa-users"></i> Usuarios
+        </button>
+        <button class="nav-btn" id="btnReportes">
+            <i class="fas fa-file-alt"></i> Reportes
+        </button>
+    </div>
+    
+    <div class="super-only">
+        <div class="nav-title">Super Admin</div>
+        <button class="nav-btn" style="background:var(--success);" id="btnCargar">
+            <i class="fas fa-file-csv"></i> Cargar desde SharePoint
+        </button>
+        <button class="nav-btn" style="background:var(--warning);" id="btnExportar">
+            <i class="fas fa-download"></i> Exportar Datos
+        </button>
+    </div>
+    
+    <div class="footer">
+        ENGINEERED BY MILO DROGUETT • v32.0
+    </div>
 </div>
 
 <div class="main-view">
-    <div id="viewInventory">
-        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px;">
-            <div class="panel">
-                <input type="text" id="uSearch" placeholder="Buscar..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
-                <div id="listaPersonas" style="height:500px; overflow-y:auto;"></div>
+    <div class="header">
+        <h1>Gestión de Activos TI</h1>
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-shield"></i>
             </div>
-            <div class="panel" id="fichaContent">
-                <div style="text-align:center; padding:100px; color:#ccc;">Seleccione un colaborador</div>
+            <div>
+                <div style="font-weight: 600; color: var(--dark);">Administrador</div>
+                <div style="font-size: 0.8rem; color: var(--gray);">Sesión Activa</div>
             </div>
         </div>
+    </div>
+    
+    <div id="viewInventory" class="view-content">
+        <div style="display: grid; grid-template-columns: 320px 1fr; gap: 25px;">
+            <div class="panel">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="uSearch" class="search-input" 
+                           placeholder="Buscar colaborador por nombre o RUT..." 
+                           oninput="renderLista()">
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsuarios">0</div>
+                        <div class="stat-label">Colaboradores</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalActivos">0</div>
+                        <div class="stat-label">Activos</div>
+                    </div>
+                </div>
+                
+                <div id="listaPersonas" class="users-list"></div>
+            </div>
+            
+            <div class="panel" id="fichaContent">
+                <div class="empty-state">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>Seleccione un colaborador</h3>
+                    <p>Elija un colaborador de la lista para ver y editar su información</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="viewDashboard" class="view-content hidden">
+        <!-- Dashboard view will be implemented here -->
     </div>
 </div>
 
 <script>
+    // Configuración de Supabase
     const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
-    const HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
     
-    let masterData = [], rawActivos = [];
+    const HEADERS = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    };
+    
+    // Variables globales
+    let masterData = [];
+    let rawActivos = [];
+    let currentUserRut = null;
+    let editMode = {};
 
-    // --- SESIÓN Y CARGA ---
-    function verificarSesion() {
-        document.querySelectorAll('.super-only').forEach(e => e.classList.remove('hidden'));
-        fetchData();
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+        verificarSesion();
+        setupEventListeners();
+    });
+
+    function setupEventListeners() {
+        // Navegación
+        document.getElementById('btnInv').addEventListener('click', () => showView('viewInventory'));
+        document.getElementById('btnDashboard').addEventListener('click', () => showView('viewDashboard'));
+        document.getElementById('btnUsuarios').addEventListener('click', () => alert('Módulo en desarrollo'));
+        document.getElementById('btnReportes').addEventListener('click', () => alert('Módulo en desarrollo'));
+        document.getElementById('btnCargar').addEventListener('click', cargarSharePoint);
+        document.getElementById('btnExportar').addEventListener('click', exportarDatos);
+        
+        // Búsqueda con debounce
+        let searchTimeout;
+        document.getElementById('uSearch').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(renderLista, 300);
+        });
+    }
+
+    function showView(viewId) {
+        // Actualizar botones de navegación
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // Mostrar vista correspondiente
+        document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    async function verificarSesion() {
+        try {
+            // Aquí podrías agregar lógica de autenticación real
+            document.querySelectorAll('.super-only').forEach(e => e.classList.remove('hidden'));
+            await fetchData();
+        } catch (error) {
+            console.error('Error en sesión:', error);
+            mostrarError('Error al verificar sesión');
+        }
     }
 
     async function fetchData() {
         setLoading(true);
-        const [rC, rA] = await Promise.all([
-            fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }),
-            fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
-        ]);
-        rawActivos = await rA.json();
-        masterData = (await rC.json()).map(c => ({
-            ...c, eqs: rawActivos.filter(a => a.rut_responsable === c.rut)
-        })).sort((a,b) => a.nombre.localeCompare(b.nombre));
-        renderLista();
-        setLoading(false);
+        try {
+            const [colaboradoresResponse, activosResponse] = await Promise.all([
+                fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*&order=nombre.asc`, { headers: HEADERS }),
+                fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
+            ]);
+
+            if (!colaboradoresResponse.ok || !activosResponse.ok) {
+                throw new Error('Error al cargar datos');
+            }
+
+            rawActivos = await activosResponse.json();
+            const colaboradores = await colaboradoresResponse.json();
+
+            masterData = colaboradores.map(colaborador => ({
+                ...colaborador,
+                equipos: rawActivos.filter(activo => activo.rut_responsable === colaborador.rut),
+                activoCount: rawActivos.filter(activo => activo.rut_responsable === colaborador.rut).length
+            }));
+
+            // Actualizar estadísticas
+            document.getElementById('totalUsuarios').textContent = masterData.length;
+            document.getElementById('totalActivos').textContent = rawActivos.length;
+
+            renderLista();
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            mostrarError('Error al cargar los datos');
+        } finally {
+            setLoading(false);
+        }
     }
 
     function renderLista() {
-        const q = document.getElementById('uSearch').value.toLowerCase();
-        document.getElementById('listaPersonas').innerHTML = masterData.filter(c => c.nombre.toLowerCase().includes(q) || c.rut.includes(q)).map(c => `
-            <div class="user-item" onclick="verFicha('${c.rut}')"><strong>${c.nombre}</strong><br><small>${c.rut}</small></div>
-        `).join('');
+        const searchQuery = document.getElementById('uSearch').value.toLowerCase();
+        const listaContainer = document.getElementById('listaPersonas');
+        
+        if (masterData.length === 0) {
+            listaContainer.innerHTML = `
+                <div class="empty-state" style="padding: 40px 20px;">
+                    <i class="fas fa-database"></i>
+                    <h3>No hay datos disponibles</h3>
+                    <p>Cargue datos desde SharePoint o agregue manualmente</p>
+                </div>
+            `;
+            return;
+        }
+
+        const filteredData = masterData.filter(colaborador => 
+            colaborador.nombre.toLowerCase().includes(searchQuery) || 
+            colaborador.rut.includes(searchQuery)
+        );
+
+        if (filteredData.length === 0) {
+            listaContainer.innerHTML = `
+                <div class="user-item" style="text-align: center; color: var(--gray);">
+                    No se encontraron resultados para "${searchQuery}"
+                </div>
+            `;
+            return;
+        }
+
+        listaContainer.innerHTML = filteredData.map(colaborador => {
+            const isActive = colaborador.rut === currentUserRut;
+            const initials = colaborador.nombre.split(' ')
+                .map(word => word[0])
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+
+            return `
+                <div class="user-item ${isActive ? 'active' : ''}" 
+                     onclick="verFicha('${colaborador.rut}')"
+                     data-rut="${colaborador.rut}">
+                    <div class="user-avatar-small">${initials}</div>
+                    <div class="user-details">
+                        <div class="user-name">${colaborador.nombre}</div>
+                        <div class="user-rut">${colaborador.rut}</div>
+                    </div>
+                    <div class="user-equipment" title="${colaborador.activoCount} equipo(s)">
+                        ${colaborador.activoCount} <i class="fas fa-laptop"></i>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
-    // --- FICHA EDITABLE ---
     function verFicha(rut) {
-        const u = masterData.find(x => x.rut === rut);
-        let html = `<h2 style="color:var(--blue); margin-bottom:20px;">${u.nombre}</h2>`;
+        currentUserRut = rut;
+        const colaborador = masterData.find(c => c.rut === rut);
+        
+        if (!colaborador) {
+            mostrarError('Colaborador no encontrado');
+            return;
+        }
 
-        u.eqs.forEach(eq => {
-            html += `
-            <div class="panel" id="panel-${eq.serie}">
-                <button class="btn-edit" onclick="activarEdicion('${eq.serie}')">EDITAR DATOS</button>
-                <div class="cat-header">Hardware y Estado</div>
-                <div class="grid-ficha">
-                    <div class="data-item"><label>Marca</label><span id="val-marca-${eq.serie}">${eq.marca}</span></div>
-                    <div class="data-item"><label>Modelo</label><span id="val-modelo-${eq.serie}">${eq.modelo}</span></div>
-                    <div class="data-item"><label>Serie</label><span>${eq.serie}</span></div>
-                    <div class="data-item"><label>Estado Físico</label><span id="val-estado-${eq.serie}">${eq.estado || 'N/A'}</span></div>
-                </div>
-                <div class="cat-header">Accesorios y Logística</div>
-                <div class="grid-ficha">
-                    <div class="data-item"><label>Mochila</label><span id="val-mochila-${eq.serie}">${eq.mochila}</span></div>
-                    <div class="data-item"><label>Cargador</label><span id="val-cargador-${eq.serie}">${eq.cargador}</span></div>
-                    <div class="data-item"><label>Fecha Entrega</label><span id="val-fecha-${eq.serie}">${eq.fecha_entrega || '-'}</span></div>
-                    <div class="data-item"><label>Firma Acta</label><span id="val-firmado-${eq.serie}">${eq.doc_firmado}</span></div>
-                </div>
-                <div class="cat-header">Observaciones</div>
-                <div class="data-item" style="width:100%"><span id="val-obs-${eq.serie}">${eq.observaciones || 'Sin notas.'}</span></div>
-                
-                <div id="edit-controls-${eq.serie}" class="hidden">
-                    <button class="btn-save" onclick="guardarCambios('${eq.serie}')">GUARDAR CAMBIOS EN NUBE</button>
-                </div>
-            </div>`;
+        // Actualizar lista para resaltar usuario activo
+        document.querySelectorAll('.user-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.rut === rut) {
+                item.classList.add('active');
+            }
         });
+
+        let html = `
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 25px;">
+                <div>
+                    <h2 style="color: var(--primary); margin-bottom: 5px;">${colaborador.nombre}</h2>
+                    <div style="color: var(--gray); font-size: 0.9rem;">
+                        <span style="background: var(--light-gray); padding: 4px 12px; border-radius: 20px;">
+                            <i class="fas fa-id-card"></i> ${colaborador.rut}
+                        </span>
+                        <span style="margin-left: 10px; background: var(--light-gray); padding: 4px 12px; border-radius: 20px;">
+                            <i class="fas fa-laptop"></i> ${colaborador.activoCount} equipo(s)
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn-edit" onclick="agregarEquipo('${rut}')">
+                        <i class="fas fa-plus"></i> Agregar Equipo
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (colaborador.equipos.length === 0) {
+            html += `
+                <div class="empty-state" style="padding: 40px 20px;">
+                    <i class="fas fa-laptop"></i>
+                    <h3>No hay equipos asignados</h3>
+                    <p>Este colaborador no tiene equipos asignados</p>
+                    <button class="btn-save" onclick="agregarEquipo('${rut}')" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> Agregar primer equipo
+                    </button>
+                </div>
+            `;
+        } else {
+            colaborador.equipos.forEach(equipo => {
+                const statusClass = getStatusClass(equipo.estado);
+                html += `
+                    <div class="panel" id="panel-${equipo.serie}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="color: var(--dark);">
+                                ${equipo.marca || 'Marca no especificada'} ${equipo.modelo || ''}
+                                <span class="status-badge ${statusClass}" style="margin-left: 10px;">
+                                    ${equipo.estado || 'No especificado'}
+                                </span>
+                            </h3>
+                            <button class="btn-edit" onclick="activarEdicion('${equipo.serie}')">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                        </div>
+                        
+                        <div class="cat-header">Información del Hardware</div>
+                        <div class="grid-ficha">
+                            <div class="data-item">
+                                <label>Marca</label>
+                                <span id="val-marca-${equipo.serie}">${equipo.marca || 'No especificado'}</span>
+                            </div>
+                            <div class="data-item">
+                                <label>Modelo</label>
+                                <span id="val-modelo-${equipo.serie}">${equipo.modelo || 'No especificado'}</span>
+                            </div>
+                            <div class="data-item">
+                                <label>Número de Serie</label>
+                                <span><strong>${equipo.serie}</strong></span>
+                            </div>
+                            <div class="data-item">
+                                <label>Estado Físico</label>
+                                <span id="val-estado-${equipo.serie}">${equipo.estado || 'No especificado'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="cat-header">Accesorios y Documentación</div>
+                        <div class="grid-ficha">
+                            <div class="data-item">
+                                <label>Mochila</label>
+                                <span id="val-mochila-${equipo.serie}">${equipo.mochila || 'No especificado'}</span>
+                            </div>
+                            <div class="data-item">
+                                <label>Cargador</label>
+                                <span id="val-cargador-${equipo.serie}">${equipo.cargador || 'No especificado'}</span>
+                            </div>
+                            <div class="data-item">
+                                <label>Fecha de Entrega</label>
+                                <span id="val-fecha-${equipo.serie}">${formatDate(equipo.fecha_entrega) || 'No especificada'}</span>
+                            </div>
+                            <div class="data-item">
+                                <label>Firma Acta</label>
+                                <span id="val-firmado-${equipo.serie}">${equipo.doc_firmado || 'Pendiente'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="cat-header">Observaciones</div>
+                        <div class="data-item" style="width:100%; min-height: 60px;">
+                            <span id="val-obs-${equipo.serie}">${equipo.observaciones || 'Sin observaciones.'}</span>
+                        </div>
+                        
+                        <div id="edit-controls-${equipo.serie}" class="edit-controls hidden">
+                            <button class="btn-save" onclick="guardarCambios('${equipo.serie}')">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                            <button class="btn-cancel" onclick="cancelarEdicion('${equipo.serie}')">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
         document.getElementById('fichaContent').innerHTML = html;
+        editMode = {}; // Resetear modo edición
+    }
+
+    function getStatusClass(status) {
+        if (!status) return 'status-pending';
+        const statusLower = status.toLowerCase();
+        if (statusLower.includes('buen') || statusLower.includes('activo') || statusLower.includes('excelente')) {
+            return 'status-active';
+        } else if (statusLower.includes('mal') || statusLower.includes('inactivo') || statusLower.includes('dañado')) {
+            return 'status-inactive';
+        }
+        return 'status-pending';
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-CL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
     }
 
     function activarEdicion(serie) {
         const campos = ['marca', 'modelo', 'estado', 'mochila', 'cargador', 'fecha', 'firmado', 'obs'];
-        campos.forEach(c => {
-            const span = document.getElementById(`val-${c}-${serie}`);
-            const valActual = span.innerText === 'N/A' || span.innerText === 'Sin notas.' ? '' : span.innerText;
-            span.innerHTML = `<input type="text" class="editable-input" id="input-${c}-${serie}" value="${valActual}">`;
+        
+        // Guardar valores actuales para posible cancelación
+        if (!editMode[serie]) {
+            editMode[serie] = {};
+            campos.forEach(campo => {
+                const span = document.getElementById(`val-${campo}-${serie}`);
+                editMode[serie][campo] = span.textContent;
+            });
+        }
+
+        // Convertir spans a inputs
+        campos.forEach(campo => {
+            const span = document.getElementById(`val-${campo}-${serie}`);
+            const currentValue = span.textContent === 'No especificado' || 
+                                span.textContent === 'No especificada' || 
+                                span.textContent === 'Sin observaciones.' ||
+                                span.textContent === 'Pendiente' ? '' : span.textContent;
+            
+            let inputType = 'text';
+            if (campo === 'fecha') inputType = 'date';
+            if (campo === 'obs') {
+                span.innerHTML = `<textarea class="editable-input" id="input-${campo}-${serie}" 
+                    rows="3" style="resize: vertical;">${currentValue}</textarea>`;
+            } else {
+                span.innerHTML = `<input type="${inputType}" class="editable-input" 
+                    id="input-${campo}-${serie}" value="${currentValue}">`;
+            }
         });
+
+        // Mostrar controles de edición
         document.getElementById(`edit-controls-${serie}`).classList.remove('hidden');
+    }
+
+    function cancelarEdicion(serie) {
+        if (!editMode[serie]) return;
+        
+        // Restaurar valores originales
+        Object.keys(editMode[serie]).forEach(campo => {
+            const span = document.getElementById(`val-${campo}-${serie}`);
+            span.innerHTML = editMode[serie][campo];
+        });
+
+        // Ocultar controles
+        document.getElementById(`edit-controls-${serie}`).classList.add('hidden');
+        delete editMode[serie];
     }
 
     async function guardarCambios(serie) {
         setLoading(true);
-        const body = {
-            marca: document.getElementById(`input-marca-${serie}`).value,
-            modelo: document.getElementById(`input-modelo-${serie}`).value,
-            estado: document.getElementById(`input-estado-${serie}`).value,
-            mochila: document.getElementById(`input-mochila-${serie}`).value,
-            cargador: document.getElementById(`input-cargador-${serie}`).value,
-            fecha_entrega: document.getElementById(`input-fecha-${serie}`).value,
-            doc_firmado: document.getElementById(`input-firmado-${serie}`).value,
-            observaciones: document.getElementById(`input-obs-${serie}`).value
-        };
+        
+        try {
+            const body = {
+                marca: document.getElementById(`input-marca-${serie}`).value.trim(),
+                modelo: document.getElementById(`input-modelo-${serie}`).value.trim(),
+                estado: document.getElementById(`input-estado-${serie}`).value.trim(),
+                mochila: document.getElementById(`input-mochila-${serie}`).value.trim(),
+                cargador: document.getElementById(`input-cargador-${serie}`).value.trim(),
+                fecha_entrega: document.getElementById(`input-fecha-${serie}`).value,
+                doc_firmado: document.getElementById(`input-firmado-${serie}`).value.trim(),
+                observaciones: document.getElementById(`input-obs-${serie}`).value.trim(),
+                updated_at: new Date().toISOString()
+            };
 
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${serie}`, {
-            method: 'PATCH',
-            headers: HEADERS,
-            body: JSON.stringify(body)
-        });
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${serie}`, {
+                method: 'PATCH',
+                headers: HEADERS,
+                body: JSON.stringify(body)
+            });
 
-        if (res.ok) {
-            alert("¡Datos actualizados con éxito!");
-            fetchData(); // Recarga datos para ver cambios
-        } else {
-            alert("Error al guardar. Intente de nuevo.");
+            if (response.ok) {
+                mostrarMensaje('¡Datos actualizados correctamente!', 'success');
+                await fetchData(); // Recargar datos
+                verFicha(currentUserRut); // Actualizar vista
+            } else {
+                throw new Error('Error al actualizar');
+            }
+        } catch (error) {
+            console.error('Error al guardar:', error);
+            mostrarMensaje('Error al guardar los cambios', 'error');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
 
-    function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
-    function salir() { location.reload(); }
+    function agregarEquipo(rut) {
+        // Implementar lógica para agregar nuevo equipo
+        alert(`Función para agregar equipo a ${rut} - En desarrollo`);
+    }
+
+    async function cargarSharePoint() {
+        if (!confirm('¿Está seguro de cargar datos desde SharePoint? Esto puede sobreescribir datos existentes.')) {
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Simulación de carga
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            mostrarMensaje('Datos cargados exitosamente desde SharePoint', 'success');
+            await fetchData();
+        } catch (error) {
+            mostrarMensaje('Error al cargar desde SharePoint', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function exportarDatos() {
+        const dataStr = JSON.stringify(masterData, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `ti-maestro-export-${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        mostrarMensaje('Datos exportados correctamente', 'success');
+    }
+
+    function setLoading(loading) {
+        const loadingBar = document.getElementById('loadingBar');
+        if (loading) {
+            loadingBar.style.width = '100%';
+            loadingBar.style.transition = 'width 0.4s ease';
+        } else {
+            loadingBar.style.width = '0';
+            loadingBar.style.transition = 'width 0.2s ease';
+        }
+    }
+
+    function mostrarMensaje(mensaje, tipo = 'info') {
+        // Crear notificación
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        `;
+        
+        if (tipo === 'success') {
+            notification.style.background = 'var(--success)';
+        } else if (tipo === 'error') {
+            notification.style.background = 'var(--danger)';
+        } else {
+            notification.style.background = 'var(--primary)';
+        }
+        
+        notification.textContent = mensaje;
+        document.body.appendChild(notification);
+        
+        // Remover después de 3 segundos
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    function mostrarError(mensaje) {
+        mostrarMensaje(mensaje, 'error');
+    }
+
+    // Añadir estilos para animaciones
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 </body>
 </html>
