@@ -1,255 +1,40 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v36.0 - Data Integrity</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+async function analizarCSV() {
+    const file = document.getElementById('csvFile').files[0];
+    if(!file) return alert("Seleccione un archivo");
 
-    <style>
-        :root {
-            --primary: #0066CC; --secondary: #E31837; --success: #22c55e;
-            --warning: #f59e0b; --danger: #ef4444; --bg: #FFFFF5; --border: #e2e8f0;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
+    const text = await file.text();
+    const lines = text.split('\n').filter(l => l.trim() !== '');
+    temporalCSVData = [];
+
+    // --- MEJORA: DETECCIÓN AUTOMÁTICA DE SEPARADOR ---
+    const firstLine = lines[0];
+    const numComas = (firstLine.match(/,/g) || []).length;
+    const numPuntoComas = (firstLine.match(/;/g) || []).length;
+    
+    // Elegimos el que más aparezca en la cabecera
+    const separador = numPuntoComas >= numComas ? ';' : ',';
+    console.log(`Separador detectado: "${separador}"`);
+    // -------------------------------------------------
+
+    for(let i=1; i<lines.length; i++) {
+        // Usamos el separador detectado dinámicamente
+        const cols = lines[i].split(separador).map(c => c.trim().replace(/"/g, ''));
         
-        .main-view { flex-grow: 1; padding: 25px; overflow-y: auto; background: #f8fafc; }
-        #sidebar { width: 280px; background: var(--primary); color: white; padding: 25px; display: flex; flex-direction: column; }
-        
-        /* Tabla de Validación CSV */
-        .validation-table-container { 
-            max-height: 400px; overflow-y: auto; border: 1px solid var(--border); 
-            border-radius: 8px; margin-top: 15px; 
-        }
-        .validation-table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; }
-        .validation-table th { position: sticky; top: 0; background: #eee; padding: 10px; text-align: left; }
-        .validation-table td { padding: 8px; border-bottom: 1px solid #eee; }
-        .row-error { background-color: #fee2e2 !important; } /* Rojo claro para errores */
-        .cell-edit { border: 1px solid transparent; padding: 4px; border-radius: 4px; width: 100%; }
-        .cell-edit:focus { border-color: var(--primary); background: white; outline: none; }
-        
-        .badge-fix { background: var(--warning); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
-        
-        .hidden { display: none !important; }
-        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; text-align: left; cursor: pointer; }
-        .nav-btn.active { background: var(--secondary); }
-    </style>
-</head>
-<body>
+        const rut = cols[0] || "";
+        const esValido = validarRUT(rut);
 
-<div id="loadingBar" style="position:fixed; top:0; left:0; height:3px; background:var(--secondary); width:0; transition:0.3s; z-index:20000;"></div>
-
-<div id="loginPage" style="display:flex; width:100%; height:100vh; align-items:center; justify-content:center; background:var(--primary);">
-    <div style="background:white; padding:40px; border-radius:20px; text-align:center; width:350px;">
-        <h2 style="margin-bottom:20px;">TI Maestro v36.0</h2>
-        <input type="password" id="loginPass" placeholder="Clave: DominoTI2024" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ccc;">
-        <button onclick="iniciarSesion()" style="width:100%; padding:10px; background:var(--secondary); color:white; border:none; border-radius:8px; cursor:pointer;">Entrar</button>
-    </div>
-</div>
-
-<div id="appContainer" class="hidden" style="width:100%; display:flex;">
-    <div id="sidebar">
-        <h3>TI Maestro</h3>
-        <nav style="margin-top:30px;">
-            <button class="nav-btn active" onclick="showView('viewInventory')"><i class="fas fa-list"></i> Inventario</button>
-            <button class="nav-btn" onclick="openCSVModal()"><i class="fas fa-file-csv"></i> Cargar CSV</button>
-        </nav>
-        <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid white; color:white; padding:10px; border-radius:8px; cursor:pointer;">Salir</button>
-    </div>
-
-    <main class="main-view">
-        <div id="viewInventory" class="view-content">
-            <h1>Inventario TI</h1>
-            <div id="listaPersonas" style="margin-top:20px;"></div>
-        </div>
-    </main>
-</div>
-
-<div id="csvModal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:10000;">
-    <div style="background:white; padding:25px; border-radius:15px; width:95%; max-width:900px; max-height:90vh; display:flex; flex-direction:column;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Pre-visualización y Corrección de Datos</h3>
-            <span id="csvStats" style="font-size:12px; color:var(--gray);"></span>
-        </div>
-        
-        <div id="uploadStep">
-            <p style="margin:15px 0;">Seleccione el archivo para analizar:</p>
-            <input type="file" id="csvFile" accept=".csv">
-            <button onclick="analizarCSV()" style="margin-top:10px; padding:10px 20px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">Analizar Archivo</button>
-        </div>
-
-        <div id="validationStep" class="hidden" style="flex-grow:1; display:flex; flex-direction:column;">
-            <div class="validation-table-container">
-                <table class="validation-table">
-                    <thead>
-                        <tr>
-                            <th>RUT (Editable)</th>
-                            <th>Nombre (Editable)</th>
-                            <th>Serie (Editable)</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="csvPreviewBody"></tbody>
-                </table>
-            </div>
-            
-            <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
-                <button onclick="closeCSVModal()" style="padding:10px 20px; border:none; border-radius:8px; cursor:pointer;">Cancelar</button>
-                <button onclick="finalizarCarga()" style="padding:10px 20px; background:var(--success); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Sincronizar Datos Limpios</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
-    const SUPABASE_KEY = "TU_KEY_AQUI"; 
-    const HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
-
-    let temporalCSVData = []; // Aquí guardaremos los datos mientras el usuario los edita
-
-    // --- 1. VALIDACIÓN DE RUT ---
-    function validarRUT(rut) {
-        if (!/^[0-9]+-[0-9kK]{1}$/.test(rut)) return false;
-        let [num, dv] = rut.split('-');
-        let sum = 0, mul = 2;
-        for (let i = num.length - 1; i >= 0; i--) {
-            sum += num[i] * mul;
-            mul = mul === 7 ? 2 : mul + 1;
-        }
-        let res = 11 - (sum % 11);
-        let dvr = res === 11 ? '0' : res === 10 ? 'K' : res.toString();
-        return dvr.toUpperCase() === dv.toUpperCase();
-    }
-
-    // --- 2. ANALIZAR CSV (Sin subir) ---
-    async function analizarCSV() {
-        const file = document.getElementById('csvFile').files[0];
-        if(!file) return alert("Seleccione un archivo");
-
-        const text = await file.text();
-        const lines = text.split('\n').filter(l => l.trim() !== '');
-        temporalCSVData = [];
-
-        for(let i=1; i<lines.length; i++) {
-            const cols = lines[i].split(';').map(c => c.trim().replace(/"/g, ''));
-            const rut = cols[0] || "";
-            const esValido = validarRUT(rut);
-
-            temporalCSVData.push({
-                rut: rut,
-                nombre: cols[1] || "SIN NOMBRE",
-                serie: cols[2] || "SIN SERIE",
-                tipo: cols[3] || "Laptop",
-                estado: cols[5] || "Activo",
-                valido: esValido,
-                revisarLuego: false
-            });
-        }
-
-        renderValidacion();
-        document.getElementById('uploadStep').classList.add('hidden');
-        document.getElementById('validationStep').classList.remove('hidden');
-    }
-
-    // --- 3. MESA DE EDICIÓN ---
-    function renderValidacion() {
-        const tbody = document.getElementById('csvPreviewBody');
-        tbody.innerHTML = "";
-
-        temporalCSVData.forEach((item, index) => {
-            const row = document.createElement('tr');
-            if(!item.valido) row.className = 'row-error';
-
-            row.innerHTML = `
-                <td><input class="cell-edit" value="${item.rut}" onchange="updateTempData(${index}, 'rut', this.value)"></td>
-                <td><input class="cell-edit" value="${item.nombre}" onchange="updateTempData(${index}, 'nombre', this.value)"></td>
-                <td><input class="cell-edit" value="${item.serie}" onchange="updateTempData(${index}, 'serie', this.value)"></td>
-                <td><span style="color:${item.valido ? 'green' : 'red'}">${item.valido ? 'OK' : 'RUT Inválido'}</span></td>
-                <td>
-                    <button class="badge-fix" onclick="marcarRevision(${index})">
-                        ${item.revisarLuego ? '🚩 Marcado' : 'Marcar para después'}
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(row);
+        temporalCSVData.push({
+            rut: rut,
+            nombre: cols[1] || "SIN NOMBRE",
+            serie: cols[2] || "SIN SERIE",
+            tipo: cols[3] || "Laptop",
+            estado: cols[5] || "Activo",
+            valido: esValido,
+            revisarLuego: false
         });
-        
-        document.getElementById('csvStats').textContent = `${temporalCSVData.length} registros cargados`;
     }
 
-    function updateTempData(index, field, value) {
-        temporalCSVData[index][field] = value;
-        // Re-validar si se cambió el RUT
-        if(field === 'rut') {
-            temporalCSVData[index].valido = validarRUT(value);
-            renderValidacion();
-        }
-    }
-
-    function marcarRevision(index) {
-        temporalCSVData[index].revisarLuego = !temporalCSVData[index].revisarLuego;
-        if(temporalCSVData[index].revisarLuego) {
-            temporalCSVData[index].estado = "PENDIENTE REVISIÓN";
-        }
-        renderValidacion();
-    }
-
-    // --- 4. SUBIDA FINAL ---
-    async function finalizarCarga() {
-        const invalidos = temporalCSVData.filter(d => !d.valido && !d.revisarLuego);
-        if(invalidos.length > 0) {
-            return alert(`Aún tienes ${invalidos.length} registros con errores. Corrígelos o márcalos para "Marcar para después".`);
-        }
-
-        setLoading(true);
-        try {
-            const colaboradores = temporalCSVData.map(d => ({ rut: d.rut, nombre: d.nombre }));
-            const activos = temporalCSVData.map(d => ({
-                serie: d.serie, 
-                tipo: d.tipo, 
-                estado: d.estado, 
-                rut_responsable: d.rut,
-                observaciones: d.revisarLuego ? "CARGADO CON ERRORES - REVISAR" : ""
-            }));
-
-            // Upsert en Supabase
-            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
-                method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify(colaboradores)
-            });
-
-            await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
-                method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify(activos)
-            });
-
-            alert("¡Sincronización exitosa!");
-            closeCSVModal();
-            location.reload(); // Recargar para ver los nuevos datos
-        } catch(e) { alert("Error al subir: " + e.message); }
-        setLoading(false);
-    }
-
-    // --- FUNCIONES AUXILIARES ---
-    function iniciarSesion() {
-        if(document.getElementById('loginPass').value === 'DominoTI2024') {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('appContainer').classList.remove('hidden');
-        } else { alert("Clave incorrecta"); }
-    }
-    function showView(id) { /* Lógica de cambio de vista */ }
-    function openCSVModal() { 
-        document.getElementById('csvModal').classList.remove('hidden'); 
-        document.getElementById('uploadStep').classList.remove('hidden');
-        document.getElementById('validationStep').classList.add('hidden');
-    }
-    function closeCSVModal() { document.getElementById('csvModal').classList.add('hidden'); }
-    function setLoading(l) { document.getElementById('loadingBar').style.width = l ? '100%' : '0'; }
-</script>
-</body>
-</html>
+    renderValidacion();
+    document.getElementById('uploadStep').classList.add('hidden');
+    document.getElementById('validationStep').classList.remove('hidden');
+}
