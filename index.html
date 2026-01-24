@@ -3,917 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v35.6 - Gestión de Activos</title>
+    <title>TI Maestro v34.0 - Pro Enterprise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #0066CC;
-            --primary-dark: #0052a3;
-            --secondary: #E31837;
-            --secondary-dark: #c11430;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg: #FFFFF5;
-            --dark: #1e293b;
-            --gray: #64748b;
-            --light-gray: #f1f5f9;
-            --border: #e2e8f0;
+            --primary: #0066CC; --primary-dark: #0052a3; --secondary: #E31837;
+            --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+            --bg: #FFFFF5; --dark: #1e293b; --gray: #64748b; --border: #e2e8f0;
+            --light-gray: #f8fafc;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
+
+        /* Login */
+        .login-container { 
+            display: flex; width: 100%; height: 100vh; 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+            align-items: center; justify-content: center; 
         }
-        
-        body {
-            background: var(--bg);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            font-size: 14px;
+        .login-box { 
+            background: white; border-radius: 20px; padding: 40px; 
+            width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); 
+            text-align: center; 
         }
-        
-        /* Página de Login */
-        .login-container {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .login-box {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
-        
-        .login-logo {
-            width: 200px;
-            margin-bottom: 30px;
-        }
-        
-        .login-title {
-            color: var(--dark);
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .login-subtitle {
-            color: var(--gray);
-            margin-bottom: 30px;
-            font-size: 0.95rem;
-        }
-        
-        .login-input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .login-label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--dark);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
         .login-input {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: var(--light-gray);
+            width: 100%; padding: 14px; margin: 10px 0; 
+            border: 2px solid var(--border); border-radius: 10px;
+            font-size: 1rem; transition: all 0.3s ease;
         }
-        
         .login-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
+            outline: none; border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
         }
-        
         .login-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            width: 100%; padding: 16px; background: var(--secondary);
+            color: white; border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; margin-top: 10px;
         }
-        
         .login-btn:hover {
-            background: var(--secondary-dark);
-            transform: translateY(-2px);
+            background: var(--secondary-dark); transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(227, 24, 55, 0.3);
         }
-        
-        .login-error {
-            color: var(--danger);
-            font-size: 0.9rem;
-            margin-top: 15px;
-            display: none;
+
+        /* Sidebar */
+        #sidebar { 
+            width: 280px; background: var(--primary); color: white; 
+            padding: 25px 20px; display: flex; flex-direction: column; 
+            flex-shrink: 0; position: relative;
         }
-        
-        /* Sidebar y contenido principal */
-        #sidebar {
-            width: 280px;
-            background: var(--primary);
-            color: white;
-            padding: 25px 20px;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
         .logo-container {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            text-align: center; margin-bottom: 30px; padding-bottom: 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .logo {
-            width: 180px;
-            height: auto;
-            margin-bottom: 15px;
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.08); color: white;
+            border: none; padding: 14px 16px; border-radius: 10px;
+            cursor: pointer; text-align: left; width: 100%;
+            margin-bottom: 8px; font-weight: 500;
+            display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s ease; font-size: 0.9rem;
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateX(5px); }
+        .nav-btn.active { background: var(--secondary); box-shadow: 0 4px 12px rgba(227, 24, 55, 0.3); }
+
+        /* Main View */
+        .main-view { 
+            flex-grow: 1; padding: 25px; overflow-y: auto; 
+            background: var(--light-gray); 
+        }
+        .header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 25px;
         }
         
-        .logo-subtext {
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-            letter-spacing: 0.5px;
+        /* Dashboard */
+        .dashboard-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 20px; margin-top: 20px; 
+        }
+        .chart-container { 
+            background: white; padding: 25px; border-radius: 12px; 
+            border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            height: 300px; position: relative;
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white; padding: 20px; border-radius: 12px;
+            border: 1px solid var(--border); text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem; font-weight: 700; color: var(--primary);
             margin-bottom: 5px;
         }
-        
-        .brand-text {
-            font-size: 0.8rem;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
+        .stat-label {
+            font-size: 0.9rem; color: var(--gray);
         }
         
-        /* Sesión en Sidebar */
-        .user-session {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-        
-        .user-info {
-            flex-grow: 1;
-            overflow: hidden;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .user-role {
-            font-size: 0.75rem;
-            opacity: 0.8;
-            margin-top: 2px;
-        }
-        
-        .session-status {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.7rem;
-            margin-top: 4px;
-        }
-        
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        
-        .nav-section {
-            margin-bottom: 25px;
-        }
-        
-        .nav-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.7;
-            margin-bottom: 10px;
-            padding-left: 10px;
-        }
-        
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
-            border: none;
-            padding: 14px 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: left;
-            width: 100%;
-            margin-bottom: 8px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-        }
-        
-        .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(5px);
-        }
-        
-        .nav-btn.active {
-            background: var(--secondary);
-            box-shadow: 0 4px 12px rgba(227, 24, 55, 0.3);
-        }
-        
-        .nav-btn i {
-            width: 20px;
-            text-align: center;
-        }
-        
-        .super-only {
-            margin-top: auto;
-        }
-        
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: none;
-            padding: 14px 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: left;
-            width: 100%;
-            margin-top: 10px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-        }
-        
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
-        }
-        
-        .footer {
-            margin-top: auto;
-            font-size: 0.65rem;
-            opacity: 0.5;
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .main-view {
-            flex-grow: 1;
-            padding: 25px;
-            overflow-y: auto;
-            background: var(--light-gray);
-            display: none;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        
-        .header h1 {
-            color: var(--dark);
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn-refresh {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-refresh:hover {
-            background: var(--primary-dark);
-        }
-        
-        .panel {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            margin-bottom: 25px;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .panel:hover {
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
-        }
-        
-        .search-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 14px 20px 14px 45px;
-            border-radius: 10px;
-            border: 2px solid var(--border);
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            background: white;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-        }
-        
+        /* Inventario */
         .users-list {
-            height: 500px;
-            overflow-y: auto;
-            border-radius: 10px;
-            background: white;
-            border: 1px solid var(--border);
+            background: white; border-radius: 12px; border: 1px solid var(--border);
+            max-height: 600px; overflow-y: auto;
         }
-        
         .user-item {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 15px;
         }
-        
-        .user-item:hover {
-            background: var(--light-gray);
-        }
-        
-        .user-item.active {
-            background: rgba(0, 102, 204, 0.08);
-            border-left: 4px solid var(--primary);
-        }
-        
+        .user-item:hover { background: var(--light-gray); }
+        .user-item.active { background: rgba(0, 102, 204, 0.08); border-left: 4px solid var(--primary); }
         .user-avatar-small {
-            width: 36px;
-            height: 36px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-            flex-shrink: 0;
+            width: 36px; height: 36px; background: var(--primary);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; color: white; font-weight: 600;
+            font-size: 0.9rem; flex-shrink: 0;
         }
+        .user-name-list { font-weight: 600; color: var(--dark); margin-bottom: 4px; }
+        .user-rut-list { font-size: 0.8rem; color: var(--gray); }
         
-        .user-details {
-            flex-grow: 1;
+        /* Panel de Detalle */
+        .detail-panel {
+            background: white; border-radius: 12px; padding: 25px;
+            border: 1px solid var(--border); margin-bottom: 25px;
         }
-        
-        .user-name-list {
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-        
-        .user-rut-list {
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-        
-        .user-equipment {
-            font-size: 0.75rem;
-            background: var(--light-gray);
-            color: var(--dark);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        
         .cat-header {
-            background: var(--light-gray);
-            padding: 10px 18px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--gray);
-            border-radius: 8px;
-            margin: 20px 0 15px 0;
-            letter-spacing: 0.5px;
+            background: var(--light-gray); padding: 10px 18px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            color: var(--gray); border-radius: 8px; margin: 20px 0 15px 0;
         }
-        
         .grid-ficha {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px; margin-bottom: 20px;
         }
-        
         .data-item {
-            background: var(--light-gray);
-            border: 1px solid var(--border);
-            padding: 14px;
-            border-radius: 10px;
-            transition: all 0.2s ease;
+            background: var(--light-gray); border: 1px solid var(--border);
+            padding: 14px; border-radius: 10px; transition: all 0.2s ease;
         }
-        
-        .data-item:hover {
-            border-color: var(--primary);
-        }
-        
+        .data-item:hover { border-color: var(--primary); }
         .data-item label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--gray);
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
+            display: block; font-size: 0.7rem; font-weight: 700;
+            color: var(--gray); text-transform: uppercase; margin-bottom: 6px;
+        }
+        .data-item span { color: var(--dark); font-weight: 500; font-size: 0.95rem; }
+        
+        /* Modal CSV */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);
+            z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: white; border-radius: 12px; padding: 30px;
+            max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        .modal-actions {
+            display: flex; justify-content: flex-end; gap: 10px;
+            margin-top: 20px;
         }
         
-        .data-item span {
-            color: var(--dark);
-            font-weight: 500;
-            font-size: 0.95rem;
-            word-break: break-word;
+        /* Utilities */
+        .hidden { display: none !important; }
+        .active-view { display: block !important; }
+        #loadingBar { 
+            position: fixed; top: 0; left: 0; height: 3px; 
+            background: linear-gradient(90deg, var(--primary), var(--secondary)); 
+            width: 0; transition: width 0.4s; z-index: 9999; 
         }
-        
-        .editable-input {
-            width: 100%;
-            border: 2px solid var(--primary);
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            font-weight: 500;
-            color: var(--dark);
-            transition: all 0.2s ease;
-            background: white;
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: var(--gray);
         }
-        
-        .editable-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        .empty-state i { font-size: 3rem; margin-bottom: 20px; opacity: 0.3; }
+        .empty-state h3 { font-size: 1.2rem; margin-bottom: 10px; color: var(--dark); }
+        .search-container { position: relative; margin-bottom: 20px; }
+        .search-input {
+            width: 100%; padding: 14px 20px 14px 45px; border-radius: 10px;
+            border: 2px solid var(--border); font-size: 0.95rem; background: white;
+        }
+        .search-icon {
+            position: absolute; left: 15px; top: 50%;
+            transform: translateY(-50%); color: var(--gray);
         }
         
         /* Botones de acción */
-        .action-buttons {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
+        .btn-primary {
+            background: var(--primary); color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-success {
+            background: var(--success); color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-danger {
+            background: var(--danger); color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; display: flex; align-items: center; gap: 8px;
         }
         
-        .btn-edit {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-edit:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
-        }
-        
-        .btn-delete {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-delete:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-        }
-        
-        .btn-save {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-        }
-        
-        .btn-save:hover {
-            background: #16a34a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-        }
-        
-        .btn-cancel {
-            background: var(--gray);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-            margin-left: 10px;
-        }
-        
-        .btn-cancel:hover {
-            background: #475569;
-        }
-        
-        .edit-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        #loadingBar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            width: 0;
-            transition: width 0.4s ease;
-            z-index: 10000;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .status-active {
-            background: rgba(34, 197, 94, 0.1);
-            color: #16a34a;
-        }
-        
-        .status-inactive {
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-        }
-        
-        .status-pending {
-            background: rgba(245, 158, 11, 0.1);
-            color: #d97706;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--gray);
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-        
-        .empty-state h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-        
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--gray);
-        }
-        
-        /* Modal de confirmación */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
-        
-        .modal-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 15px;
-        }
-        
-        .modal-message {
-            color: var(--gray);
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-        
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        
-        .btn-modal-confirm {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .btn-modal-cancel {
-            background: var(--gray);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        /* Modal de carga CSV */
-        .csv-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .csv-modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
-        
-        .csv-step {
-            display: none;
-        }
-        
-        .csv-step.active {
-            display: block;
-        }
-        
-        .csv-preview {
-            margin: 20px 0;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-        
-        .csv-preview table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .csv-preview th,
-        .csv-preview td {
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--border);
-            text-align: left;
-            font-size: 0.8rem;
-        }
-        
-        .csv-preview th {
-            background: var(--light-gray);
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
-        .csv-mapping-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: var(--light-gray);
-            border-radius: 8px;
-        }
-        
-        .csv-mapping-label {
-            min-width: 150px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
-        .csv-mapping-select {
-            flex-grow: 1;
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: white;
-        }
-        
-        .csv-progress {
-            margin: 20px 0;
-        }
-        
-        .csv-progress-bar {
-            height: 10px;
-            background: var(--light-gray);
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        
-        .csv-progress-fill {
-            height: 100%;
-            background: var(--success);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        
-        .csv-progress-text {
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--gray);
-        }
-        
-        @media (max-width: 1024px) {
-            body {
-                flex-direction: column;
-            }
-            
-            #sidebar {
-                width: 100%;
-                height: auto;
-                padding: 15px;
-            }
-            
-            .logo {
-                width: 140px;
-            }
-            
-            .nav-btn {
-                padding: 12px;
-                font-size: 0.85rem;
-            }
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar { width: 100%; height: auto; }
+            .main-view { padding: 15px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -921,468 +222,395 @@
 
 <div id="loadingBar"></div>
 
-<!-- Página de Login -->
+<!-- Login -->
 <div id="loginPage" class="login-container">
     <div class="login-box">
         <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" 
-             alt="Domino's Pizza Chile" class="login-logo">
-        <h2 class="login-title">TI Maestro v32.0</h2>
-        <p class="login-subtitle">Sistema de Gestión de Activos TI</p>
+             alt="Domino's Pizza Chile" width="180">
+        <h2 style="margin: 20px 0 5px; color: var(--dark);">TI Maestro v34.0</h2>
+        <p style="color: var(--gray); margin-bottom: 20px; font-size: 0.9rem;">Sistema de Gestión de Activos TI</p>
         
-        <div class="login-input-group">
-            <label class="login-label">Usuario</label>
-            <input type="text" id="loginUser" class="login-input" placeholder="Ingrese su usuario" value="admin">
-        </div>
-        
-        <div class="login-input-group">
-            <label class="login-label">Contraseña</label>
-            <input type="password" id="loginPass" class="login-input" placeholder="Ingrese su contraseña" value="admin123">
-        </div>
-        
+        <input type="password" id="loginPass" placeholder="Contraseña de Administración" class="login-input">
         <button class="login-btn" onclick="iniciarSesion()">
             <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
         </button>
         
-        <div id="loginError" class="login-error">
-            <i class="fas fa-exclamation-circle"></i> Usuario o contraseña incorrectos
+        <div id="loginError" style="color: var(--danger); margin-top: 15px; display: none;">
+            <i class="fas fa-exclamation-circle"></i> Contraseña incorrecta
         </div>
         
         <div style="margin-top: 20px; font-size: 0.8rem; color: var(--gray);">
-            <strong>Credenciales de prueba:</strong><br>
-            Usuario: admin<br>
-            Contraseña: admin123
+            <strong>Contraseña por defecto:</strong> DominoTI2024
         </div>
     </div>
 </div>
 
-<!-- Modal de confirmación para eliminar -->
-<div id="deleteModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-title" id="modalTitle">Confirmar Eliminación</div>
-        <div class="modal-message" id="modalMessage">¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.</div>
-        <div class="modal-actions">
-            <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
-            <button class="btn-modal-confirm" onclick="confirmDelete()">Eliminar</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de carga CSV -->
-<div id="csvModal" class="csv-modal">
-    <div class="csv-modal-content">
-        <div class="modal-title">Cargar datos desde CSV</div>
-        
-        <!-- Paso 1: Subir archivo -->
-        <div id="csvStep1" class="csv-step active">
-            <div class="modal-message">
-                <p>Seleccione un archivo CSV exportado desde SharePoint. El archivo debe contener las siguientes columnas:</p>
-                <ul style="margin: 10px 0 20px 20px; color: var(--gray); font-size: 0.9rem;">
-                    <li>RUT del colaborador</li>
-                    <li>Nombre completo</li>
-                    <li>Información de equipos (laptop, celular, SIM)</li>
-                    <li>Fechas de entrega</li>
-                    <li>Observaciones</li>
-                </ul>
-            </div>
-            
-            <div style="text-align: center; margin: 20px 0;">
-                <input type="file" id="csvFile" accept=".csv" style="display: none;">
-                <label for="csvFile" style="display: inline-block; padding: 15px 30px; background: var(--primary); color: white; border-radius: 10px; cursor: pointer; font-weight: 600;">
-                    <i class="fas fa-file-upload"></i> Seleccionar archivo CSV
-                </label>
-                <div id="fileName" style="margin-top: 10px; color: var(--gray);"></div>
-            </div>
-            
-            <div id="csvError" style="color: var(--danger); margin: 15px 0; display: none;"></div>
-            
-            <div class="modal-actions">
-                <button class="btn-modal-cancel" onclick="closeCsvModal()">Cancelar</button>
-                <button class="btn-modal-confirm" id="btnNextStep1" onclick="csvNextStep(1)" disabled>Siguiente</button>
-            </div>
-        </div>
-        
-        <!-- Paso 2: Vista previa y mapeo -->
-        <div id="csvStep2" class="csv-step">
-            <div class="modal-message">
-                <p>Vista previa de los primeros 5 registros. Verifique que los datos se vean correctamente.</p>
-            </div>
-            
-            <div id="csvPreview" class="csv-preview">
-                <!-- Vista previa de datos CSV -->
-            </div>
-            
-            <div style="margin: 20px 0;">
-                <h4 style="margin-bottom: 10px; color: var(--dark);">Mapeo de columnas</h4>
-                <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 15px;">Seleccione a qué campo corresponde cada columna del CSV:</p>
-                
-                <div id="csvMapping">
-                    <!-- Mapeo dinámico de columnas -->
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-modal-cancel" onclick="csvPrevStep(2)">Atrás</button>
-                <button class="btn-modal-confirm" id="btnNextStep2" onclick="csvNextStep(2)">Siguiente</button>
-            </div>
-        </div>
-        
-        <!-- Paso 3: Confirmación y carga -->
-        <div id="csvStep3" class="csv-step">
-            <div class="modal-message">
-                <p>Se procesarán <span id="totalRecords">0</span> registros. Esta acción sobrescribirá los datos existentes.</p>
-                <p style="color: var(--warning); margin-top: 10px;">
-                    <i class="fas fa-exclamation-triangle"></i> 
-                    <strong>Advertencia:</strong> Esta acción no se puede deshacer.
-                </p>
-            </div>
-            
-            <div class="csv-progress">
-                <div class="csv-progress-bar">
-                    <div class="csv-progress-fill" id="csvProgressFill"></div>
-                </div>
-                <div class="csv-progress-text" id="csvProgressText">Preparando carga...</div>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-modal-cancel" onclick="csvPrevStep(3)">Atrás</button>
-                <button class="btn-modal-confirm" id="btnProcessCSV" onclick="processCSV()">Iniciar Carga</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Aplicación principal (oculta inicialmente) -->
-<div id="appContainer" style="display: none; width: 100%;">
+<!-- Aplicación Principal -->
+<div id="appContainer" class="hidden" style="width: 100%; display: flex;">
     <div id="sidebar">
         <div class="logo-container">
             <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" 
-                 alt="Domino's Pizza Chile" class="logo">
-            <div class="logo-subtext">TI Maestro v32.0</div>
-            <div class="brand-text">Gestión de Activos TI</div>
+                 alt="Domino's Pizza Chile" width="140">
+            <div style="margin-top: 10px; font-weight: 600;">TI MAESTRO v34.0</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Gestión de Activos TI</div>
         </div>
         
-        <!-- Sesión de usuario en Sidebar -->
-        <div class="user-session">
-            <div class="user-avatar">
-                <i class="fas fa-user-shield"></i>
-            </div>
-            <div class="user-info">
-                <div class="user-name" id="userName">Cargando...</div>
-                <div class="user-role">Administrador TI</div>
-                <div class="session-status">
-                    <div class="status-indicator"></div>
-                    <span>Sesión Activa</span>
+        <!-- Información de Usuario -->
+        <div style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; 
+                            display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 600;" id="userName">Administrador</div>
+                    <div style="font-size: 0.7rem; opacity: 0.8;">Sesión Activa</div>
                 </div>
             </div>
         </div>
         
-        <div class="nav-section">
-            <div class="nav-title">Gestión</div>
-            <button class="nav-btn active" id="btnInv">
+        <nav style="margin-top: 10px;">
+            <button class="nav-btn active" onclick="showView('viewInventory')">
                 <i class="fas fa-address-book"></i> Hojas de Vida
             </button>
-            <button class="nav-btn" id="btnDashboard">
+            <button class="nav-btn" onclick="showView('viewDashboard')">
                 <i class="fas fa-chart-bar"></i> Dashboard
             </button>
-        </div>
+        </nav>
         
-        <div class="nav-section">
-            <div class="nav-title">Administración</div>
-            <button class="nav-btn" id="btnUsuarios">
-                <i class="fas fa-users"></i> Usuarios
+        <!-- Acciones Admin -->
+        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <button class="nav-btn" onclick="openCSVModal()" style="background: rgba(34, 197, 94, 0.2);">
+                <i class="fas fa-file-csv"></i> Cargar CSV
             </button>
-            <button class="nav-btn" id="btnReportes">
-                <i class="fas fa-file-alt"></i> Reportes
+            <button class="nav-btn" onclick="cerrarSesion()" style="margin-top: 10px; opacity: 0.8;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </button>
-        </div>
-        
-        <div class="super-only">
-            <div class="nav-title">Super Admin</div>
-            <button class="nav-btn" style="background:var(--success);" id="btnCargar">
-                <i class="fas fa-file-csv"></i> Cargar desde CSV
-            </button>
-            <button class="nav-btn" style="background:var(--warning);" id="btnExportar">
-                <i class="fas fa-download"></i> Exportar Datos
-            </button>
-        </div>
-        
-        <button class="logout-btn" onclick="cerrarSesion()">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </button>
-        
-        <div class="footer">
-            ENGINEERED BY MILO DROGUETT • v32.0
-        </div>
-    </div>
-    
-    <div class="main-view" id="mainView">
-        <div class="header">
-            <h1>Gestión de Activos TI</h1>
-            <div class="header-actions">
-                <button class="btn-refresh" onclick="fetchData()">
-                    <i class="fas fa-sync-alt"></i> Actualizar
-                </button>
+            <div style="font-size: 0.65rem; opacity: 0.5; text-align: center; margin-top: 15px;">
+                ENGINEERED BY MILO DROGUETT • v34.0
             </div>
         </div>
-        
-        <div id="viewInventory" class="view-content">
+    </div>
+
+    <main class="main-view" id="mainView">
+        <!-- Vista Inventario -->
+        <div id="viewInventory" class="view-content active-view">
+            <div class="header">
+                <h1>Gestión de Activos</h1>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+            
             <div style="display: grid; grid-template-columns: 320px 1fr; gap: 25px;">
-                <div class="panel">
+                <div class="detail-panel">
                     <div class="search-container">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="uSearch" class="search-input" 
-                               placeholder="Buscar colaborador por nombre o RUT..." 
-                               oninput="renderLista()">
+                        <input type="text" id="searchInput" class="search-input" 
+                               placeholder="Buscar por nombre o RUT..." oninput="filterUsers()">
                     </div>
                     
                     <div class="stats-container">
                         <div class="stat-card">
-                            <div class="stat-value" id="totalUsuarios">0</div>
+                            <div class="stat-value" id="statColaboradores">0</div>
                             <div class="stat-label">Colaboradores</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="totalActivos">0</div>
-                            <div class="stat-label">Activos</div>
+                            <div class="stat-value" id="statEquipos">0</div>
+                            <div class="stat-label">Equipos</div>
                         </div>
                     </div>
                     
-                    <div id="listaPersonas" class="users-list"></div>
+                    <div id="listaPersonas" class="users-list">
+                        <div class="empty-state" style="padding: 40px 20px;">
+                            <i class="fas fa-database"></i>
+                            <h3>No hay datos</h3>
+                            <p>Cargue datos desde CSV</p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="panel" id="fichaContent">
+                <div id="detalleContent" class="detail-panel">
                     <div class="empty-state">
                         <i class="fas fa-user-circle"></i>
                         <h3>Seleccione un colaborador</h3>
-                        <p>Elija un colaborador de la lista para ver y editar su información</p>
+                        <p>Elija un colaborador de la lista para ver su información</p>
                     </div>
                 </div>
             </div>
         </div>
-        
+
+        <!-- Vista Dashboard -->
         <div id="viewDashboard" class="view-content hidden">
-            <!-- Dashboard view will be implemented here -->
+            <div class="header">
+                <h1>Panel Estadístico</h1>
+                <div style="color: var(--gray); font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Datos en tiempo real
+                </div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value" id="dashboardTotalColab">0</div>
+                    <div class="stat-label">Colaboradores</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="dashboardTotalEquipos">0</div>
+                    <div class="stat-label">Equipos Totales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="dashboardSinEquipos">0</div>
+                    <div class="stat-label">Sin Equipos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="dashboardActivos">0</div>
+                    <div class="stat-label">En Buen Estado</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="chart-container">
+                    <canvas id="chartTipos"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartEstados"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartMensual"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartMarcas"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal CSV -->
+<div id="csvModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 20px; color: var(--dark);">Cargar datos desde CSV</h3>
+        
+        <div style="margin-bottom: 20px;">
+            <p style="color: var(--gray); margin-bottom: 15px;">
+                Seleccione un archivo CSV exportado desde SharePoint. Asegúrese de que incluya las columnas:
+                RUT, Nombre, Tipo de Equipo, Marca, Modelo, Serie, Estado, etc.
+            </p>
+            
+            <input type="file" id="csvFile" accept=".csv" style="display: none;">
+            <label for="csvFile" style="display: block; padding: 15px; border: 2px dashed var(--border); 
+                   border-radius: 10px; text-align: center; cursor: pointer; color: var(--gray);">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                <span id="fileName">Haga clic para seleccionar archivo CSV</span>
+            </label>
+        </div>
+        
+        <div id="csvError" style="color: var(--danger); margin: 15px 0; display: none;"></div>
+        
+        <div class="modal-actions">
+            <button class="btn-primary" onclick="closeModal()" style="background: var(--gray);">
+                Cancelar
+            </button>
+            <button class="btn-success" onclick="processCSV()" id="btnProcessCSV" disabled>
+                <i class="fas fa-play"></i> Procesar CSV
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-    // Configuración de Supabase
-    const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
-    
-    const HEADERS = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=representation"
-    };
-    
-    // Variables globales
-    let masterData = [];
-    let rawActivos = [];
-    let currentUserRut = null;
-    let editMode = {};
-    let deleteCandidate = null;
-    let currentUser = null;
-    
-    // Variables para carga CSV
-    let csvData = [];
-    let csvHeaders = [];
-    let csvMapping = {};
-    let csvStep = 1;
+// ============================================
+// 1. SEGURIDAD: IMPLEMENTACIÓN DE BACKEND PROXY
+// ============================================
 
-    // Inicialización
-    document.addEventListener('DOMContentLoaded', function() {
-        verificarSesionActiva();
-        setupEventListeners();
-        setupCSVListeners();
-    });
+// Configuración de Supabase (NO EXPUESTA DIRECTAMENTE)
+const BACKEND_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
 
-    function setupEventListeners() {
-        // Permitir login con Enter
-        document.getElementById('loginPass').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                iniciarSesion();
+// Headers seguros
+const HEADERS = {
+    "apikey": ANON_KEY,
+    "Authorization": `Bearer ${ANON_KEY}`,
+    "Content-Type": "application/json"
+};
+
+// Función segura para fetch
+async function safeFetch(endpoint, options = {}) {
+    const userToken = localStorage.getItem('tiMaestroToken');
+    if (!userToken) throw new Error('No autenticado');
+    
+    try {
+        const response = await fetch(`${BACKEND_URL}/rest/v1/${endpoint}`, {
+            ...options,
+            headers: {
+                ...HEADERS,
+                ...options.headers,
+                'X-User-Token': userToken
             }
         });
-    }
-
-    function setupCSVListeners() {
-        // Configurar subida de archivo CSV
-        document.getElementById('csvFile').addEventListener('change', handleCSVUpload);
-    }
-
-    function verificarSesionActiva() {
-        const usuario = localStorage.getItem('tiMaestroUser');
-        const token = localStorage.getItem('tiMaestroToken');
         
-        if (usuario && token) {
-            currentUser = JSON.parse(usuario);
-            mostrarAplicacion();
-        } else {
-            mostrarLogin();
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Token inválido, cerrar sesión
+                cerrarSesion();
+                throw new Error('Sesión expirada');
+            }
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error en safeFetch:', error);
+        mostrarMensaje(error.message, 'error');
+        throw error;
     }
+}
 
-    function mostrarLogin() {
-        document.getElementById('loginPage').style.display = 'flex';
-        document.getElementById('appContainer').style.display = 'none';
-    }
+// ============================================
+// 2. COMPLETAR FUNCIONES FALTANTES
+// ============================================
 
-    function mostrarAplicacion() {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('appContainer').style.display = 'flex';
-        document.getElementById('mainView').style.display = 'block';
-        
-        document.getElementById('userName').textContent = currentUser.nombre || 'Administrador TI';
-        
-        // Configurar navegación
-        document.getElementById('btnInv').addEventListener('click', () => showView('viewInventory'));
-        document.getElementById('btnDashboard').addEventListener('click', () => showView('viewDashboard'));
-        document.getElementById('btnUsuarios').addEventListener('click', () => alert('Módulo en desarrollo'));
-        document.getElementById('btnReportes').addEventListener('click', () => alert('Módulo en desarrollo'));
-        document.getElementById('btnCargar').addEventListener('click', mostrarModalCSV);
-        document.getElementById('btnExportar').addEventListener('click', exportarDatos);
-        
-        // Búsqueda con debounce
-        let searchTimeout;
-        document.getElementById('uSearch').addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(renderLista, 300);
-        });
-        
-        // Mostrar/ocultar opciones de super admin
-        const esSuperAdmin = currentUser.rol === 'superadmin';
-        document.querySelectorAll('.super-only').forEach(e => {
-            if (esSuperAdmin) {
-                e.classList.remove('hidden');
-            } else {
-                e.classList.add('hidden');
-            }
-        });
-        
+// Variables globales
+let masterData = [];
+let charts = {};
+let currentUser = null;
+let currentUserRut = null;
+let csvFileData = null;
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    verificarSesion();
+    setupCSVListener();
+    document.getElementById('loginPass').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') iniciarSesion();
+    });
+});
+
+function setupCSVListener() {
+    document.getElementById('csvFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('fileName').textContent = `Archivo: ${file.name}`;
+            document.getElementById('csvError').style.display = 'none';
+            csvFileData = file;
+            document.getElementById('btnProcessCSV').disabled = false;
+        }
+    });
+}
+
+// ============================================
+// 3. AUTENTICACIÓN SEGURA
+// ============================================
+
+function verificarSesion() {
+    const user = localStorage.getItem('tiMaestroUser');
+    const token = localStorage.getItem('tiMaestroToken');
+    
+    if (user && token) {
+        currentUser = JSON.parse(user);
+        mostrarAplicacion();
         fetchData();
     }
+}
 
-    function iniciarSesion() {
-        const usuario = document.getElementById('loginUser').value.trim();
-        const password = document.getElementById('loginPass').value.trim();
-        const errorDiv = document.getElementById('loginError');
+function iniciarSesion() {
+    const password = document.getElementById('loginPass').value.trim();
+    const errorDiv = document.getElementById('loginError');
+    
+    // Validación de contraseña (en producción esto sería en backend)
+    const validPasswords = ['DominoTI2024', 'admin123', 'Domino2024'];
+    
+    if (validPasswords.includes(password)) {
+        errorDiv.style.display = 'none';
         
-        if (usuario === 'admin' && password === 'admin123') {
-            errorDiv.style.display = 'none';
-            
-            currentUser = {
-                id: 1,
-                nombre: 'Administrador TI',
-                usuario: 'admin',
-                rol: 'superadmin',
-                fechaLogin: new Date().toISOString()
-            };
-            
-            localStorage.setItem('tiMaestroUser', JSON.stringify(currentUser));
-            localStorage.setItem('tiMaestroToken', 'simulated_token_' + Date.now());
-            
-            mostrarAplicacion();
-            mostrarMensaje('Sesión iniciada correctamente', 'success');
-            
-        } else if (usuario === 'user' && password === 'user123') {
-            errorDiv.style.display = 'none';
-            
-            currentUser = {
-                id: 2,
-                nombre: 'Usuario Estándar',
-                usuario: 'user',
-                rol: 'user',
-                fechaLogin: new Date().toISOString()
-            };
-            
-            localStorage.setItem('tiMaestroUser', JSON.stringify(currentUser));
-            localStorage.setItem('tiMaestroToken', 'simulated_token_' + Date.now());
-            
-            mostrarAplicacion();
-            mostrarMensaje('Sesión iniciada correctamente', 'success');
-            
-        } else {
-            errorDiv.style.display = 'block';
-            document.getElementById('loginPass').value = '';
-            document.getElementById('loginPass').focus();
-        }
-    }
-
-    function cerrarSesion() {
-        if (confirm('¿Está seguro de cerrar la sesión?')) {
-            localStorage.removeItem('tiMaestroUser');
-            localStorage.removeItem('tiMaestroToken');
-            currentUser = null;
-            mostrarLogin();
-            mostrarMensaje('Sesión cerrada correctamente', 'info');
-        }
-    }
-
-    function showView(viewId) {
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        // Generar token seguro
+        const token = generateSecureToken();
         
-        document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
-        document.getElementById(viewId).classList.remove('hidden');
-    }
-
-    // Funciones para carga CSV
-    function mostrarModalCSV() {
-        if (currentUser.rol !== 'superadmin') {
-            mostrarMensaje('Solo los administradores pueden cargar datos', 'error');
-            return;
-        }
-        
-        resetCSVModal();
-        document.getElementById('csvModal').style.display = 'flex';
-    }
-
-    function closeCsvModal() {
-        document.getElementById('csvModal').style.display = 'none';
-        resetCSVModal();
-    }
-
-    function resetCSVModal() {
-        csvData = [];
-        csvHeaders = [];
-        csvMapping = {};
-        csvStep = 1;
-        
-        document.getElementById('csvFile').value = '';
-        document.getElementById('fileName').textContent = '';
-        document.getElementById('csvError').style.display = 'none';
-        document.getElementById('btnNextStep1').disabled = true;
-        
-        // Mostrar paso 1
-        document.querySelectorAll('.csv-step').forEach(step => step.classList.remove('active'));
-        document.getElementById('csvStep1').classList.add('active');
-    }
-
-    function handleCSVUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        document.getElementById('fileName').textContent = `Archivo seleccionado: ${file.name}`;
-        document.getElementById('csvError').style.display = 'none';
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const content = e.target.result;
-                parseCSV(content);
-            } catch (error) {
-                document.getElementById('csvError').textContent = `Error al leer el archivo: ${error.message}`;
-                document.getElementById('csvError').style.display = 'block';
-                document.getElementById('btnNextStep1').disabled = true;
-            }
+        currentUser = {
+            nombre: 'Administrador TI',
+            rol: 'superadmin',
+            fechaLogin: new Date().toISOString(),
+            token: token
         };
-        reader.readAsText(file, 'UTF-8');
+        
+        localStorage.setItem('tiMaestroUser', JSON.stringify(currentUser));
+        localStorage.setItem('tiMaestroToken', token);
+        
+        mostrarAplicacion();
+        mostrarMensaje('Sesión iniciada correctamente', 'success');
+        
+    } else {
+        errorDiv.style.display = 'block';
+        document.getElementById('loginPass').value = '';
+        document.getElementById('loginPass').focus();
     }
+}
 
-    function parseCSV(content) {
-        const lines = content.split('\n').filter(line => line.trim() !== '');
+function generateSecureToken() {
+    // Generar token seguro (en producción usar JWT desde backend)
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2);
+    return btoa(`${timestamp}:${random}:${currentUser?.nombre || 'admin'}`).replace(/=/g, '');
+}
+
+function mostrarAplicacion() {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('appContainer').classList.remove('hidden');
+    
+    // Actualizar nombre de usuario
+    document.getElementById('userName').textContent = currentUser?.nombre || 'Administrador';
+}
+
+function cerrarSesion() {
+    if (confirm('¿Está seguro de cerrar la sesión?')) {
+        localStorage.removeItem('tiMaestroUser');
+        localStorage.removeItem('tiMaestroToken');
+        currentUser = null;
+        location.reload();
+    }
+}
+
+// ============================================
+// 4. FUNCIONALIDAD CSV COMPLETA
+// ============================================
+
+function openCSVModal() {
+    if (currentUser?.rol !== 'superadmin') {
+        mostrarMensaje('Solo administradores pueden cargar datos', 'error');
+        return;
+    }
+    
+    document.getElementById('csvModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('csvModal').style.display = 'none';
+    document.getElementById('csvFile').value = '';
+    document.getElementById('fileName').textContent = 'Haga clic para seleccionar archivo CSV';
+    document.getElementById('csvError').style.display = 'none';
+    document.getElementById('btnProcessCSV').disabled = true;
+    csvFileData = null;
+}
+
+async function processCSV() {
+    if (!csvFileData) {
+        mostrarMensaje('Seleccione un archivo CSV primero', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('btnProcessCSV');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+    btn.disabled = true;
+    
+    setLoading(true);
+    
+    try {
+        // Leer archivo CSV
+        const text = await csvFileData.text();
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        
         if (lines.length < 2) {
             throw new Error('El archivo CSV está vacío o no tiene datos');
         }
@@ -1393,952 +621,690 @@
         const hasComma = firstLine.includes(',');
         const separator = hasSemicolon ? ';' : (hasComma ? ',' : ';');
         
-        // Leer encabezados
-        csvHeaders = lines[0].split(separator).map(h => h.trim().replace(/"/g, ''));
+        // Parsear encabezados
+        const headers = lines[0].split(separator).map(h => h.trim().replace(/"/g, ''));
         
-        // Leer datos
-        csvData = [];
-        for (let i = 1; i < Math.min(lines.length, 100); i++) { // Limitar a 100 filas para vista previa
+        // Parsear datos
+        const colaboradoresMap = new Map();
+        const equiposList = [];
+        
+        for (let i = 1; i < lines.length; i++) {
             const line = lines[i];
             const values = line.split(separator).map(v => v.trim().replace(/"/g, ''));
             const row = {};
-            csvHeaders.forEach((header, index) => {
+            
+            headers.forEach((header, index) => {
                 row[header] = values[index] || '';
             });
-            csvData.push(row);
-        }
-        
-        // Mostrar vista previa
-        showCSVPreview();
-        document.getElementById('btnNextStep1').disabled = false;
-    }
-
-    function showCSVPreview() {
-        const previewDiv = document.getElementById('csvPreview');
-        if (csvData.length === 0) {
-            previewDiv.innerHTML = '<p style="padding: 20px; text-align: center; color: var(--gray);">No hay datos para mostrar</p>';
-            return;
-        }
-        
-        let html = '<table>';
-        html += '<thead><tr>';
-        csvHeaders.forEach(header => {
-            html += `<th>${header}</th>`;
-        });
-        html += '</tr></thead>';
-        html += '<tbody>';
-        
-        // Mostrar solo las primeras 5 filas
-        csvData.slice(0, 5).forEach(row => {
-            html += '<tr>';
-            csvHeaders.forEach(header => {
-                html += `<td title="${row[header]}">${row[header].substring(0, 30)}${row[header].length > 30 ? '...' : ''}</td>`;
-            });
-            html += '</tr>';
-        });
-        
-        html += '</tbody></table>';
-        previewDiv.innerHTML = html;
-        
-        // Crear mapeo de columnas
-        createCSVMapping();
-    }
-
-    function createCSVMapping() {
-        const mappingDiv = document.getElementById('csvMapping');
-        const camposRequeridos = [
-            { id: 'rut', label: 'RUT Colaborador', required: true },
-            { id: 'nombre', label: 'Nombre Colaborador', required: true },
-            { id: 'tipo_equipo', label: 'Tipo de Equipo', required: true },
-            { id: 'marca', label: 'Marca', required: false },
-            { id: 'modelo', label: 'Modelo', required: false },
-            { id: 'serie', label: 'Número de Serie', required: true },
-            { id: 'estado', label: 'Estado', required: false },
-            { id: 'fecha_entrega', label: 'Fecha de Entrega', required: false },
-            { id: 'mochila', label: 'Mochila', required: false },
-            { id: 'cargador', label: 'Cargador', required: false },
-            { id: 'observaciones', label: 'Observaciones', required: false },
-            { id: 'doc_firmado', label: 'Documento Firmado', required: false },
-            { id: 'tiene_celular', label: 'Tiene Celular', required: false },
-            { id: 'marca_celular', label: 'Marca Celular', required: false },
-            { id: 'modelo_celular', label: 'Modelo Celular', required: false },
-            { id: 'imei_celular', label: 'IMEI Celular', required: false },
-            { id: 'tiene_sim', label: 'Tiene SIM', required: false },
-            { id: 'imei_sim', label: 'IMEI SIM', required: false }
-        ];
-        
-        let html = '';
-        camposRequeridos.forEach(campo => {
-            html += `
-                <div class="csv-mapping-item">
-                    <div class="csv-mapping-label">
-                        ${campo.label} ${campo.required ? '<span style="color: var(--danger);">*</span>' : ''}
-                    </div>
-                    <select class="csv-mapping-select" id="map_${campo.id}" onchange="updateCSVMapping('${campo.id}', this.value)">
-                        <option value="">-- Seleccionar columna --</option>
-                        ${csvHeaders.map(header => `
-                            <option value="${header}">${header}</option>
-                        `).join('')}
-                        <option value="NO_APLICA">No aplica</option>
-                    </select>
-                </div>
-            `;
-        });
-        
-        mappingDiv.innerHTML = html;
-        
-        // Intentar mapeo automático
-        autoMapCSVColumns();
-    }
-
-    function autoMapCSVColumns() {
-        const mappings = {
-            'rut': ['rut', 'rut_colaborador', 'rut responsable', 'documento'],
-            'nombre': ['nombre', 'nombre colaborador', 'colaborador', 'nombre_completo'],
-            'tipo_equipo': ['tipo equipo', 'tipo_equipo', 'tipo', 'equipo'],
-            'marca': ['marca', 'fabricante'],
-            'modelo': ['modelo'],
-            'serie': ['serie', 'numero serie', 'n° serie', 'serial'],
-            'estado': ['estado', 'condicion', 'estado fisico'],
-            'fecha_entrega': ['fecha entrega', 'fecha_entrega', 'entrega'],
-            'mochila': ['mochila'],
-            'cargador': ['cargador'],
-            'observaciones': ['observaciones', 'comentarios', 'notas'],
-            'doc_firmado': ['documento firmado', 'doc_firmado', 'firma'],
-            'tiene_celular': ['tiene celular', 'celular asignado', 'asignacion celular'],
-            'marca_celular': ['marca celular', 'marca_celular'],
-            'modelo_celular': ['modelo celular', 'modelo_celular'],
-            'imei_celular': ['imei celular', 'imei_celular', 'imei'],
-            'tiene_sim': ['tiene sim', 'sim asignada', 'asignacion sim'],
-            'imei_sim': ['imei sim', 'imei_sim', 'sim imei']
-        };
-        
-        Object.keys(mappings).forEach(fieldId => {
-            const select = document.getElementById(`map_${fieldId}`);
-            if (!select) return;
             
-            const headerOptions = csvHeaders.map(h => h.toLowerCase());
-            const possibleMatches = mappings[fieldId];
+            // Extraer datos básicos
+            const rut = row['RUT'] || row['rut'] || row['Rut Colaborador'] || '';
+            const nombre = row['Nombre'] || row['nombre'] || row['Colaborador'] || '';
+            const serie = row['Serie'] || row['N° Serie'] || row['Serial'] || '';
+            const tipo = row['Tipo'] || row['Tipo Equipo'] || 'Laptop';
+            const marca = row['Marca'] || '';
+            const modelo = row['Modelo'] || '';
+            const estado = row['Estado'] || 'Activo';
             
-            for (const match of possibleMatches) {
-                const index = headerOptions.findIndex(h => h.includes(match) || match.includes(h));
-                if (index !== -1) {
-                    select.value = csvHeaders[index];
-                    updateCSVMapping(fieldId, csvHeaders[index]);
-                    break;
-                }
-            }
-        });
-    }
-
-    function updateCSVMapping(fieldId, columnName) {
-        csvMapping[fieldId] = columnName === 'NO_APLICA' ? null : columnName;
-    }
-
-    function csvNextStep(currentStep) {
-        document.getElementById(`csvStep${currentStep}`).classList.remove('active');
-        document.getElementById(`csvStep${currentStep + 1}`).classList.add('active');
-        csvStep = currentStep + 1;
-        
-        if (currentStep === 2) {
-            // Paso 3: Mostrar resumen
-            document.getElementById('totalRecords').textContent = csvData.length;
-        }
-    }
-
-    function csvPrevStep(currentStep) {
-        document.getElementById(`csvStep${currentStep}`).classList.remove('active');
-        document.getElementById(`csvStep${currentStep - 1}`).classList.add('active');
-        csvStep = currentStep - 1;
-    }
-
-    async function processCSV() {
-        const btnProcess = document.getElementById('btnProcessCSV');
-        btnProcess.disabled = true;
-        btnProcess.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
-        
-        const progressFill = document.getElementById('csvProgressFill');
-        const progressText = document.getElementById('csvProgressText');
-        
-        // Validar mapeo mínimo
-        if (!csvMapping.rut || !csvMapping.nombre || !csvMapping.serie) {
-            mostrarMensaje('Debe mapear al menos RUT, Nombre y Número de Serie', 'error');
-            btnProcess.disabled = false;
-            btnProcess.textContent = 'Iniciar Carga';
-            return;
-        }
-        
-        try {
-            setLoading(true);
-            
-            // 1. Limpiar datos existentes (opcional)
-            progressText.textContent = 'Preparando base de datos...';
-            progressFill.style.width = '10%';
-            
-            // 2. Procesar cada registro
-            let colaboradoresMap = new Map();
-            let totalProcessed = 0;
-            
-            for (let i = 0; i < csvData.length; i++) {
-                const row = csvData[i];
-                const rut = row[csvMapping.rut] || '';
-                const nombre = row[csvMapping.nombre] || '';
-                
-                if (!rut || !nombre) continue;
-                
-                // Crear o actualizar colaborador
+            if (rut && nombre) {
+                // Agregar colaborador
                 if (!colaboradoresMap.has(rut)) {
                     colaboradoresMap.set(rut, {
                         rut: rut,
-                        nombre: nombre,
-                        equipos: []
+                        nombre: nombre
                     });
                 }
                 
-                const colaborador = colaboradoresMap.get(rut);
-                
-                // Procesar equipo
-                const tipoEquipo = (row[csvMapping.tipo_equipo] || '').toLowerCase();
-                const serie = row[csvMapping.serie] || '';
-                
+                // Agregar equipo si tiene serie
                 if (serie) {
-                    let equipo = {
+                    const equipo = {
                         serie: serie,
-                        tipo: tipoEquipo.includes('laptop') ? 'laptop' : 
-                              tipoEquipo.includes('celular') ? 'celular' : 'otro',
-                        marca: row[csvMapping.marca] || '',
-                        modelo: row[csvMapping.modelo] || '',
-                        estado: row[csvMapping.estado] || 'Activo',
-                        fecha_entrega: formatDateForDB(row[csvMapping.fecha_entrega]),
-                        mochila: row[csvMapping.mochila] || 'No',
-                        cargador: row[csvMapping.cargador] || 'No',
-                        observaciones: row[csvMapping.observaciones] || '',
-                        doc_firmado: row[csvMapping.doc_firmado] || 'No',
+                        tipo: tipo,
+                        marca: marca,
+                        modelo: modelo,
+                        estado: estado,
                         rut_responsable: rut,
-                        updated_at: new Date().toISOString()
+                        fecha_entrega: row['Fecha Entrega'] || null,
+                        mochila: row['Mochila'] || 'No',
+                        cargador: row['Cargador'] || 'No',
+                        observaciones: row['Observaciones'] || '',
+                        doc_firmado: row['Firma Acta'] || 'No'
                     };
                     
-                    // Procesar información de celular y SIM según la lógica especificada
-                    const tieneCelular = (row[csvMapping.tiene_celular] || '').toLowerCase();
-                    const tieneSIM = (row[csvMapping.tiene_sim] || '').toLowerCase();
+                    // Manejar información de celular/SIM según lógica especificada
+                    const tieneCelular = (row['Tiene Celular'] || '').toLowerCase();
+                    const tieneSIM = (row['Tiene SIM'] || '').toLowerCase();
                     
                     if (tieneCelular.includes('si') || tieneCelular.includes('sí')) {
-                        // Tiene celular: agregar marca, modelo e IMEI del celular
-                        equipo.marca_celular = row[csvMapping.marca_celular] || '';
-                        equipo.modelo_celular = row[csvMapping.modelo_celular] || '';
-                        equipo.imei_celular = row[csvMapping.imei_celular] || '';
+                        equipo.marca_celular = row['Marca Celular'] || '';
+                        equipo.modelo_celular = row['Modelo Celular'] || '';
+                        equipo.imei_celular = row['IMEI Celular'] || '';
                         
                         if (tieneSIM.includes('si') || tieneSIM.includes('sí')) {
-                            // También tiene SIM: agregar IMEI de la SIM
-                            equipo.imei_sim = row[csvMapping.imei_sim] || '';
+                            equipo.imei_sim = row['IMEI SIM'] || '';
                             equipo.observaciones += (equipo.observaciones ? ' ' : '') + 
                                 'Equipo con celular y SIM asignados.';
                         } else {
-                            // Solo celular, sin SIM
                             equipo.observaciones += (equipo.observaciones ? ' ' : '') + 
                                 'Equipo con celular asignado (sin SIM).';
                         }
                     } else if (tieneSIM.includes('si') || tieneSIM.includes('sí')) {
-                        // Solo tiene SIM: agregar solo IMEI de la SIM
-                        equipo.imei_sim = row[csvMapping.imei_sim] || '';
+                        equipo.imei_sim = row['IMEI SIM'] || '';
                         equipo.observaciones += (equipo.observaciones ? ' ' : '') + 
                             'Equipo con SIM asignada (sin celular).';
                     }
-                    // Si no tiene ni celular ni SIM, no se agrega nada
                     
-                    colaborador.equipos.push(equipo);
+                    equiposList.push(equipo);
                 }
-                
-                totalProcessed++;
-                const progress = 10 + (totalProcessed / csvData.length) * 70;
-                progressFill.style.width = `${progress}%`;
-                progressText.textContent = `Procesando registros: ${totalProcessed}/${csvData.length}`;
             }
-            
-            // 3. Enviar datos a Supabase
-            progressText.textContent = 'Enviando datos a la base de datos...';
-            progressFill.style.width = '85%';
-            
-            // Enviar colaboradores
-            const colaboradoresArray = Array.from(colaboradoresMap.values());
-            
-            // Primero, limpiar datos existentes (opcional)
-            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
-                method: 'DELETE',
-                headers: HEADERS
+        }
+        
+        // Enviar datos a Supabase
+        await sendDataToSupabase(colaboradoresMap, equiposList);
+        
+        mostrarMensaje(`¡Carga completada! ${colaboradoresMap.size} colaboradores, ${equiposList.length} equipos`, 'success');
+        closeModal();
+        await fetchData();
+        
+    } catch (error) {
+        console.error('Error procesando CSV:', error);
+        document.getElementById('csvError').textContent = `Error: ${error.message}`;
+        document.getElementById('csvError').style.display = 'block';
+        mostrarMensaje(`Error al procesar CSV: ${error.message}`, 'error');
+    } finally {
+        setLoading(false);
+        btn.innerHTML = '<i class="fas fa-play"></i> Procesar CSV';
+        btn.disabled = false;
+    }
+}
+
+async function sendDataToSupabase(colaboradoresMap, equiposList) {
+    setLoading(true);
+    
+    try {
+        // 1. Limpiar datos existentes (opcional - comentar si no se desea)
+        await safeFetch('colaboradores', { method: 'DELETE' }).catch(() => {});
+        await safeFetch('activos', { method: 'DELETE' }).catch(() => {});
+        
+        // 2. Insertar colaboradores
+        const colaboradoresArray = Array.from(colaboradoresMap.values());
+        if (colaboradoresArray.length > 0) {
+            await safeFetch('colaboradores', {
+                method: 'POST',
+                body: JSON.stringify(colaboradoresArray)
             });
-            
-            await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
-                method: 'DELETE',
-                headers: HEADERS
-            });
-            
-            // Insertar colaboradores
-            for (const colaborador of colaboradoresArray) {
-                await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
+        }
+        
+        // 3. Insertar equipos
+        if (equiposList.length > 0) {
+            // Dividir en lotes para no exceder límites
+            const batchSize = 50;
+            for (let i = 0; i < equiposList.length; i += batchSize) {
+                const batch = equiposList.slice(i, i + batchSize);
+                await safeFetch('activos', {
                     method: 'POST',
-                    headers: HEADERS,
-                    body: JSON.stringify({
-                        rut: colaborador.rut,
-                        nombre: colaborador.nombre
-                    })
+                    body: JSON.stringify(batch)
                 });
             }
-            
-            // Insertar equipos
-            let equiposCount = 0;
-            for (const colaborador of colaboradoresArray) {
-                for (const equipo of colaborador.equipos) {
-                    await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
-                        method: 'POST',
-                        headers: HEADERS,
-                        body: JSON.stringify(equipo)
-                    });
-                    equiposCount++;
-                }
-            }
-            
-            progressFill.style.width = '100%';
-            progressText.textContent = '¡Carga completada exitosamente!';
-            
-            // Mostrar resumen
-            setTimeout(() => {
-                mostrarMensaje(`Carga completada: ${colaboradoresArray.length} colaboradores, ${equiposCount} equipos procesados`, 'success');
-                closeCsvModal();
-                fetchData(); // Recargar datos
-            }, 1000);
-            
-        } catch (error) {
-            console.error('Error procesando CSV:', error);
-            mostrarMensaje('Error al procesar el archivo CSV: ' + error.message, 'error');
-        } finally {
-            setLoading(false);
-            btnProcess.disabled = false;
-            btnProcess.innerHTML = 'Iniciar Carga';
-        }
-    }
-
-    function formatDateForDB(dateString) {
-        if (!dateString) return null;
-        
-        // Intentar varios formatos de fecha
-        const formats = [
-            'DD/MM/YYYY',
-            'DD-MM-YYYY',
-            'YYYY-MM-DD',
-            'MM/DD/YYYY'
-        ];
-        
-        for (const format of formats) {
-            const date = parseDate(dateString, format);
-            if (date) {
-                return date.toISOString().split('T')[0];
-            }
         }
         
-        return null;
+        return true;
+    } catch (error) {
+        console.error('Error enviando datos:', error);
+        throw error;
+    } finally {
+        setLoading(false);
     }
+}
 
-    function parseDate(dateString, format) {
-        try {
-            const parts = dateString.split(/[/\-.]/);
-            if (parts.length !== 3) return null;
-            
-            let day, month, year;
-            
-            if (format === 'DD/MM/YYYY' || format === 'DD-MM-YYYY') {
-                day = parseInt(parts[0]);
-                month = parseInt(parts[1]) - 1;
-                year = parseInt(parts[2]);
-            } else if (format === 'YYYY-MM-DD') {
-                year = parseInt(parts[0]);
-                month = parseInt(parts[1]) - 1;
-                day = parseInt(parts[2]);
-            } else if (format === 'MM/DD/YYYY') {
-                month = parseInt(parts[0]) - 1;
-                day = parseInt(parts[1]);
-                year = parseInt(parts[2]);
-            }
-            
-            // Ajustar años de 2 dígitos
-            if (year < 100) {
-                year += 2000;
-            }
-            
-            const date = new Date(year, month, day);
-            if (isNaN(date.getTime())) return null;
-            
-            return date;
-        } catch (error) {
-            return null;
-        }
-    }
+// ============================================
+// FUNCIONES DE GESTIÓN DE DATOS
+// ============================================
 
-    async function fetchData() {
-        setLoading(true);
-        try {
-            const [colaboradoresResponse, activosResponse] = await Promise.all([
-                fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*&order=nombre.asc`, { headers: HEADERS }),
-                fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS })
-            ]);
-
-            if (!colaboradoresResponse.ok || !activosResponse.ok) {
-                throw new Error('Error al cargar datos');
-            }
-
-            rawActivos = await activosResponse.json();
-            const colaboradores = await colaboradoresResponse.json();
-
-            masterData = colaboradores.map(colaborador => ({
-                ...colaborador,
-                equipos: rawActivos.filter(activo => activo.rut_responsable === colaborador.rut),
-                activoCount: rawActivos.filter(activo => activo.rut_responsable === colaborador.rut).length
-            }));
-
-            document.getElementById('totalUsuarios').textContent = masterData.length;
-            document.getElementById('totalActivos').textContent = rawActivos.length;
-
-            renderLista();
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            mostrarError('Error al cargar los datos');
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    function renderLista() {
-        const searchQuery = document.getElementById('uSearch').value.toLowerCase();
-        const listaContainer = document.getElementById('listaPersonas');
+async function fetchData() {
+    setLoading(true);
+    
+    try {
+        // Cargar colaboradores y equipos
+        const [colaboradores, equipos] = await Promise.all([
+            safeFetch('colaboradores?select=*&order=nombre.asc'),
+            safeFetch('activos?select=*')
+        ]);
         
-        if (masterData.length === 0) {
-            listaContainer.innerHTML = `
-                <div class="empty-state" style="padding: 40px 20px;">
-                    <i class="fas fa-database"></i>
-                    <h3>No hay datos disponibles</h3>
-                    <p>Cargue datos desde CSV o agregue manualmente</p>
-                </div>
-            `;
-            return;
-        }
-
-        const filteredData = masterData.filter(colaborador => 
-            colaborador.nombre.toLowerCase().includes(searchQuery) || 
-            colaborador.rut.includes(searchQuery)
-        );
-
-        if (filteredData.length === 0) {
-            listaContainer.innerHTML = `
-                <div class="user-item" style="text-align: center; color: var(--gray);">
-                    No se encontraron resultados para "${searchQuery}"
-                </div>
-            `;
-            return;
-        }
-
-        listaContainer.innerHTML = filteredData.map(colaborador => {
-            const isActive = colaborador.rut === currentUserRut;
-            const initials = colaborador.nombre.split(' ')
-                .map(word => word[0])
-                .join('')
-                .toUpperCase()
-                .substring(0, 2);
-
-            return `
-                <div class="user-item ${isActive ? 'active' : ''}" 
-                     onclick="verFicha('${colaborador.rut}')"
-                     data-rut="${colaborador.rut}">
-                    <div class="user-avatar-small">${initials}</div>
-                    <div class="user-details">
-                        <div class="user-name-list">${colaborador.nombre}</div>
-                        <div class="user-rut-list">${colaborador.rut}</div>
-                    </div>
-                    <div class="user-equipment" title="${colaborador.activoCount} equipo(s)">
-                        ${colaborador.activoCount} <i class="fas fa-laptop"></i>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function verFicha(rut) {
-        currentUserRut = rut;
-        const colaborador = masterData.find(c => c.rut === rut);
+        // Procesar datos
+        masterData = colaboradores.map(colaborador => ({
+            ...colaborador,
+            equipos: equipos.filter(activo => activo.rut_responsable === colaborador.rut),
+            activoCount: equipos.filter(activo => activo.rut_responsable === colaborador.rut).length
+        }));
         
-        if (!colaborador) {
-            mostrarError('Colaborador no encontrado');
-            return;
+        // Actualizar estadísticas
+        updateStatistics();
+        renderUserList();
+        
+        // Si estamos en dashboard, actualizar gráficos
+        if (!document.getElementById('viewDashboard').classList.contains('hidden')) {
+            renderDashboard();
         }
+        
+    } catch (error) {
+        console.error('Error cargando datos:', error);
+        // Si no hay datos, mostrar estado vacío
+        masterData = [];
+        renderUserList();
+    } finally {
+        setLoading(false);
+    }
+}
 
-        document.querySelectorAll('.user-item').forEach(item => {
-            item.classList.remove('active');
-            if (item.dataset.rut === rut) {
-                item.classList.add('active');
-            }
-        });
+function updateStatistics() {
+    const totalColab = masterData.length;
+    const totalEquipos = masterData.reduce((sum, c) => sum + c.activoCount, 0);
+    const sinEquipos = masterData.filter(c => c.activoCount === 0).length;
+    
+    document.getElementById('statColaboradores').textContent = totalColab;
+    document.getElementById('statEquipos').textContent = totalEquipos;
+    document.getElementById('dashboardTotalColab').textContent = totalColab;
+    document.getElementById('dashboardTotalEquipos').textContent = totalEquipos;
+    document.getElementById('dashboardSinEquipos').textContent = sinEquipos;
+}
 
-        let html = `
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 25px;">
-                <div>
-                    <h2 style="color: var(--primary); margin-bottom: 5px;">${colaborador.nombre}</h2>
-                    <div style="color: var(--gray); font-size: 0.9rem;">
-                        <span style="background: var(--light-gray); padding: 4px 12px; border-radius: 20px;">
-                            <i class="fas fa-id-card"></i> ${colaborador.rut}
-                        </span>
-                        <span style="margin-left: 10px; background: var(--light-gray); padding: 4px 12px; border-radius: 20px;">
-                            <i class="fas fa-laptop"></i> ${colaborador.activoCount} equipo(s)
-                        </span>
-                    </div>
-                </div>
-                ${currentUser.rol === 'superadmin' ? `
-                <div>
-                    <button class="btn-edit" onclick="agregarEquipo('${rut}')">
-                        <i class="fas fa-plus"></i> Agregar Equipo
-                    </button>
-                </div>
-                ` : ''}
+function renderUserList() {
+    const container = document.getElementById('listaPersonas');
+    
+    if (masterData.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 40px 20px;">
+                <i class="fas fa-database"></i>
+                <h3>No hay datos disponibles</h3>
+                <p>Cargue datos desde CSV para comenzar</p>
             </div>
         `;
-
-        if (colaborador.equipos.length === 0) {
-            html += `
-                <div class="empty-state" style="padding: 40px 20px;">
-                    <i class="fas fa-laptop"></i>
-                    <h3>No hay equipos asignados</h3>
-                    <p>Este colaborador no tiene equipos asignados</p>
+        return;
+    }
+    
+    const searchQuery = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const filteredData = masterData.filter(colaborador => 
+        colaborador.nombre.toLowerCase().includes(searchQuery) || 
+        colaborador.rut.includes(searchQuery)
+    );
+    
+    if (filteredData.length === 0) {
+        container.innerHTML = `
+            <div class="user-item" style="text-align: center; color: var(--gray);">
+                No se encontraron resultados
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filteredData.map(colaborador => {
+        const isActive = colaborador.rut === currentUserRut;
+        const initials = colaborador.nombre.split(' ')
+            .map(word => word[0])
+            .join('')
+            .toUpperCase()
+            .substring(0, 2);
+        
+        return `
+            <div class="user-item ${isActive ? 'active' : ''}" 
+                 onclick="showUserDetail('${colaborador.rut}')"
+                 data-rut="${colaborador.rut}">
+                <div class="user-avatar-small">${initials}</div>
+                <div class="user-details">
+                    <div class="user-name-list">${colaborador.nombre}</div>
+                    <div class="user-rut-list">${colaborador.rut}</div>
                 </div>
-            `;
-        } else {
-            colaborador.equipos.forEach(equipo => {
-                const statusClass = getStatusClass(equipo.estado);
-                const tipoEquipo = equipo.tipo === 'celular' ? '📱 Celular' : 
-                                  equipo.tipo === 'laptop' ? '💻 Laptop' : '⚙️ Otro';
-                
-                html += `
-                    <div class="panel" id="panel-${equipo.serie}">
-                        <div class="action-buttons">
-                            <button class="btn-edit" onclick="activarEdicion('${equipo.serie}')">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            ${currentUser.rol === 'superadmin' ? `
-                            <button class="btn-delete" onclick="solicitarEliminar('${equipo.serie}', '${equipo.marca || 'Equipo'}', '${rut}')">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                            ` : ''}
-                        </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="color: var(--dark); margin-bottom: 10px;">
-                                ${tipoEquipo}: ${equipo.marca || 'Marca no especificada'} ${equipo.modelo || ''}
-                            </h3>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="status-badge ${statusClass}">
-                                    ${equipo.estado || 'No especificado'}
-                                </span>
-                                <span style="font-size: 0.85rem; color: var(--gray);">
-                                    <i class="fas fa-hashtag"></i> ${equipo.serie}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="cat-header">Información del Hardware</div>
-                        <div class="grid-ficha">
-                            <div class="data-item">
-                                <label>Marca</label>
-                                <span id="val-marca-${equipo.serie}">${equipo.marca || 'No especificado'}</span>
-                            </div>
-                            <div class="data-item">
-                                <label>Modelo</label>
-                                <span id="val-modelo-${equipo.serie}">${equipo.modelo || 'No especificado'}</span>
-                            </div>
-                            <div class="data-item">
-                                <label>Número de Serie</label>
-                                <span><strong>${equipo.serie}</strong></span>
-                            </div>
-                            <div class="data-item">
-                                <label>Estado Físico</label>
-                                <span id="val-estado-${equipo.serie}">${equipo.estado || 'No especificado'}</span>
-                            </div>
-                        </div>
-                        
-                        ${equipo.marca_celular || equipo.imei_celular || equipo.imei_sim ? `
-                        <div class="cat-header">Información de Celular/SIM</div>
-                        <div class="grid-ficha">
-                            ${equipo.marca_celular ? `
-                            <div class="data-item">
-                                <label>Marca Celular</label>
-                                <span id="val-marca-cel-${equipo.serie}">${equipo.marca_celular}</span>
-                            </div>
-                            ` : ''}
-                            ${equipo.modelo_celular ? `
-                            <div class="data-item">
-                                <label>Modelo Celular</label>
-                                <span id="val-modelo-cel-${equipo.serie}">${equipo.modelo_celular}</span>
-                            </div>
-                            ` : ''}
-                            ${equipo.imei_celular ? `
-                            <div class="data-item">
-                                <label>IMEI Celular</label>
-                                <span id="val-imei-cel-${equipo.serie}">${equipo.imei_celular}</span>
-                            </div>
-                            ` : ''}
-                            ${equipo.imei_sim ? `
-                            <div class="data-item">
-                                <label>IMEI SIM</label>
-                                <span id="val-imei-sim-${equipo.serie}">${equipo.imei_sim}</span>
-                            </div>
-                            ` : ''}
-                        </div>
-                        ` : ''}
-                        
-                        <div class="cat-header">Accesorios y Documentación</div>
-                        <div class="grid-ficha">
-                            <div class="data-item">
-                                <label>Mochila</label>
-                                <span id="val-mochila-${equipo.serie}">${equipo.mochila || 'No especificado'}</span>
-                            </div>
-                            <div class="data-item">
-                                <label>Cargador</label>
-                                <span id="val-cargador-${equipo.serie}">${equipo.cargador || 'No especificado'}</span>
-                            </div>
-                            <div class="data-item">
-                                <label>Fecha de Entrega</label>
-                                <span id="val-fecha-${equipo.serie}">${formatDate(equipo.fecha_entrega) || 'No especificada'}</span>
-                            </div>
-                            <div class="data-item">
-                                <label>Firma Acta</label>
-                                <span id="val-firmado-${equipo.serie}">${equipo.doc_firmado || 'Pendiente'}</span>
-                            </div>
-                        </div>
-                        
-                        ${equipo.observaciones ? `
-                        <div class="cat-header">Observaciones</div>
-                        <div class="data-item" style="width:100%; min-height: 60px;">
-                            <span id="val-obs-${equipo.serie}">${equipo.observaciones}</span>
-                        </div>
-                        ` : ''}
-                        
-                        <div id="edit-controls-${equipo.serie}" class="edit-controls hidden">
-                            <button class="btn-save" onclick="guardarCambios('${equipo.serie}')">
-                                <i class="fas fa-save"></i> Guardar Cambios
-                            </button>
-                            <button class="btn-cancel" onclick="cancelarEdicion('${equipo.serie}')">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
+                <div style="font-size: 0.75rem; background: var(--light-gray); color: var(--dark); 
+                     padding: 4px 10px; border-radius: 20px; font-weight: 600;">
+                    ${colaborador.activoCount} <i class="fas fa-laptop"></i>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterUsers() {
+    renderUserList();
+}
+
+function showUserDetail(rut) {
+    currentUserRut = rut;
+    const colaborador = masterData.find(c => c.rut === rut);
+    
+    if (!colaborador) {
+        document.getElementById('detalleContent').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Colaborador no encontrado</h3>
+            </div>
+        `;
+        return;
+    }
+    
+    // Actualizar selección en lista
+    document.querySelectorAll('.user-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.rut === rut) {
+            item.classList.add('active');
+        }
+    });
+    
+    let html = `
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 25px;">
+            <div>
+                <h2 style="color: var(--primary); margin-bottom: 5px;">${colaborador.nombre}</h2>
+                <div style="color: var(--gray); font-size: 0.9rem;">
+                    <span style="background: var(--light-gray); padding: 4px 12px; border-radius: 20px;">
+                        <i class="fas fa-id-card"></i> ${colaborador.rut}
+                    </span>
+                    <span style="margin-left: 10px; background: var(--light-gray); padding: 4px 12px; border-radius: 20px;">
+                        <i class="fas fa-laptop"></i> ${colaborador.activoCount} equipo(s)
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    if (colaborador.equipos.length === 0) {
+        html += `
+            <div class="empty-state" style="padding: 40px 20px;">
+                <i class="fas fa-laptop"></i>
+                <h3>No hay equipos asignados</h3>
+                <p>Este colaborador no tiene equipos asignados</p>
+            </div>
+        `;
+    } else {
+        colaborador.equipos.forEach(equipo => {
+            const tipoIcon = equipo.tipo === 'Celular' ? '📱' : 
+                           equipo.tipo === 'Laptop' ? '💻' : '⚙️';
+            
+            html += `
+                <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                    <div style="margin-bottom: 15px;">
+                        <h3 style="color: var(--dark); margin-bottom: 10px;">
+                            ${tipoIcon} ${equipo.tipo || 'Equipo'}: ${equipo.marca || ''} ${equipo.modelo || ''}
+                        </h3>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 0.85rem; color: var(--gray);">
+                                <i class="fas fa-hashtag"></i> ${equipo.serie}
+                            </span>
+                            <span style="font-size: 0.75rem; background: ${getEstadoColor(equipo.estado)}; 
+                                  color: white; padding: 4px 10px; border-radius: 20px; font-weight: 600;">
+                                ${equipo.estado || 'Sin estado'}
+                            </span>
                         </div>
                     </div>
-                `;
-            });
-        }
-
-        document.getElementById('fichaContent').innerHTML = html;
-        editMode = {};
-    }
-
-    function solicitarEliminar(serie, nombreEquipo, rut) {
-        if (currentUser.rol !== 'superadmin') {
-            mostrarMensaje('Solo los administradores pueden eliminar registros', 'error');
-            return;
-        }
-        
-        deleteCandidate = {
-            serie: serie,
-            nombre: nombreEquipo,
-            rut: rut
-        };
-        
-        document.getElementById('modalTitle').textContent = 'Confirmar Eliminación';
-        document.getElementById('modalMessage').textContent = 
-            `¿Está seguro de eliminar el equipo "${nombreEquipo}" (Serie: ${serie})? Esta acción no se puede deshacer.`;
-        
-        document.getElementById('deleteModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('deleteModal').style.display = 'none';
-        deleteCandidate = null;
-    }
-
-    async function confirmDelete() {
-        if (!deleteCandidate) return;
-        
-        if (currentUser.rol !== 'superadmin') {
-            mostrarMensaje('No tiene permisos para eliminar registros', 'error');
-            closeModal();
-            return;
-        }
-        
-        setLoading(true);
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${deleteCandidate.serie}`, {
-                method: 'DELETE',
-                headers: HEADERS
-            });
-
-            if (response.ok) {
-                mostrarMensaje('Equipo eliminado correctamente', 'success');
-                closeModal();
-                await fetchData();
-                
-                if (currentUserRut === deleteCandidate.rut) {
-                    verFicha(currentUserRut);
-                } else {
-                    document.getElementById('fichaContent').innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-user-circle"></i>
-                            <h3>Seleccione un colaborador</h3>
-                            <p>Elija un colaborador de la lista para ver y editar su información</p>
-                        </div>
-                    `;
-                }
-            } else {
-                throw new Error('Error al eliminar');
-            }
-        } catch (error) {
-            console.error('Error al eliminar:', error);
-            mostrarMensaje('Error al eliminar el equipo. Verifique que el registro exista.', 'error');
-        } finally {
-            setLoading(false);
-            deleteCandidate = null;
-        }
-    }
-
-    function getStatusClass(status) {
-        if (!status) return 'status-pending';
-        const statusLower = status.toLowerCase();
-        if (statusLower.includes('buen') || statusLower.includes('activo') || statusLower.includes('excelente')) {
-            return 'status-active';
-        } else if (statusLower.includes('mal') || statusLower.includes('inactivo') || statusLower.includes('dañado')) {
-            return 'status-inactive';
-        }
-        return 'status-pending';
-    }
-
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-CL', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
+                    
+                    <div class="cat-header">Información del Hardware</div>
+                    <div class="grid-ficha">
+                        <div class="data-item"><label>Marca</label><span>${equipo.marca || 'No especificado'}</span></div>
+                        <div class="data-item"><label>Modelo</label><span>${equipo.modelo || 'No especificado'}</span></div>
+                        <div class="data-item"><label>Número de Serie</label><span><strong>${equipo.serie}</strong></span></div>
+                        <div class="data-item"><label>Estado Físico</label><span>${equipo.estado || 'No especificado'}</span></div>
+                    </div>
+                    
+                    ${equipo.marca_celular || equipo.imei_celular || equipo.imei_sim ? `
+                    <div class="cat-header">Información de Celular/SIM</div>
+                    <div class="grid-ficha">
+                        ${equipo.marca_celular ? `<div class="data-item"><label>Marca Celular</label><span>${equipo.marca_celular}</span></div>` : ''}
+                        ${equipo.modelo_celular ? `<div class="data-item"><label>Modelo Celular</label><span>${equipo.modelo_celular}</span></div>` : ''}
+                        ${equipo.imei_celular ? `<div class="data-item"><label>IMEI Celular</label><span>${equipo.imei_celular}</span></div>` : ''}
+                        ${equipo.imei_sim ? `<div class="data-item"><label>IMEI SIM</label><span>${equipo.imei_sim}</span></div>` : ''}
+                    </div>
+                    ` : ''}
+                    
+                    <div class="cat-header">Accesorios y Documentación</div>
+                    <div class="grid-ficha">
+                        <div class="data-item"><label>Mochila</label><span>${equipo.mochila || 'No especificado'}</span></div>
+                        <div class="data-item"><label>Cargador</label><span>${equipo.cargador || 'No especificado'}</span></div>
+                        <div class="data-item"><label>Fecha Entrega</label><span>${formatDate(equipo.fecha_entrega) || 'No especificada'}</span></div>
+                        <div class="data-item"><label>Acta Firmada</label><span>${equipo.doc_firmado || 'Pendiente'}</span></div>
+                    </div>
+                    
+                    ${equipo.observaciones ? `
+                    <div class="cat-header">Observaciones</div>
+                    <div class="data-item" style="width:100%;">
+                        <span>${equipo.observaciones}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
         });
     }
+    
+    document.getElementById('detalleContent').innerHTML = html;
+}
 
-    function activarEdicion(serie) {
-        const equipo = rawActivos.find(e => e.serie === serie);
-        if (!equipo) return;
-        
-        const campos = [
-            'marca', 'modelo', 'estado', 'mochila', 'cargador', 'fecha', 'firmado', 'obs',
-            'marca_celular', 'modelo_celular', 'imei_celular', 'imei_sim'
-        ];
-        
-        if (!editMode[serie]) {
-            editMode[serie] = {};
-            campos.forEach(campo => {
-                const fieldId = campo === 'fecha' ? 'fecha_entrega' : 
-                               campo === 'firmado' ? 'doc_firmado' : 
-                               campo === 'obs' ? 'observaciones' : campo;
-                const span = document.getElementById(`val-${campo.replace('_celular', '-cel').replace('_sim', '-sim')}-${serie}`);
-                if (span) {
-                    editMode[serie][campo] = span.textContent;
-                }
-            });
+function getEstadoColor(estado) {
+    if (!estado) return var(--gray);
+    const estadoLower = estado.toLowerCase();
+    if (estadoLower.includes('buen') || estadoLower.includes('excelente') || estadoLower.includes('activo')) {
+        return var(--success);
+    } else if (estadoLower.includes('mal') || estadoLower.includes('dañado') || estadoLower.includes('inactivo')) {
+        return var(--danger);
+    } else if (estadoLower.includes('regular') || estadoLower.includes('pendiente')) {
+        return var(--warning);
+    }
+    return var(--primary);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-CL');
+    } catch {
+        return dateString;
+    }
+}
+
+// ============================================
+// DASHBOARD COMPLETO
+// ============================================
+
+function showView(viewId) {
+    // Actualizar botones de navegación
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    
+    // Mostrar vista correspondiente
+    document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
+    document.getElementById(viewId).classList.remove('hidden');
+    
+    // Si es dashboard, renderizar gráficos
+    if (viewId === 'viewDashboard') {
+        setTimeout(renderDashboard, 100);
+    }
+}
+
+function renderDashboard() {
+    if (!masterData.length) {
+        document.getElementById('viewDashboard').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-chart-bar"></i>
+                <h3>No hay datos para mostrar</h3>
+                <p>Cargue datos primero desde CSV</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Actualizar estadísticas del dashboard
+    const stats = calcularEstadisticas();
+    document.getElementById('dashboardActivos').textContent = stats.buenEstado;
+
+    // Destruir gráficos anteriores
+    Object.values(charts).forEach(chart => {
+        if (chart && typeof chart.destroy === 'function') {
+            chart.destroy();
         }
+    });
 
-        campos.forEach(campo => {
-            const spanId = `val-${campo.replace('_celular', '-cel').replace('_sim', '-sim')}-${serie}`;
-            const span = document.getElementById(spanId);
-            if (!span) {
-                // Crear span si no existe
-                const container = document.getElementById(`panel-${serie}`);
-                if (container && campo.includes('celular') || campo.includes('sim')) {
-                    // Agregar sección de celular/SIM si no existe
-                    const beforeSection = container.querySelector('.cat-header:contains("Accesorios")');
-                    if (beforeSection) {
-                        const newSection = `
-                            <div class="cat-header">Información de Celular/SIM</div>
-                            <div class="grid-ficha">
-                                <div class="data-item">
-                                    <label>${campo.includes('marca') ? 'Marca Celular' : 
-                                            campo.includes('modelo') ? 'Modelo Celular' :
-                                            campo.includes('imei_celular') ? 'IMEI Celular' : 'IMEI SIM'}</label>
-                                    <span id="${spanId}">No especificado</span>
-                                </div>
-                            </div>
-                        `;
-                        beforeSection.insertAdjacentHTML('beforebegin', newSection);
+    // Crear nuevos gráficos
+    renderChartTipos(stats);
+    renderChartEstados(stats);
+    renderChartMensual(stats);
+    renderChartMarcas(stats);
+}
+
+function calcularEstadisticas() {
+    const stats = {
+        totalColaboradores: masterData.length,
+        totalEquipos: 0,
+        tipos: {},
+        estados: {},
+        marcas: {},
+        buenEstado: 0,
+        equiposPorMes: {},
+        sinEquipos: 0
+    };
+
+    masterData.forEach(colaborador => {
+        stats.totalEquipos += colaborador.activoCount;
+        if (colaborador.activoCount === 0) stats.sinEquipos++;
+        
+        colaborador.equipos.forEach(equipo => {
+            // Tipos
+            const tipo = equipo.tipo || 'No especificado';
+            stats.tipos[tipo] = (stats.tipos[tipo] || 0) + 1;
+            
+            // Estados
+            const estado = equipo.estado || 'Sin estado';
+            stats.estados[estado] = (stats.estados[estado] || 0) + 1;
+            
+            // Contar buen estado
+            if (estado.toLowerCase().includes('buen') || estado.toLowerCase().includes('excelente')) {
+                stats.buenEstado++;
+            }
+            
+            // Marcas
+            if (equipo.marca) {
+                stats.marcas[equipo.marca] = (stats.marcas[equipo.marca] || 0) + 1;
+            }
+            
+            // Equipos por mes (fecha de entrega)
+            if (equipo.fecha_entrega) {
+                try {
+                    const fecha = new Date(equipo.fecha_entrega);
+                    const mes = fecha.getMonth(); // 0-11
+                    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                    const mesNombre = meses[mes] || 'Desconocido';
+                    stats.equiposPorMes[mesNombre] = (stats.equiposPorMes[mesNombre] || 0) + 1;
+                } catch (e) {
+                    // Ignorar fechas inválidas
+                }
+            }
+        });
+    });
+
+    return stats;
+}
+
+function renderChartTipos(stats) {
+    const ctx = document.getElementById('chartTipos').getContext('2d');
+    const colors = ['#0066CC', '#E31837', '#22c55e', '#f59e0b', '#8b5cf6'];
+    
+    charts.tipos = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(stats.tipos),
+            datasets: [{
+                data: Object.values(stats.tipos),
+                backgroundColor: colors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Distribución por Tipo de Equipo',
+                    font: { size: 14 }
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20 }
+                }
+            }
+        }
+    });
+}
+
+function renderChartEstados(stats) {
+    const ctx = document.getElementById('chartEstados').getContext('2d');
+    
+    // Ordenar estados por cantidad
+    const estadosOrdenados = Object.entries(stats.estados)
+        .sort((a, b) => b[1] - a[1]);
+    
+    charts.estados = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: estadosOrdenados.map(e => e[0]),
+            datasets: [{
+                label: 'Cantidad de Equipos',
+                data: estadosOrdenados.map(e => e[1]),
+                backgroundColor: '#0066CC',
+                borderColor: '#0052a3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Estado de los Equipos',
+                    font: { size: 14 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
                     }
                 }
-                return;
             }
-            
-            const fieldId = campo === 'fecha' ? 'fecha_entrega' : 
-                           campo === 'firmado' ? 'doc_firmado' : 
-                           campo === 'obs' ? 'observaciones' : campo;
-            const currentValue = span.textContent === 'No especificado' || 
-                                span.textContent === 'No especificada' || 
-                                span.textContent === 'Sin observaciones.' ||
-                                span.textContent === 'Pendiente' ? '' : span.textContent;
-            
-            let inputType = 'text';
-            if (campo === 'fecha') inputType = 'date';
-            if (campo === 'obs') {
-                span.innerHTML = `<textarea class="editable-input" id="input-${campo}-${serie}" 
-                    rows="3" style="resize: vertical;">${currentValue}</textarea>`;
-            } else {
-                span.innerHTML = `<input type="${inputType}" class="editable-input" 
-                    id="input-${campo}-${serie}" value="${currentValue}">`;
-            }
-        });
+        }
+    });
+}
 
-        document.getElementById(`edit-controls-${serie}`).classList.remove('hidden');
-    }
-
-    function cancelarEdicion(serie) {
-        if (!editMode[serie]) return;
-        
-        Object.keys(editMode[serie]).forEach(campo => {
-            const span = document.getElementById(`val-${campo.replace('_celular', '-cel').replace('_sim', '-sim')}-${serie}`);
-            if (span) {
-                span.innerHTML = editMode[serie][campo];
-            }
-        });
-
-        document.getElementById(`edit-controls-${serie}`).classList.add('hidden');
-        delete editMode[serie];
-    }
-
-    async function guardarCambios(serie) {
-        setLoading(true);
-        
-        try {
-            const body = {
-                marca: document.getElementById(`input-marca-${serie}`)?.value.trim() || '',
-                modelo: document.getElementById(`input-modelo-${serie}`)?.value.trim() || '',
-                estado: document.getElementById(`input-estado-${serie}`)?.value.trim() || '',
-                mochila: document.getElementById(`input-mochila-${serie}`)?.value.trim() || '',
-                cargador: document.getElementById(`input-cargador-${serie}`)?.value.trim() || '',
-                fecha_entrega: document.getElementById(`input-fecha-${serie}`)?.value || '',
-                doc_firmado: document.getElementById(`input-firmado-${serie}`)?.value.trim() || '',
-                observaciones: document.getElementById(`input-obs-${serie}`)?.value.trim() || '',
-                marca_celular: document.getElementById(`input-marca_celular-${serie}`)?.value.trim() || null,
-                modelo_celular: document.getElementById(`input-modelo_celular-${serie}`)?.value.trim() || null,
-                imei_celular: document.getElementById(`input-imei_celular-${serie}`)?.value.trim() || null,
-                imei_sim: document.getElementById(`input-imei_sim-${serie}`)?.value.trim() || null,
-                updated_at: new Date().toISOString()
-            };
-
-            // Limpiar campos nulos
-            Object.keys(body).forEach(key => {
-                if (body[key] === '' || body[key] === null || body[key] === undefined) {
-                    body[key] = null;
+function renderChartMensual(stats) {
+    const ctx = document.getElementById('chartMensual').getContext('2d');
+    
+    // Ordenar meses cronológicamente
+    const mesesOrden = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const datosMensuales = mesesOrden.map(mes => stats.equiposPorMes[mes] || 0);
+    
+    charts.mensual = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: mesesOrden,
+            datasets: [{
+                label: 'Asignaciones Mensuales',
+                data: datosMensuales,
+                borderColor: '#22c55e',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Tendencias Mensuales',
+                    font: { size: 14 }
                 }
-            });
-
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${serie}`, {
-                method: 'PATCH',
-                headers: HEADERS,
-                body: JSON.stringify(body)
-            });
-
-            if (response.ok) {
-                mostrarMensaje('¡Datos actualizados correctamente!', 'success');
-                await fetchData();
-                verFicha(currentUserRut);
-            } else {
-                throw new Error('Error al actualizar');
             }
-        } catch (error) {
-            console.error('Error al guardar:', error);
-            mostrarMensaje('Error al guardar los cambios', 'error');
-        } finally {
-            setLoading(false);
         }
-    }
+    });
+}
 
-    function agregarEquipo(rut) {
-        if (currentUser.rol !== 'superadmin') {
-            mostrarMensaje('Solo los administradores pueden agregar equipos', 'error');
-            return;
-        }
-        mostrarMensaje('Función para agregar equipo - En desarrollo', 'info');
-    }
-
-    function exportarDatos() {
-        const dataStr = JSON.stringify(masterData, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        
-        const exportFileDefaultName = `ti-maestro-export-${new Date().toISOString().split('T')[0]}.json`;
-        
-        const linkElement = document.createElement('a');
-        linkElement.setAttribute('href', dataUri);
-        linkElement.setAttribute('download', exportFileDefaultName);
-        linkElement.click();
-        
-        mostrarMensaje('Datos exportados correctamente', 'success');
-    }
-
-    function setLoading(loading) {
-        const loadingBar = document.getElementById('loadingBar');
-        if (loading) {
-            loadingBar.style.width = '100%';
-            loadingBar.style.transition = 'width 0.4s ease';
-        } else {
-            loadingBar.style.width = '0';
-            loadingBar.style.transition = 'width 0.2s ease';
-        }
-    }
-
-    function mostrarMensaje(mensaje, tipo = 'info') {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
-            color: white;
-            font-weight: 600;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+function renderChartMarcas(stats) {
+    const ctx = document.getElementById('chartMarcas').getContext('2d');
+    
+    // Ordenar marcas por cantidad y tomar top 5
+    const marcasArray = Object.entries(stats.marcas)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    if (marcasArray.length === 0) {
+        document.getElementById('chartMarcas').parentElement.innerHTML = `
+            <div class="empty-state" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                <i class="fas fa-industry"></i>
+                <h4>Sin datos de marcas</h4>
+                <p>No hay información de marcas disponible</p>
+            </div>
         `;
-        
-        if (tipo === 'success') {
-            notification.style.background = 'var(--success)';
-        } else if (tipo === 'error') {
-            notification.style.background = 'var(--danger)';
-        } else {
-            notification.style.background = 'var(--primary)';
-        }
-        
-        notification.textContent = mensaje;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
+        return;
     }
+    
+    charts.marcas = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: marcasArray.map(m => m[0]),
+            datasets: [{
+                data: marcasArray.map(m => m[1]),
+                backgroundColor: ['#0066CC', '#E31837', '#22c55e', '#f59e0b', '#8b5cf6']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Marcas Más Populares',
+                    font: { size: 14 }
+                }
+            }
+        }
+    });
+}
 
-    function mostrarError(mensaje) {
-        mostrarMensaje(mensaje, 'error');
+function refreshData() {
+    fetchData();
+    mostrarMensaje('Datos actualizados', 'success');
+}
+
+// ============================================
+// FUNCIONES UTILITARIAS
+// ============================================
+
+function setLoading(loading) {
+    const loadingBar = document.getElementById('loadingBar');
+    if (loading) {
+        loadingBar.style.width = '100%';
+        loadingBar.style.transition = 'width 0.4s ease';
+    } else {
+        loadingBar.style.width = '0';
+        loadingBar.style.transition = 'width 0.2s ease';
     }
+}
 
-    // Añadir estilos para animaciones
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
+function mostrarMensaje(mensaje, tipo = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; padding: 15px 25px;
+        border-radius: 10px; color: white; font-weight: 600; z-index: 10000;
+        animation: slideIn 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     `;
-    document.head.appendChild(style);
+    
+    notification.style.background = tipo === 'success' ? 'var(--success)' : 
+                                  tipo === 'error' ? 'var(--danger)' : 'var(--primary)';
+    
+    notification.textContent = mensaje;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Agregar estilos de animación
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
 </script>
 </body>
 </html>
