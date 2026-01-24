@@ -37,6 +37,102 @@
             font-size: 14px;
         }
         
+        /* Página de Login */
+        .login-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .login-logo {
+            width: 200px;
+            margin-bottom: 30px;
+        }
+        
+        .login-title {
+            color: var(--dark);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .login-subtitle {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        
+        .login-input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .login-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--light-gray);
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            background: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(227, 24, 55, 0.3);
+        }
+        
+        .login-error {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        /* Sidebar y contenido principal */
         #sidebar {
             width: 280px;
             background: var(--primary);
@@ -60,7 +156,6 @@
             width: 180px;
             height: auto;
             margin-bottom: 15px;
-            /* Quitamos el filtro para ver colores originales */
         }
         
         .logo-subtext {
@@ -194,6 +289,29 @@
             margin-top: auto;
         }
         
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 14px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            margin-top: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
         .footer {
             margin-top: auto;
             font-size: 0.65rem;
@@ -208,6 +326,7 @@
             padding: 25px;
             overflow-y: auto;
             background: var(--light-gray);
+            display: none;
         }
         
         .header {
@@ -694,6 +813,40 @@
 
 <div id="loadingBar"></div>
 
+<!-- Página de Login -->
+<div id="loginPage" class="login-container">
+    <div class="login-box">
+        <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" 
+             alt="Domino's Pizza Chile" class="login-logo">
+        <h2 class="login-title">TI Maestro v32.0</h2>
+        <p class="login-subtitle">Sistema de Gestión de Activos TI</p>
+        
+        <div class="login-input-group">
+            <label class="login-label">Usuario</label>
+            <input type="text" id="loginUser" class="login-input" placeholder="Ingrese su usuario" value="admin">
+        </div>
+        
+        <div class="login-input-group">
+            <label class="login-label">Contraseña</label>
+            <input type="password" id="loginPass" class="login-input" placeholder="Ingrese su contraseña" value="admin123">
+        </div>
+        
+        <button class="login-btn" onclick="iniciarSesion()">
+            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </button>
+        
+        <div id="loginError" class="login-error">
+            <i class="fas fa-exclamation-circle"></i> Usuario o contraseña incorrectos
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 0.8rem; color: var(--gray);">
+            <strong>Credenciales de prueba:</strong><br>
+            Usuario: admin<br>
+            Contraseña: admin123
+        </div>
+    </div>
+</div>
+
 <!-- Modal de confirmación para eliminar -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
@@ -706,111 +859,117 @@
     </div>
 </div>
 
-<div id="sidebar">
-    <div class="logo-container">
-        <!-- Logo de Domino's Pizza Chile con colores originales -->
-        <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" 
-             alt="Domino's Pizza Chile" class="logo">
-        <div class="logo-subtext">TI Maestro v32.0</div>
-        <div class="brand-text">Gestión de Activos TI</div>
-    </div>
-    
-    <!-- Sesión de usuario en Sidebar -->
-    <div class="user-session">
-        <div class="user-avatar">
-            <i class="fas fa-user-shield"></i>
+<!-- Aplicación principal (oculta inicialmente) -->
+<div id="appContainer" style="display: none; width: 100%;">
+    <div id="sidebar">
+        <div class="logo-container">
+            <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" 
+                 alt="Domino's Pizza Chile" class="logo">
+            <div class="logo-subtext">TI Maestro v32.0</div>
+            <div class="brand-text">Gestión de Activos TI</div>
         </div>
-        <div class="user-info">
-            <div class="user-name" id="userName">Administrador del Sistema</div>
-            <div class="user-role">Administrador TI</div>
-            <div class="session-status">
-                <div class="status-indicator"></div>
-                <span>Sesión Activa</span>
+        
+        <!-- Sesión de usuario en Sidebar -->
+        <div class="user-session">
+            <div class="user-avatar">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="userName">Cargando...</div>
+                <div class="user-role">Administrador TI</div>
+                <div class="session-status">
+                    <div class="status-indicator"></div>
+                    <span>Sesión Activa</span>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div class="nav-section">
-        <div class="nav-title">Gestión</div>
-        <button class="nav-btn active" id="btnInv">
-            <i class="fas fa-address-book"></i> Hojas de Vida
-        </button>
-        <button class="nav-btn" id="btnDashboard">
-            <i class="fas fa-chart-bar"></i> Dashboard
-        </button>
-    </div>
-    
-    <div class="nav-section">
-        <div class="nav-title">Administración</div>
-        <button class="nav-btn" id="btnUsuarios">
-            <i class="fas fa-users"></i> Usuarios
-        </button>
-        <button class="nav-btn" id="btnReportes">
-            <i class="fas fa-file-alt"></i> Reportes
-        </button>
-    </div>
-    
-    <div class="super-only">
-        <div class="nav-title">Super Admin</div>
-        <button class="nav-btn" style="background:var(--success);" id="btnCargar">
-            <i class="fas fa-file-csv"></i> Cargar desde SharePoint
-        </button>
-        <button class="nav-btn" style="background:var(--warning);" id="btnExportar">
-            <i class="fas fa-download"></i> Exportar Datos
-        </button>
-    </div>
-    
-    <div class="footer">
-        ENGINEERED BY MILO DROGUETT • v32.0
-    </div>
-</div>
-
-<div class="main-view">
-    <div class="header">
-        <h1>Gestión de Activos TI</h1>
-        <div class="header-actions">
-            <button class="btn-refresh" onclick="fetchData()">
-                <i class="fas fa-sync-alt"></i> Actualizar
+        
+        <div class="nav-section">
+            <div class="nav-title">Gestión</div>
+            <button class="nav-btn active" id="btnInv">
+                <i class="fas fa-address-book"></i> Hojas de Vida
+            </button>
+            <button class="nav-btn" id="btnDashboard">
+                <i class="fas fa-chart-bar"></i> Dashboard
             </button>
         </div>
-    </div>
-    
-    <div id="viewInventory" class="view-content">
-        <div style="display: grid; grid-template-columns: 320px 1fr; gap: 25px;">
-            <div class="panel">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="uSearch" class="search-input" 
-                           placeholder="Buscar colaborador por nombre o RUT..." 
-                           oninput="renderLista()">
-                </div>
-                
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalUsuarios">0</div>
-                        <div class="stat-label">Colaboradores</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalActivos">0</div>
-                        <div class="stat-label">Activos</div>
-                    </div>
-                </div>
-                
-                <div id="listaPersonas" class="users-list"></div>
-            </div>
-            
-            <div class="panel" id="fichaContent">
-                <div class="empty-state">
-                    <i class="fas fa-user-circle"></i>
-                    <h3>Seleccione un colaborador</h3>
-                    <p>Elija un colaborador de la lista para ver y editar su información</p>
-                </div>
-            </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Administración</div>
+            <button class="nav-btn" id="btnUsuarios">
+                <i class="fas fa-users"></i> Usuarios
+            </button>
+            <button class="nav-btn" id="btnReportes">
+                <i class="fas fa-file-alt"></i> Reportes
+            </button>
+        </div>
+        
+        <div class="super-only">
+            <div class="nav-title">Super Admin</div>
+            <button class="nav-btn" style="background:var(--success);" id="btnCargar">
+                <i class="fas fa-file-csv"></i> Cargar desde SharePoint
+            </button>
+            <button class="nav-btn" style="background:var(--warning);" id="btnExportar">
+                <i class="fas fa-download"></i> Exportar Datos
+            </button>
+        </div>
+        
+        <button class="logout-btn" onclick="cerrarSesion()">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
+        
+        <div class="footer">
+            ENGINEERED BY MILO DROGUETT • v32.0
         </div>
     </div>
     
-    <div id="viewDashboard" class="view-content hidden">
-        <!-- Dashboard view will be implemented here -->
+    <div class="main-view" id="mainView">
+        <div class="header">
+            <h1>Gestión de Activos TI</h1>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick="fetchData()">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+            </div>
+        </div>
+        
+        <div id="viewInventory" class="view-content">
+            <div style="display: grid; grid-template-columns: 320px 1fr; gap: 25px;">
+                <div class="panel">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="uSearch" class="search-input" 
+                               placeholder="Buscar colaborador por nombre o RUT..." 
+                               oninput="renderLista()">
+                    </div>
+                    
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalUsuarios">0</div>
+                            <div class="stat-label">Colaboradores</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalActivos">0</div>
+                            <div class="stat-label">Activos</div>
+                        </div>
+                    </div>
+                    
+                    <div id="listaPersonas" class="users-list"></div>
+                </div>
+                
+                <div class="panel" id="fichaContent">
+                    <div class="empty-state">
+                        <i class="fas fa-user-circle"></i>
+                        <h3>Seleccione un colaborador</h3>
+                        <p>Elija un colaborador de la lista para ver y editar su información</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="viewDashboard" class="view-content hidden">
+            <!-- Dashboard view will be implemented here -->
+        </div>
     </div>
 </div>
 
@@ -832,16 +991,51 @@
     let currentUserRut = null;
     let editMode = {};
     let deleteCandidate = null; // Registro a eliminar
+    let currentUser = null;
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', function() {
-        verificarSesion();
+        verificarSesionActiva();
         setupEventListeners();
-        cargarInfoUsuario();
     });
 
     function setupEventListeners() {
-        // Navegación
+        // Permitir login con Enter
+        document.getElementById('loginPass').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                iniciarSesion();
+            }
+        });
+    }
+
+    function verificarSesionActiva() {
+        const usuario = localStorage.getItem('tiMaestroUser');
+        const token = localStorage.getItem('tiMaestroToken');
+        
+        if (usuario && token) {
+            // Hay sesión activa
+            currentUser = JSON.parse(usuario);
+            mostrarAplicacion();
+        } else {
+            // No hay sesión, mostrar login
+            mostrarLogin();
+        }
+    }
+
+    function mostrarLogin() {
+        document.getElementById('loginPage').style.display = 'flex';
+        document.getElementById('appContainer').style.display = 'none';
+    }
+
+    function mostrarAplicacion() {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('appContainer').style.display = 'flex';
+        document.getElementById('mainView').style.display = 'block';
+        
+        // Configurar información del usuario
+        document.getElementById('userName').textContent = currentUser.nombre || 'Administrador TI';
+        
+        // Configurar navegación
         document.getElementById('btnInv').addEventListener('click', () => showView('viewInventory'));
         document.getElementById('btnDashboard').addEventListener('click', () => showView('viewDashboard'));
         document.getElementById('btnUsuarios').addEventListener('click', () => alert('Módulo en desarrollo'));
@@ -855,12 +1049,82 @@
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(renderLista, 300);
         });
+        
+        // Mostrar/ocultar opciones de super admin
+        const esSuperAdmin = currentUser.rol === 'superadmin';
+        document.querySelectorAll('.super-only').forEach(e => {
+            if (esSuperAdmin) {
+                e.classList.remove('hidden');
+            } else {
+                e.classList.add('hidden');
+            }
+        });
+        
+        // Cargar datos
+        fetchData();
     }
 
-    function cargarInfoUsuario() {
-        // Aquí podrías cargar datos reales del usuario desde localStorage o session
-        const nombreUsuario = localStorage.getItem('nombreUsuario') || 'Administrador TI';
-        document.getElementById('userName').textContent = nombreUsuario;
+    function iniciarSesion() {
+        const usuario = document.getElementById('loginUser').value.trim();
+        const password = document.getElementById('loginPass').value.trim();
+        const errorDiv = document.getElementById('loginError');
+        
+        // Validación simple (en producción esto sería contra una base de datos)
+        if (usuario === 'admin' && password === 'admin123') {
+            errorDiv.style.display = 'none';
+            
+            // Simular autenticación exitosa
+            currentUser = {
+                id: 1,
+                nombre: 'Administrador TI',
+                usuario: 'admin',
+                rol: 'superadmin',
+                fechaLogin: new Date().toISOString()
+            };
+            
+            // Guardar sesión
+            localStorage.setItem('tiMaestroUser', JSON.stringify(currentUser));
+            localStorage.setItem('tiMaestroToken', 'simulated_token_' + Date.now());
+            
+            // Mostrar aplicación
+            mostrarAplicacion();
+            mostrarMensaje('Sesión iniciada correctamente', 'success');
+            
+        } else if (usuario === 'user' && password === 'user123') {
+            errorDiv.style.display = 'none';
+            
+            // Usuario normal
+            currentUser = {
+                id: 2,
+                nombre: 'Usuario Estándar',
+                usuario: 'user',
+                rol: 'user',
+                fechaLogin: new Date().toISOString()
+            };
+            
+            // Guardar sesión
+            localStorage.setItem('tiMaestroUser', JSON.stringify(currentUser));
+            localStorage.setItem('tiMaestroToken', 'simulated_token_' + Date.now());
+            
+            // Mostrar aplicación
+            mostrarAplicacion();
+            mostrarMensaje('Sesión iniciada correctamente', 'success');
+            
+        } else {
+            errorDiv.style.display = 'block';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginPass').focus();
+        }
+    }
+
+    function cerrarSesion() {
+        if (confirm('¿Está seguro de cerrar la sesión?')) {
+            localStorage.removeItem('tiMaestroUser');
+            localStorage.removeItem('tiMaestroToken');
+            currentUser = null;
+            mostrarLogin();
+            mostrarMensaje('Sesión cerrada correctamente', 'info');
+        }
     }
 
     function showView(viewId) {
@@ -871,23 +1135,6 @@
         // Mostrar vista correspondiente
         document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
         document.getElementById(viewId).classList.remove('hidden');
-    }
-
-    async function verificarSesion() {
-        try {
-            // Verificar si hay sesión activa
-            const token = localStorage.getItem('supabaseToken');
-            if (!token) {
-                // Podrías redirigir a login aquí
-                console.log('No hay sesión activa');
-            }
-            
-            document.querySelectorAll('.super-only').forEach(e => e.classList.remove('hidden'));
-            await fetchData();
-        } catch (error) {
-            console.error('Error en sesión:', error);
-            mostrarError('Error al verificar sesión');
-        }
     }
 
     async function fetchData() {
@@ -1036,9 +1283,11 @@
                             <button class="btn-edit" onclick="activarEdicion('${equipo.serie}')">
                                 <i class="fas fa-edit"></i> Editar
                             </button>
-                            <button class="btn-delete" onclick="solicitarEliminar('${equipo.serie}', '${equipo.marca || 'Equipo'}')">
+                            ${currentUser.rol === 'superadmin' ? `
+                            <button class="btn-delete" onclick="solicitarEliminar('${equipo.serie}', '${equipo.marca || 'Equipo'}', '${rut}')">
                                 <i class="fas fa-trash"></i> Eliminar
                             </button>
+                            ` : ''}
                         </div>
                         
                         <div style="margin-bottom: 20px;">
@@ -1118,11 +1367,16 @@
     }
 
     // Funciones para eliminar registros
-    function solicitarEliminar(serie, nombreEquipo) {
+    function solicitarEliminar(serie, nombreEquipo, rut) {
+        if (currentUser.rol !== 'superadmin') {
+            mostrarMensaje('Solo los administradores pueden eliminar registros', 'error');
+            return;
+        }
+        
         deleteCandidate = {
             serie: serie,
             nombre: nombreEquipo,
-            rut: currentUserRut
+            rut: rut
         };
         
         document.getElementById('modalTitle').textContent = 'Confirmar Eliminación';
@@ -1139,6 +1393,12 @@
 
     async function confirmDelete() {
         if (!deleteCandidate) return;
+        
+        if (currentUser.rol !== 'superadmin') {
+            mostrarMensaje('No tiene permisos para eliminar registros', 'error');
+            closeModal();
+            return;
+        }
         
         setLoading(true);
         try {
@@ -1170,7 +1430,7 @@
             }
         } catch (error) {
             console.error('Error al eliminar:', error);
-            mostrarMensaje('Error al eliminar el equipo', 'error');
+            mostrarMensaje('Error al eliminar el equipo. Verifique que el registro exista.', 'error');
         } finally {
             setLoading(false);
             deleteCandidate = null;
@@ -1285,11 +1545,20 @@
     }
 
     function agregarEquipo(rut) {
+        if (currentUser.rol !== 'superadmin') {
+            mostrarMensaje('Solo los administradores pueden agregar equipos', 'error');
+            return;
+        }
         // Implementar lógica para agregar nuevo equipo
         mostrarMensaje('Función para agregar equipo - En desarrollo', 'info');
     }
 
     async function cargarSharePoint() {
+        if (currentUser.rol !== 'superadmin') {
+            mostrarMensaje('Solo los administradores pueden cargar datos', 'error');
+            return;
+        }
+        
         if (!confirm('¿Está seguro de cargar datos desde SharePoint? Esto puede sobreescribir datos existentes.')) {
             return;
         }
