@@ -3,34 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v40.0 - Database Fix</title>
+    <title>TI Maestro v40.5 - Enterprise Stable</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         :root {
-            --primary: #0066CC; --primary-dark: #0052a3; --secondary: #E31837;
-            --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
-            --bg: #FFFFF5; --dark: #1e293b; --gray: #64748b; --border: #e2e8f0;
-            --light-gray: #f8fafc;
+            --primary: #0066CC; --secondary: #E31837; --success: #22c55e;
+            --danger: #ef4444; --bg: #FFFFF5; --border: #e2e8f0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
+        
+        /* Sidebar */
         #sidebar { width: 260px; background: var(--primary); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .main-view { flex-grow: 1; padding: 25px; overflow-y: auto; background: var(--light-gray); }
-        .nav-btn { background: rgba(255,255,255,0.08); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 8px; text-align: left; display: flex; align-items: center; gap: 10px; }
-        .nav-btn.active { background: var(--secondary); }
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-top: 20px; }
+        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); }
+        .nav-btn.active { background: var(--secondary); font-weight: bold; }
+
+        /* Main View */
+        .main-view { flex-grow: 1; padding: 25px; overflow-y: auto; background: #f8fafc; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        /* Table */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f1f5f9; padding: 15px; text-align: left; border-bottom: 2px solid var(--border); }
+        th { background: #f1f5f9; padding: 15px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600; }
         td { padding: 12px 15px; border-bottom: 1px solid #edf2f7; }
-        .hidden { display: none !important; }
+        tr:hover { background-color: #fcfcfc; }
+
+        /* Modals */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
-        #loadingBar { position: fixed; top: 0; left: 0; height: 3px; background: var(--secondary); width: 0; transition: 0.3s; z-index: 11000; }
-        .validation-table { width: 100%; font-size: 11px; border-collapse: collapse; }
-        .row-error { background: #fee2e2; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; color: #333; }
+        .hidden { display: none !important; }
+        
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px; }
+        .btn-save { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        .btn-action { border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-edit { background: #e0f2fe; color: #0369a1; margin-right: 5px; }
+        .btn-del { background: #fee2e2; color: #991b1b; }
+        
+        #loadingBar { position: fixed; top: 0; left: 0; height: 3px; background: var(--secondary); width: 0; transition: 0.3s; z-index: 20000; }
     </style>
 </head>
 <body>
@@ -38,9 +51,9 @@
 <div id="loadingBar"></div>
 
 <div id="loginPage" style="display: flex; width:100%; height:100vh; align-items:center; justify-content:center; background: var(--primary);">
-    <div style="background:white; padding:40px; border-radius:20px; text-align:center; width:350px;">
+    <div style="background:white; padding:40px; border-radius:20px; text-align:center; width:350px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
         <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="150">
-        <h2 style="margin: 20px 0;">TI Maestro v40.0</h2>
+        <h2 style="margin: 20px 0 10px;">TI Maestro v40.5</h2>
         <input type="password" id="loginPass" placeholder="Clave de Acceso" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;">
         <button onclick="iniciarSesion()" style="width:100%; padding:12px; background:var(--secondary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">ACCEDER</button>
     </div>
@@ -48,21 +61,28 @@
 
 <div id="appContainer" class="hidden" style="width: 100%; display: flex;">
     <div id="sidebar">
-        <h3 style="margin-bottom:20px;">MENU TI</h3>
+        <h3 style="margin-bottom:20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom:10px;">TI MAESTRO</h3>
         <nav>
-            <button class="nav-btn active" onclick="showView('viewInventory')"><i class="fas fa-database"></i> Inventario</button>
-            <button class="nav-btn" onclick="abrirModalCSV()"><i class="fas fa-file-import"></i> Cargar CSV</button>
+            <button class="nav-btn active" onclick="showView('viewInventory')"><i class="fas fa-list"></i> Inventario</button>
+            <button class="nav-btn" onclick="abrirModalManual()"><i class="fas fa-plus"></i> Nuevo Activo</button>
+            <button class="nav-btn" onclick="abrirModalCSV()"><i class="fas fa-file-upload"></i> Cargar CSV</button>
         </nav>
         <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid white; color:white; padding:10px; border-radius:8px; cursor:pointer;">Cerrar Sesión</button>
     </div>
 
     <main class="main-view">
         <div id="viewInventory" class="view-content">
-            <h1>Gestión Maestro de Activos</h1>
+            <div class="header">
+                <h1>Maestro de Activos TI</h1>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="searchInput" placeholder="Buscar por RUT o Nombre..." style="width:250px;" oninput="renderTable()">
+                    <button onclick="fetchData()" class="btn-action" style="background:#eee;"><i class="fas fa-sync"></i></button>
+                </div>
+            </div>
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr><th>RUT</th><th>Nombre</th><th>Serie</th><th>Marca/Modelo</th><th>Estado</th></tr>
+                        <tr><th>RUT</th><th>Colaborador</th><th>Serie</th><th>Detalle</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="mainTableBody"></tbody>
                 </table>
@@ -71,199 +91,192 @@
     </main>
 </div>
 
-<div id="csvModal" class="hidden" class="modal">
-    <div class="modal" style="display:flex;">
-        <div class="modal-content">
-            <div id="paso1">
-                <h3>1. Subir Archivo</h3>
-                <input type="file" id="csvFile" accept=".csv" style="margin:20px 0;">
-                <button onclick="analizarColumnas()" class="nav-btn" style="background:var(--primary); text-align:center; display:block;">Analizar Columnas</button>
+<div id="modalManual" class="hidden modal">
+    <div class="modal-content">
+        <h3 id="formTitle">Gestionar Activo</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
+            <div><label>RUT Responsable</label><input type="text" id="f_rut" placeholder="12345678-9"></div>
+            <div><label>Nombre Persona</label><input type="text" id="f_nombre" placeholder="Nombre completo"></div>
+            <div><label>Nº de Serie</label><input type="text" id="f_serie" placeholder="ID del equipo"></div>
+            <div><label>Marca/Modelo</label><input type="text" id="f_marca" placeholder="Ej: Dell Latitude"></div>
+            <div><label>Estado</label>
+                <select id="f_estado">
+                    <option>Buen Estado</option>
+                    <option>Dañado</option>
+                    <option>En Reparación</option>
+                </select>
             </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
+            <button onclick="cerrarModalManual()" style="padding:10px; border:none; cursor:pointer;">Cancelar</button>
+            <button onclick="guardarRegistro()" class="btn-save">Guardar en Base de Datos</button>
+        </div>
+    </div>
+</div>
 
-            <div id="paso2" class="hidden">
-                <h3>2. Mapear Columnas</h3>
-                <div id="mapeoContainer" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0;"></div>
-                <button onclick="procesarDatosCSV()" class="nav-btn" style="background:var(--success); text-align:center; display:block;">Previsualizar Datos</button>
+<div id="csvModal" class="hidden modal">
+    <div class="modal-content" style="max-width:800px;">
+        <h3>Importación Masiva CSV</h3>
+        <div id="csvPaso1">
+            <input type="file" id="csvFile" accept=".csv" style="margin:20px 0;">
+            <button onclick="analizarCSV()" class="nav-btn" style="background:var(--primary); justify-content:center;">Analizar Archivo</button>
+        </div>
+        <div id="csvPaso2" class="hidden">
+            <div style="max-height:300px; overflow:auto; margin:15px 0; border:1px solid #eee;">
+                <table style="width:100%; font-size:11px;" id="csvTablePreview"></table>
             </div>
-
-            <div id="paso3" class="hidden">
-                <h3>3. Validar y Subir</h3>
-                <div style="max-height:300px; overflow:auto; border:1px solid #ddd; margin:15px 0;">
-                    <table class="validation-table">
-                        <thead><tr><th>RUT</th><th>Nombre</th><th>Serie</th><th>Estado</th></tr></thead>
-                        <tbody id="previewBody"></tbody>
-                    </table>
-                </div>
-                <div style="display:flex; gap:10px; justify-content:flex-end;">
-                    <button onclick="cerrarModalCSV()">Cancelar</button>
-                    <button onclick="sincronizarSupabase()" style="background:var(--success); color:white; padding:10px; border:none; border-radius:5px;">Sincronizar Ahora</button>
-                </div>
-            </div>
+            <button onclick="sincronizarCSV()" class="btn-save" style="width:100%;">Confirmar y Sincronizar</button>
         </div>
     </div>
 </div>
 
 <script>
+    // --- CONFIGURACIÓN SEGURA ---
     const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
-    const SUPABASE_KEY = "TU_KEY_AQUI"; 
-    // USAR SIEMPRE "Prefer": "resolution=merge-duplicates" para evitar errores de duplicados
-    const HEADERS = { 
-        "apikey": SUPABASE_KEY, 
-        "Authorization": `Bearer ${SUPABASE_KEY}`, 
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
+
+    const HEADERS = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Content-Type": "application/json",
-        "Prefer": "return=minimal" 
+        "Prefer": "resolution=merge-duplicates"
     };
 
-    let lineasRaw = [];
-    let temporalData = [];
+    let masterData = [];
+    let csvDataTemporal = [];
 
-    // --- ANALIZAR COLUMNAS ---
-    async function analizarColumnas() {
-        const file = document.getElementById('csvFile').files[0];
-        if(!file) return;
-        const text = await file.text();
-        lineasRaw = text.split(/\r?\n/).filter(l => l.trim() !== '');
-        
-        const header = lineasRaw[0];
-        const sep = header.includes(';') ? ';' : ',';
-        const cols = header.split(sep).map(h => h.trim().replace(/"/g, ''));
-
-        const config = [
-            { id: 'm_rut', label: 'RUT', sug: 'Rut' },
-            { id: 'm_nombre', label: 'Persona', sug: 'Persona' },
-            { id: 'm_serie', label: 'Serie', sug: 'Nº de Serie' },
-            { id: 'm_marca', label: 'Marca', sug: 'Marca' },
-            { id: 'm_modelo', label: 'Modelo', sug: 'Modelo' }
-        ];
-
-        document.getElementById('mapeoContainer').innerHTML = config.map(c => `
-            <div>
-                <label style="font-size:10px;">${c.label}</label>
-                <select id="${c.id}" style="width:100%">${cols.map((h, i) => `<option value="${i}" ${h.toLowerCase().includes(c.sug.toLowerCase()) ? 'selected':''}>${h}</option>`).join('')}</select>
-            </div>
-        `).join('');
-        
-        document.getElementById('paso1').classList.add('hidden');
-        document.getElementById('paso2').classList.remove('hidden');
-    }
-
-    // --- PROCESAR DATOS ---
-    function procesarDatosCSV() {
-        const idx = {
-            rut: document.getElementById('m_rut').value,
-            nombre: document.getElementById('m_nombre').value,
-            serie: document.getElementById('m_serie').value,
-            marca: document.getElementById('m_marca').value,
-            modelo: document.getElementById('m_modelo').value
-        };
-
-        const sep = lineasRaw[0].includes(';') ? ';' : ',';
-        const regex = new RegExp(`(?!\\s*${sep}|\\s*$)(?:(?:"(?:[^"]|"")*"|[^${sep}"\\s\\n\\r]*))`, 'g');
-
-        temporalData = [];
-        for(let i=1; i<lineasRaw.length; i++) {
-            let cols = lineasRaw[i].match(regex) || [];
-            cols = cols.map(c => c.replace(/^"|"$/g, '').trim());
-            if(cols.length < 2) continue;
-
-            temporalData.push({
-                rut: cols[idx.rut] || "S/R",
-                nombre: cols[idx.nombre] || "S/N",
-                serie: cols[idx.serie] || "S/S",
-                marca: cols[idx.marca] || "",
-                modelo: cols[idx.modelo] || "",
-                estado: "Asignado"
-            });
-        }
-
-        document.getElementById('previewBody').innerHTML = temporalData.slice(0, 10).map(d => `
-            <tr><td>${d.rut}</td><td>${d.nombre}</td><td>${d.serie}</td><td>${d.estado}</td></tr>
-        `).join('');
-
-        document.getElementById('paso2').classList.add('hidden');
-        document.getElementById('paso3').classList.remove('hidden');
-    }
-
-    // --- SINCRONIZACIÓN CON SUPABASE (LA PARTE CRÍTICA) ---
-    async function sincronizarSupabase() {
-        setLoading(true);
-        console.log("Iniciando sincronización...");
-
-        try {
-            // 1. Preparar Colaboradores (sin duplicados)
-            const colabUnicos = Array.from(new Map(temporalData.map(item => [item.rut, { rut: item.rut, nombre: item.nombre }])).values());
-            
-            console.log("Subiendo colaboradores:", colabUnicos.length);
-            const res1 = await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
-                method: 'POST',
-                headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify(colabUnicos)
-            });
-
-            if(!res1.ok) {
-                const errText = await res1.text();
-                throw new Error(`Error en Colaboradores: ${errText}`);
-            }
-
-            // 2. Preparar Activos
-            const activosData = temporalData.map(d => ({
-                serie: d.serie,
-                marca: d.marca,
-                modelo: d.modelo,
-                estado: d.estado,
-                rut_responsable: d.rut
-            }));
-
-            console.log("Subiendo activos:", activosData.length);
-            const res2 = await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
-                method: 'POST',
-                headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify(activosData)
-            });
-
-            if(!res2.ok) {
-                const errText = await res2.text();
-                throw new Error(`Error en Activos: ${errText}`);
-            }
-
-            alert("✅ ¡Base de datos poblada con éxito!");
-            cerrarModalCSV();
-            fetchData(); // Recargar tabla principal
-
-        } catch (error) {
-            console.error("Fallo crítico:", error);
-            alert("❌ Error: " + error.message);
-        } finally {
-            setLoading(false);
-        }
+    // --- FUNCIONES DE INICIO ---
+    function iniciarSesion() {
+        if(document.getElementById('loginPass').value === 'DominoTI2024') {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            fetchData();
+        } else { alert("Contraseña incorrecta"); }
     }
 
     async function fetchData() {
         setLoading(true);
         try {
-            const c = await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json());
-            const a = await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS }).then(r => r.json());
+            const colabs = await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json());
+            const activos = await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS }).then(r => r.json());
             
-            document.getElementById('mainTableBody').innerHTML = a.map(activo => {
-                const colab = c.find(u => u.rut === activo.rut_responsable);
-                return `<tr>
-                    <td>${activo.rut_responsable}</td>
-                    <td>${colab ? colab.nombre : 'No asignado'}</td>
-                    <td>${activo.serie}</td>
-                    <td>${activo.marca} ${activo.modelo}</td>
-                    <td>${activo.estado}</td>
-                </tr>`;
-            }).join('');
-        } catch(e) { console.error("Error al cargar tabla:", e); }
+            masterData = activos.map(a => ({
+                ...a,
+                persona: colabs.find(c => c.rut === a.rut_responsable)?.nombre || 'No asignado'
+            }));
+            renderTable();
+        } catch(e) { console.error("Error cargando datos"); }
         setLoading(false);
     }
 
-    // Funciones Base
-    function iniciarSesion() { if(document.getElementById('loginPass').value === 'DominoTI2024') { document.getElementById('loginPage').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden'); fetchData(); } }
-    function showView(v) { document.querySelectorAll('.view-content').forEach(x => x.classList.add('hidden')); document.getElementById(v).classList.remove('hidden'); }
-    function abrirModalCSV() { document.getElementById('csvModal').classList.remove('hidden'); document.getElementById('paso1').classList.remove('hidden'); document.getElementById('paso2').classList.add('hidden'); document.getElementById('paso3').classList.add('hidden'); }
-    function cerrarModalCSV() { document.getElementById('csvModal').classList.add('hidden'); }
+    function renderTable() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const body = document.getElementById('mainTableBody');
+        
+        const filtered = masterData.filter(d => 
+            d.rut_responsable.toLowerCase().includes(query) || 
+            d.persona.toLowerCase().includes(query) || 
+            d.serie.toLowerCase().includes(query)
+        );
+
+        body.innerHTML = filtered.map(d => `
+            <tr>
+                <td><b>${d.rut_responsable}</b></td>
+                <td>${d.persona}</td>
+                <td><code>${d.serie}</code></td>
+                <td>${d.marca || ''}</td>
+                <td><span style="color:${d.estado.includes('Buen')?'green':'red'}">${d.estado}</span></td>
+                <td>
+                    <button class="btn-action btn-edit" onclick="prepararEdicion('${d.serie}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action btn-del" onclick="eliminarActivo('${d.serie}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // --- ACCIONES CRUD ---
+    async function guardarRegistro() {
+        const payload = {
+            rut: document.getElementById('f_rut').value.trim(),
+            nombre: document.getElementById('f_nombre').value.trim(),
+            serie: document.getElementById('f_serie').value.trim(),
+            marca: document.getElementById('f_marca').value.trim(),
+            estado: document.getElementById('f_estado').value
+        };
+
+        if(!payload.rut || !payload.serie) return alert("RUT y Serie son obligatorios");
+
+        setLoading(true);
+        try {
+            // 1. Guardar Colaborador
+            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
+                method: 'POST', headers: HEADERS,
+                body: JSON.stringify({ rut: payload.rut, nombre: payload.nombre })
+            });
+            // 2. Guardar Activo
+            await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
+                method: 'POST', headers: HEADERS,
+                body: JSON.stringify({ 
+                    serie: payload.serie, marca: payload.marca, 
+                    estado: payload.estado, rut_responsable: payload.rut 
+                })
+            });
+            cerrarModalManual();
+            fetchData();
+        } catch(e) { alert("Error al guardar"); }
+        setLoading(false);
+    }
+
+    async function eliminarActivo(serie) {
+        if(!confirm("¿Eliminar este equipo definitivamente?")) return;
+        setLoading(true);
+        await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${serie}`, {
+            method: 'DELETE', headers: HEADERS
+        });
+        fetchData();
+    }
+
+    // --- LÓGICA CSV ---
+    async function analizarCSV() {
+        const file = document.getElementById('csvFile').files[0];
+        if(!file) return;
+        const text = await file.text();
+        const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+        const sep = lines[0].includes(';') ? ';' : ',';
+        
+        csvDataTemporal = lines.slice(1).map(line => {
+            const cols = line.split(sep).map(c => c.trim().replace(/"/g, ''));
+            return { rut: cols[0], nombre: cols[1], serie: cols[2], marca: cols[4], estado: "Asignado" };
+        }).filter(d => d.rut && d.serie);
+
+        document.getElementById('csvTablePreview').innerHTML = `
+            <thead><tr><th>RUT</th><th>Nombre</th><th>Serie</th></tr></thead>
+            <tbody>${csvDataTemporal.slice(0,5).map(d => `<tr><td>${d.rut}</td><td>${d.nombre}</td><td>${d.serie}</td></tr>`).join('')}</tbody>
+        `;
+        document.getElementById('csvPaso1').classList.add('hidden');
+        document.getElementById('csvPaso2').classList.remove('hidden');
+    }
+
+    async function sincronizarCSV() {
+        setLoading(true);
+        const colabs = Array.from(new Map(csvDataTemporal.map(i => [i.rut, {rut: i.rut, nombre: i.nombre}])).values());
+        const activos = csvDataTemporal.map(i => ({ serie: i.serie, marca: i.marca, estado: i.estado, rut_responsable: i.rut }));
+
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, { method: 'POST', headers: HEADERS, body: JSON.stringify(colabs) });
+            await fetch(`${SUPABASE_URL}/rest/v1/activos`, { method: 'POST', headers: HEADERS, body: JSON.stringify(activos) });
+            alert("¡Sincronización Exitosa!");
+            location.reload();
+        } catch(e) { alert("Error de red"); }
+        setLoading(false);
+    }
+
+    // --- UTILS ---
     function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
+    function abrirModalManual() { document.getElementById('modalManual').classList.remove('hidden'); }
+    function cerrarModalManual() { document.getElementById('modalManual').classList.add('hidden'); }
+    function abrirModalCSV() { document.getElementById('csvModal').classList.remove('hidden'); }
+    function showView(v) { /* Solo hay una vista funcional en esta versión */ }
 </script>
 </body>
 </html>
