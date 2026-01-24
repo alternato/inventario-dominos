@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v39.0 - Full Management</title>
+    <title>TI Maestro v40.0 - Database Fix</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,44 +15,22 @@
             --bg: #FFFFF5; --dark: #1e293b; --gray: #64748b; --border: #e2e8f0;
             --light-gray: #f8fafc;
         }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
-
-        /* Sidebar */
         #sidebar { width: 260px; background: var(--primary); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-btn { background: rgba(255,255,255,0.08); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 8px; text-align: left; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .nav-btn:hover { background: rgba(255,255,255,0.15); }
-        .nav-btn.active { background: var(--secondary); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-
-        /* Main View */
         .main-view { flex-grow: 1; padding: 25px; overflow-y: auto; background: var(--light-gray); }
-        
-        /* Data Table Style */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f1f5f9; padding: 15px; font-weight: 600; color: var(--dark); border-bottom: 2px solid var(--border); }
-        td { padding: 12px 15px; border-bottom: 1px solid #edf2f7; vertical-align: middle; }
-        tr:hover { background-color: #f8fafc; }
-
-        /* Badges */
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .badge-info { background: #e0f2fe; color: #0369a1; }
-        .badge-success { background: #dcfce7; color: #15803d; }
-
-        /* Forms & Modals */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; }
-
+        .nav-btn { background: rgba(255,255,255,0.08); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 8px; text-align: left; display: flex; align-items: center; gap: 10px; }
+        .nav-btn.active { background: var(--secondary); }
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f1f5f9; padding: 15px; text-align: left; border-bottom: 2px solid var(--border); }
+        td { padding: 12px 15px; border-bottom: 1px solid #edf2f7; }
         .hidden { display: none !important; }
-        .btn-action { border: none; padding: 8px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .btn-edit { background: #eff6ff; color: #2563eb; margin-right: 5px; }
-        .btn-delete { background: #fef2f2; color: #dc2626; }
-        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
         #loadingBar { position: fixed; top: 0; left: 0; height: 3px; background: var(--secondary); width: 0; transition: 0.3s; z-index: 11000; }
+        .validation-table { width: 100%; font-size: 11px; border-collapse: collapse; }
+        .row-error { background: #fee2e2; }
     </style>
 </head>
 <body>
@@ -62,234 +40,230 @@
 <div id="loginPage" style="display: flex; width:100%; height:100vh; align-items:center; justify-content:center; background: var(--primary);">
     <div style="background:white; padding:40px; border-radius:20px; text-align:center; width:350px;">
         <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="150">
-        <h2 style="margin: 20px 0;">TI Maestro v39.0</h2>
-        <input type="password" id="loginPass" placeholder="Contraseña Admin" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;">
+        <h2 style="margin: 20px 0;">TI Maestro v40.0</h2>
+        <input type="password" id="loginPass" placeholder="Clave de Acceso" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;">
         <button onclick="iniciarSesion()" style="width:100%; padding:12px; background:var(--secondary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">ACCEDER</button>
     </div>
 </div>
 
 <div id="appContainer" class="hidden" style="width: 100%; display: flex;">
     <div id="sidebar">
-        <h3>TI MAESTRO</h3>
-        <nav style="margin-top:30px;">
-            <button class="nav-btn active" id="navInv" onclick="showView('viewInventory')"><i class="fas fa-database"></i> Gestión Base</button>
-            <button class="nav-btn" id="navDash" onclick="showView('viewDashboard')"><i class="fas fa-chart-pie"></i> Estadísticas</button>
-            <hr style="opacity:0.2; margin:15px 0;">
-            <button class="nav-btn" onclick="abrirModalManual()" style="background:var(--success);"><i class="fas fa-plus-circle"></i> Nuevo Registro</button>
-            <button class="nav-btn" onclick="abrirModalCSV()"><i class="fas fa-file-import"></i> Importar CSV</button>
+        <h3 style="margin-bottom:20px;">MENU TI</h3>
+        <nav>
+            <button class="nav-btn active" onclick="showView('viewInventory')"><i class="fas fa-database"></i> Inventario</button>
+            <button class="nav-btn" onclick="abrirModalCSV()"><i class="fas fa-file-import"></i> Cargar CSV</button>
         </nav>
         <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid white; color:white; padding:10px; border-radius:8px; cursor:pointer;">Cerrar Sesión</button>
     </div>
 
     <main class="main-view">
         <div id="viewInventory" class="view-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h1>Inventario Maestro de Activos</h1>
-                <input type="text" id="mainSearch" placeholder="🔍 Buscar por RUT, Nombre o Serie..." style="width:300px;" oninput="renderMainTable()">
-            </div>
-
+            <h1>Gestión Maestro de Activos</h1>
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr>
-                            <th>RUT</th>
-                            <th>Persona</th>
-                            <th>Área</th>
-                            <th>Activo (Serie)</th>
-                            <th>Marca/Modelo</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
+                        <tr><th>RUT</th><th>Nombre</th><th>Serie</th><th>Marca/Modelo</th><th>Estado</th></tr>
                     </thead>
                     <tbody id="mainTableBody"></tbody>
                 </table>
             </div>
         </div>
-
-        <div id="viewDashboard" class="view-content hidden">
-            <h1>Dashboard TI</h1>
-            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px; margin:20px 0;">
-                <div style="background:white; padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border);">
-                    <small>Colaboradores</small><h2 id="countColab">0</h2>
-                </div>
-                <div style="background:white; padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border);">
-                    <small>Equipos Totales</small><h2 id="countEquip">0</h2>
-                </div>
-                <div style="background:white; padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border);">
-                    <small>Dañados/Críticos</small><h2 id="countBad" style="color:var(--danger)">0</h2>
-                </div>
-                <div style="background:white; padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border);">
-                    <small>Operativos</small><h2 id="countOk" style="color:var(--success)">0</h2>
-                </div>
-            </div>
-            <div class="dashboard-grid">
-                <div class="chart-container"><canvas id="chartTipos"></canvas></div>
-                <div class="chart-container"><canvas id="chartEstados"></canvas></div>
-            </div>
-        </div>
     </main>
 </div>
 
-<div id="modalManual" class="modal hidden">
-    <div class="modal-content">
-        <h3 id="modalManualTitle">Nuevo Registro de Activo</h3>
-        <hr style="margin:15px 0; opacity:0.1;">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-            <div class="form-group"><label>RUT Colaborador</label><input type="text" id="f_rut" placeholder="12345678-9"></div>
-            <div class="form-group"><label>Nombre Completo</label><input type="text" id="f_nombre"></div>
-            <div class="form-group"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Marketing</option><option>RRHH</option><option>Administración</option></select></div>
-            <div class="form-group"><label>Nº de Serie</label><input type="text" id="f_serie"></div>
-            <div class="form-group"><label>Marca</label><input type="text" id="f_marca"></div>
-            <div class="form-group"><label>Modelo</label><input type="text" id="f_modelo"></div>
-            <div class="form-group"><label>Estado</label><select id="f_estado"><option>Buen Estado</option><option>Dañado</option><option>Extraviado</option></select></div>
-        </div>
-        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
-            <button onclick="cerrarModalManual()" style="padding:10px; border:none; border-radius:8px;">Cancelar</button>
-            <button onclick="guardarRegistroManual()" class="btn-success">Guardar Cambios</button>
+<div id="csvModal" class="hidden" class="modal">
+    <div class="modal" style="display:flex;">
+        <div class="modal-content">
+            <div id="paso1">
+                <h3>1. Subir Archivo</h3>
+                <input type="file" id="csvFile" accept=".csv" style="margin:20px 0;">
+                <button onclick="analizarColumnas()" class="nav-btn" style="background:var(--primary); text-align:center; display:block;">Analizar Columnas</button>
+            </div>
+
+            <div id="paso2" class="hidden">
+                <h3>2. Mapear Columnas</h3>
+                <div id="mapeoContainer" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0;"></div>
+                <button onclick="procesarDatosCSV()" class="nav-btn" style="background:var(--success); text-align:center; display:block;">Previsualizar Datos</button>
+            </div>
+
+            <div id="paso3" class="hidden">
+                <h3>3. Validar y Subir</h3>
+                <div style="max-height:300px; overflow:auto; border:1px solid #ddd; margin:15px 0;">
+                    <table class="validation-table">
+                        <thead><tr><th>RUT</th><th>Nombre</th><th>Serie</th><th>Estado</th></tr></thead>
+                        <tbody id="previewBody"></tbody>
+                    </table>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                    <button onclick="cerrarModalCSV()">Cancelar</button>
+                    <button onclick="sincronizarSupabase()" style="background:var(--success); color:white; padding:10px; border:none; border-radius:5px;">Sincronizar Ahora</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // CONFIG
     const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
-    const SUPABASE_KEY = "TU_API_KEY_AQUI";
-    const HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" };
+    const SUPABASE_KEY = "TU_KEY_AQUI"; 
+    // USAR SIEMPRE "Prefer": "resolution=merge-duplicates" para evitar errores de duplicados
+    const HEADERS = { 
+        "apikey": SUPABASE_KEY, 
+        "Authorization": `Bearer ${SUPABASE_KEY}`, 
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal" 
+    };
 
-    let masterData = [];
-    let charts = {};
-    let editTargetSerie = null;
+    let lineasRaw = [];
+    let temporalData = [];
 
-    // --- 1. RENDERIZADO DE TABLA COMPLETA ---
-    function renderMainTable() {
-        const body = document.getElementById('mainTableBody');
-        const search = document.getElementById('mainSearch').value.toLowerCase();
+    // --- ANALIZAR COLUMNAS ---
+    async function analizarColumnas() {
+        const file = document.getElementById('csvFile').files[0];
+        if(!file) return;
+        const text = await file.text();
+        lineasRaw = text.split(/\r?\n/).filter(l => l.trim() !== '');
         
-        let filtered = [];
-        masterData.forEach(c => {
-            c.equipos.forEach(e => {
-                if(c.nombre.toLowerCase().includes(search) || c.rut.includes(search) || e.serie.toLowerCase().includes(search)) {
-                    filtered.push({ colab: c, equip: e });
-                }
-            });
-        });
+        const header = lineasRaw[0];
+        const sep = header.includes(';') ? ';' : ',';
+        const cols = header.split(sep).map(h => h.trim().replace(/"/g, ''));
 
-        body.innerHTML = filtered.map(row => `
-            <tr>
-                <td><b>${row.colab.rut}</b></td>
-                <td>${row.colab.nombre}</td>
-                <td><span class="badge badge-info">${row.equip.area || 'General'}</span></td>
-                <td><code>${row.equip.serie}</code></td>
-                <td>${row.equip.marca} ${row.equip.modelo}</td>
-                <td><span class="badge" style="background:${row.equip.estado.includes('Buen') ? '#dcfce7':'#fee2e2'}; color:${row.equip.estado.includes('Buen') ? '#15803d':'#dc2626'}">${row.equip.estado}</span></td>
-                <td>
-                    <button class="btn-action btn-edit" onclick="editarRegistro('${row.equip.serie}')"><i class="fas fa-edit"></i></button>
-                    <button class="btn-action btn-delete" onclick="eliminarRegistro('${row.equip.serie}')"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
+        const config = [
+            { id: 'm_rut', label: 'RUT', sug: 'Rut' },
+            { id: 'm_nombre', label: 'Persona', sug: 'Persona' },
+            { id: 'm_serie', label: 'Serie', sug: 'Nº de Serie' },
+            { id: 'm_marca', label: 'Marca', sug: 'Marca' },
+            { id: 'm_modelo', label: 'Modelo', sug: 'Modelo' }
+        ];
+
+        document.getElementById('mapeoContainer').innerHTML = config.map(c => `
+            <div>
+                <label style="font-size:10px;">${c.label}</label>
+                <select id="${c.id}" style="width:100%">${cols.map((h, i) => `<option value="${i}" ${h.toLowerCase().includes(c.sug.toLowerCase()) ? 'selected':''}>${h}</option>`).join('')}</select>
+            </div>
         `).join('');
+        
+        document.getElementById('paso1').classList.add('hidden');
+        document.getElementById('paso2').classList.remove('hidden');
     }
 
-    // --- 2. ACCIONES CRUD ---
-    async function guardarRegistroManual() {
-        const data = {
-            rut: document.getElementById('f_rut').value,
-            nombre: document.getElementById('f_nombre').value,
-            area: document.getElementById('f_area').value,
-            serie: document.getElementById('f_serie').value,
-            marca: document.getElementById('f_marca').value,
-            modelo: document.getElementById('f_modelo').value,
-            estado: document.getElementById('f_estado').value
+    // --- PROCESAR DATOS ---
+    function procesarDatosCSV() {
+        const idx = {
+            rut: document.getElementById('m_rut').value,
+            nombre: document.getElementById('m_nombre').value,
+            serie: document.getElementById('m_serie').value,
+            marca: document.getElementById('m_marca').value,
+            modelo: document.getElementById('m_modelo').value
         };
 
+        const sep = lineasRaw[0].includes(';') ? ';' : ',';
+        const regex = new RegExp(`(?!\\s*${sep}|\\s*$)(?:(?:"(?:[^"]|"")*"|[^${sep}"\\s\\n\\r]*))`, 'g');
+
+        temporalData = [];
+        for(let i=1; i<lineasRaw.length; i++) {
+            let cols = lineasRaw[i].match(regex) || [];
+            cols = cols.map(c => c.replace(/^"|"$/g, '').trim());
+            if(cols.length < 2) continue;
+
+            temporalData.push({
+                rut: cols[idx.rut] || "S/R",
+                nombre: cols[idx.nombre] || "S/N",
+                serie: cols[idx.serie] || "S/S",
+                marca: cols[idx.marca] || "",
+                modelo: cols[idx.modelo] || "",
+                estado: "Asignado"
+            });
+        }
+
+        document.getElementById('previewBody').innerHTML = temporalData.slice(0, 10).map(d => `
+            <tr><td>${d.rut}</td><td>${d.nombre}</td><td>${d.serie}</td><td>${d.estado}</td></tr>
+        `).join('');
+
+        document.getElementById('paso2').classList.add('hidden');
+        document.getElementById('paso3').classList.remove('hidden');
+    }
+
+    // --- SINCRONIZACIÓN CON SUPABASE (LA PARTE CRÍTICA) ---
+    async function sincronizarSupabase() {
         setLoading(true);
+        console.log("Iniciando sincronización...");
+
         try {
-            // Upsert Colaborador
-            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
-                method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify({ rut: data.rut, nombre: data.nombre })
+            // 1. Preparar Colaboradores (sin duplicados)
+            const colabUnicos = Array.from(new Map(temporalData.map(item => [item.rut, { rut: item.rut, nombre: item.nombre }])).values());
+            
+            console.log("Subiendo colaboradores:", colabUnicos.length);
+            const res1 = await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
+                method: 'POST',
+                headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify(colabUnicos)
             });
 
-            // Upsert Activo
-            await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
-                method: 'POST', headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
-                body: JSON.stringify({ 
-                    serie: data.serie, marca: data.marca, modelo: data.modelo, 
-                    estado: data.estado, area: data.area, rut_responsable: data.rut 
-                })
+            if(!res1.ok) {
+                const errText = await res1.text();
+                throw new Error(`Error en Colaboradores: ${errText}`);
+            }
+
+            // 2. Preparar Activos
+            const activosData = temporalData.map(d => ({
+                serie: d.serie,
+                marca: d.marca,
+                modelo: d.modelo,
+                estado: d.estado,
+                rut_responsable: d.rut
+            }));
+
+            console.log("Subiendo activos:", activosData.length);
+            const res2 = await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
+                method: 'POST',
+                headers: { ...HEADERS, "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify(activosData)
             });
 
-            alert("Registro Procesado Correctamente");
-            cerrarModalManual();
-            fetchData();
-        } catch (e) { alert("Error al guardar"); }
-        setLoading(false);
+            if(!res2.ok) {
+                const errText = await res2.text();
+                throw new Error(`Error en Activos: ${errText}`);
+            }
+
+            alert("✅ ¡Base de datos poblada con éxito!");
+            cerrarModalCSV();
+            fetchData(); // Recargar tabla principal
+
+        } catch (error) {
+            console.error("Fallo crítico:", error);
+            alert("❌ Error: " + error.message);
+        } finally {
+            setLoading(false);
+        }
     }
 
-    async function eliminarRegistro(serie) {
-        if(!confirm(`¿Seguro que desea eliminar el equipo ${serie}?`)) return;
-        setLoading(true);
-        await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${serie}`, { method: 'DELETE', headers: HEADERS });
-        fetchData();
-    }
-
-    function editarRegistro(serie) {
-        const item = masterData.flatMap(c => c.equipos).find(e => e.serie === serie);
-        const colab = masterData.find(c => c.rut === item.rut_responsable);
-        
-        document.getElementById('f_rut').value = colab.rut;
-        document.getElementById('f_nombre').value = colab.nombre;
-        document.getElementById('f_serie').value = item.serie;
-        document.getElementById('f_marca').value = item.marca;
-        document.getElementById('f_modelo').value = item.modelo;
-        document.getElementById('f_estado').value = item.estado;
-        document.getElementById('f_area').value = item.area || 'Operaciones';
-        
-        abrirModalManual();
-        document.getElementById('modalManualTitle').textContent = "Editando Equipo: " + serie;
-    }
-
-    // --- 3. FETCH & DASHBOARD ---
     async function fetchData() {
         setLoading(true);
-        const [c, a] = await Promise.all([
-            fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json()),
-            fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS }).then(r => r.json())
-        ]);
-        masterData = c.map(col => ({
-            ...col, equipos: a.filter(act => act.rut_responsable === col.rut),
-            activoCount: a.filter(act => act.rut_responsable === col.rut).length
-        }));
-        
-        // Stats
-        document.getElementById('countColab').textContent = c.length;
-        document.getElementById('countEquip').textContent = a.length;
-        document.getElementById('countOk').textContent = a.filter(x => x.estado.includes('Buen')).length;
-        document.getElementById('countBad').textContent = a.filter(x => !x.estado.includes('Buen')).length;
-
-        renderMainTable();
+        try {
+            const c = await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json());
+            const a = await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS }).then(r => r.json());
+            
+            document.getElementById('mainTableBody').innerHTML = a.map(activo => {
+                const colab = c.find(u => u.rut === activo.rut_responsable);
+                return `<tr>
+                    <td>${activo.rut_responsable}</td>
+                    <td>${colab ? colab.nombre : 'No asignado'}</td>
+                    <td>${activo.serie}</td>
+                    <td>${activo.marca} ${activo.modelo}</td>
+                    <td>${activo.estado}</td>
+                </tr>`;
+            }).join('');
+        } catch(e) { console.error("Error al cargar tabla:", e); }
         setLoading(false);
     }
 
-    // UTILS
-    function iniciarSesion() {
-        if(document.getElementById('loginPass').value === 'DominoTI2024') {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('appContainer').classList.remove('hidden');
-            fetchData();
-        } else { alert("Error"); }
-    }
-    function showView(v) {
-        document.querySelectorAll('.view-content').forEach(x => x.classList.add('hidden'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(v).classList.remove('hidden');
-        if(v === 'viewDashboard') renderDashboard();
-    }
-    function abrirModalManual() { document.getElementById('modalManual').classList.remove('hidden'); }
-    function cerrarModalManual() { document.getElementById('modalManual').classList.add('hidden'); }
+    // Funciones Base
+    function iniciarSesion() { if(document.getElementById('loginPass').value === 'DominoTI2024') { document.getElementById('loginPage').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden'); fetchData(); } }
+    function showView(v) { document.querySelectorAll('.view-content').forEach(x => x.classList.add('hidden')); document.getElementById(v).classList.remove('hidden'); }
+    function abrirModalCSV() { document.getElementById('csvModal').classList.remove('hidden'); document.getElementById('paso1').classList.remove('hidden'); document.getElementById('paso2').classList.add('hidden'); document.getElementById('paso3').classList.add('hidden'); }
+    function cerrarModalCSV() { document.getElementById('csvModal').classList.add('hidden'); }
     function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
-
-    // (Llamar funciones de CSV de la v38 aquí si se desea integrar el modal CSV también)
 </script>
 </body>
 </html>
