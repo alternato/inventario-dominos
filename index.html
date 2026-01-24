@@ -46,6 +46,7 @@
             flex-direction: column;
             flex-shrink: 0;
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .logo-container {
@@ -56,20 +57,95 @@
         }
         
         .logo {
-            width: 100px;
+            width: 180px;
             height: auto;
-            filter: brightness(0) invert(1);
+            margin-bottom: 15px;
+            /* Quitamos el filtro para ver colores originales */
+        }
+        
+        .logo-subtext {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
         }
         
         .brand-text {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Sesión en Sidebar */
+        .user-session {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-weight: 600;
-            margin-top: 10px;
-            opacity: 0.9;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .user-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+        
+        .session-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+            margin-top: 4px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
         
         .nav-section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .nav-title {
@@ -147,22 +223,27 @@
             font-weight: 700;
         }
         
-        .user-info {
+        .header-actions {
             display: flex;
-            align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
         
-        .user-avatar {
-            width: 40px;
-            height: 40px;
+        .btn-refresh {
             background: var(--primary);
-            border-radius: 50%;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-refresh:hover {
+            background: var(--primary-dark);
         }
         
         .panel {
@@ -173,6 +254,7 @@
             margin-bottom: 25px;
             border: 1px solid var(--border);
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .panel:hover {
@@ -253,13 +335,13 @@
             flex-grow: 1;
         }
         
-        .user-name {
+        .user-name-list {
             font-weight: 600;
             color: var(--dark);
             margin-bottom: 4px;
         }
         
-        .user-rut {
+        .user-rut-list {
             font-size: 0.8rem;
             color: var(--gray);
         }
@@ -339,10 +421,16 @@
             box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
         }
         
-        .btn-edit {
+        /* Botones de acción */
+        .action-buttons {
             position: absolute;
             top: 20px;
             right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-edit {
             background: var(--primary);
             color: white;
             border: none;
@@ -361,6 +449,27 @@
             background: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+        }
+        
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
         }
         
         .btn-save {
@@ -497,6 +606,68 @@
             color: var(--gray);
         }
         
+        /* Modal de confirmación */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .modal-message {
+            color: var(--gray);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn-modal-confirm {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-modal-cancel {
+            background: var(--gray);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
         @media (max-width: 1024px) {
             body {
                 flex-direction: column;
@@ -506,6 +677,10 @@
                 width: 100%;
                 height: auto;
                 padding: 15px;
+            }
+            
+            .logo {
+                width: 140px;
             }
             
             .nav-btn {
@@ -519,11 +694,40 @@
 
 <div id="loadingBar"></div>
 
+<!-- Modal de confirmación para eliminar -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-title" id="modalTitle">Confirmar Eliminación</div>
+        <div class="modal-message" id="modalMessage">¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.</div>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
+            <button class="btn-modal-confirm" onclick="confirmDelete()">Eliminar</button>
+        </div>
+    </div>
+</div>
+
 <div id="sidebar">
     <div class="logo-container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Domino%27s_pizza_logo.svg/1200px-Domino%27s_pizza_logo.svg.png" 
-             alt="Domino's Pizza" class="logo">
-        <div class="brand-text">TI Maestro v32.0</div>
+        <!-- Logo de Domino's Pizza Chile con colores originales -->
+        <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" 
+             alt="Domino's Pizza Chile" class="logo">
+        <div class="logo-subtext">TI Maestro v32.0</div>
+        <div class="brand-text">Gestión de Activos TI</div>
+    </div>
+    
+    <!-- Sesión de usuario en Sidebar -->
+    <div class="user-session">
+        <div class="user-avatar">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <div class="user-info">
+            <div class="user-name" id="userName">Administrador del Sistema</div>
+            <div class="user-role">Administrador TI</div>
+            <div class="session-status">
+                <div class="status-indicator"></div>
+                <span>Sesión Activa</span>
+            </div>
+        </div>
     </div>
     
     <div class="nav-section">
@@ -564,14 +768,10 @@
 <div class="main-view">
     <div class="header">
         <h1>Gestión de Activos TI</h1>
-        <div class="user-info">
-            <div class="user-avatar">
-                <i class="fas fa-user-shield"></i>
-            </div>
-            <div>
-                <div style="font-weight: 600; color: var(--dark);">Administrador</div>
-                <div style="font-size: 0.8rem; color: var(--gray);">Sesión Activa</div>
-            </div>
+        <div class="header-actions">
+            <button class="btn-refresh" onclick="fetchData()">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
         </div>
     </div>
     
@@ -631,11 +831,13 @@
     let rawActivos = [];
     let currentUserRut = null;
     let editMode = {};
+    let deleteCandidate = null; // Registro a eliminar
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', function() {
         verificarSesion();
         setupEventListeners();
+        cargarInfoUsuario();
     });
 
     function setupEventListeners() {
@@ -655,6 +857,12 @@
         });
     }
 
+    function cargarInfoUsuario() {
+        // Aquí podrías cargar datos reales del usuario desde localStorage o session
+        const nombreUsuario = localStorage.getItem('nombreUsuario') || 'Administrador TI';
+        document.getElementById('userName').textContent = nombreUsuario;
+    }
+
     function showView(viewId) {
         // Actualizar botones de navegación
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -667,7 +875,13 @@
 
     async function verificarSesion() {
         try {
-            // Aquí podrías agregar lógica de autenticación real
+            // Verificar si hay sesión activa
+            const token = localStorage.getItem('supabaseToken');
+            if (!token) {
+                // Podrías redirigir a login aquí
+                console.log('No hay sesión activa');
+            }
+            
             document.querySelectorAll('.super-only').forEach(e => e.classList.remove('hidden'));
             await fetchData();
         } catch (error) {
@@ -753,8 +967,8 @@
                      data-rut="${colaborador.rut}">
                     <div class="user-avatar-small">${initials}</div>
                     <div class="user-details">
-                        <div class="user-name">${colaborador.nombre}</div>
-                        <div class="user-rut">${colaborador.rut}</div>
+                        <div class="user-name-list">${colaborador.nombre}</div>
+                        <div class="user-rut-list">${colaborador.rut}</div>
                     </div>
                     <div class="user-equipment" title="${colaborador.activoCount} equipo(s)">
                         ${colaborador.activoCount} <i class="fas fa-laptop"></i>
@@ -818,16 +1032,27 @@
                 const statusClass = getStatusClass(equipo.estado);
                 html += `
                     <div class="panel" id="panel-${equipo.serie}">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="color: var(--dark);">
-                                ${equipo.marca || 'Marca no especificada'} ${equipo.modelo || ''}
-                                <span class="status-badge ${statusClass}" style="margin-left: 10px;">
-                                    ${equipo.estado || 'No especificado'}
-                                </span>
-                            </h3>
+                        <div class="action-buttons">
                             <button class="btn-edit" onclick="activarEdicion('${equipo.serie}')">
                                 <i class="fas fa-edit"></i> Editar
                             </button>
+                            <button class="btn-delete" onclick="solicitarEliminar('${equipo.serie}', '${equipo.marca || 'Equipo'}')">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: var(--dark); margin-bottom: 10px;">
+                                ${equipo.marca || 'Marca no especificada'} ${equipo.modelo || ''}
+                            </h3>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="status-badge ${statusClass}">
+                                    ${equipo.estado || 'No especificado'}
+                                </span>
+                                <span style="font-size: 0.85rem; color: var(--gray);">
+                                    <i class="fas fa-hashtag"></i> ${equipo.serie}
+                                </span>
+                            </div>
                         </div>
                         
                         <div class="cat-header">Información del Hardware</div>
@@ -890,6 +1115,66 @@
 
         document.getElementById('fichaContent').innerHTML = html;
         editMode = {}; // Resetear modo edición
+    }
+
+    // Funciones para eliminar registros
+    function solicitarEliminar(serie, nombreEquipo) {
+        deleteCandidate = {
+            serie: serie,
+            nombre: nombreEquipo,
+            rut: currentUserRut
+        };
+        
+        document.getElementById('modalTitle').textContent = 'Confirmar Eliminación';
+        document.getElementById('modalMessage').textContent = 
+            `¿Está seguro de eliminar el equipo "${nombreEquipo}" (Serie: ${serie})? Esta acción no se puede deshacer.`;
+        
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        deleteCandidate = null;
+    }
+
+    async function confirmDelete() {
+        if (!deleteCandidate) return;
+        
+        setLoading(true);
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${deleteCandidate.serie}`, {
+                method: 'DELETE',
+                headers: HEADERS
+            });
+
+            if (response.ok) {
+                mostrarMensaje('Equipo eliminado correctamente', 'success');
+                closeModal();
+                await fetchData(); // Recargar datos
+                
+                // Si todavía estamos viendo el mismo usuario, actualizar su ficha
+                if (currentUserRut === deleteCandidate.rut) {
+                    verFicha(currentUserRut);
+                } else {
+                    // Mostrar estado vacío si ya no hay datos
+                    document.getElementById('fichaContent').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-user-circle"></i>
+                            <h3>Seleccione un colaborador</h3>
+                            <p>Elija un colaborador de la lista para ver y editar su información</p>
+                        </div>
+                    `;
+                }
+            } else {
+                throw new Error('Error al eliminar');
+            }
+        } catch (error) {
+            console.error('Error al eliminar:', error);
+            mostrarMensaje('Error al eliminar el equipo', 'error');
+        } finally {
+            setLoading(false);
+            deleteCandidate = null;
+        }
     }
 
     function getStatusClass(status) {
@@ -1001,7 +1286,7 @@
 
     function agregarEquipo(rut) {
         // Implementar lógica para agregar nuevo equipo
-        alert(`Función para agregar equipo a ${rut} - En desarrollo`);
+        mostrarMensaje('Función para agregar equipo - En desarrollo', 'info');
     }
 
     async function cargarSharePoint() {
