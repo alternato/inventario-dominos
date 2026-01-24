@@ -3,260 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v43.0 - Columnas Dedicadas</title>
+    <title>TI Maestro v44.0 - Vista Total</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0066CC; --secondary: #E31837; --success: #22c55e;
-            --danger: #ef4444; --bg: #f8fafc; --border: #e2e8f0; --dark: #1e293b;
+            --danger: #ef4444; --bg: #f1f5f9; --border: #cbd5e1; --dark: #0f172a;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; font-size: 12px; }
+        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; font-size: 11px; }
         
-        #sidebar { width: 250px; background: var(--primary); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        #sidebar { width: 240px; background: var(--primary); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .nav-btn.active { background: var(--secondary); font-weight: bold; }
 
-        .main-view { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+        .main-view { flex-grow: 1; padding: 15px; overflow: hidden; display: flex; flex-direction: column; }
         
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: auto; flex-grow: 1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 2200px; } /* Más ancho para ver telefonía */
-        th { background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 10; white-space: nowrap; }
-        td { padding: 8px 12px; border-bottom: 1px solid #edf2f7; white-space: nowrap; }
+        /* Contenedor de Tabla con Scroll */
+        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border); overflow: auto; flex-grow: 1; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 2500px; } /* Ancho extremo para ver TODO */
+        th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 10; color: #475569; text-transform: uppercase; font-size: 10px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+        tr:hover { background-color: #f8fafc; }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100000; }
-        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 95%; max-width: 1100px; max-height: 95vh; overflow-y: auto; }
+        /* Estilos de Celda */
+        .tag { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 9px; }
+        .tag-blue { background: #dbeafe; color: #1e40af; }
+        .tag-green { background: #dcfce7; color: #166534; }
+
+        /* Modales */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 95%; max-width: 1000px; max-height: 90vh; overflow-y: auto; }
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .section-header { grid-column: span 4; padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 5px; font-weight: 800; color: var(--primary); font-size: 12px; }
         
-        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 15px; text-align: left; }
-        .section-title { grid-column: span 4; background: #1e293b; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-top: 15px; display: flex; justify-content: space-between; }
-        
-        label { font-weight: 700; font-size: 10px; color: #555; text-transform: uppercase; margin-bottom: 4px; }
-        input, select, textarea { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; width: 100%; }
+        label { display: block; font-weight: 600; margin-bottom: 3px; color: #64748b; }
+        input, select, textarea { width: 100%; padding: 7px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 12px; }
         
         .hidden { display: none !important; }
-        #loadingBar { position: fixed; top: 0; left: 0; height: 3px; background: var(--secondary); width: 0; transition: 0.3s; z-index: 300000; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: var(--secondary); z-index: 11000; transform: scaleX(0); transition: 0.3s; transform-origin: left; }
     </style>
 </head>
 <body>
 
-<div id="loadingBar"></div>
+<div id="loader"></div>
 
-<div id="loginPage" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--primary); display:flex; align-items:center; justify-content:center; z-index:200000;">
-    <div style="background:white; padding:40px; border-radius:20px; width:350px; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.4);">
-        <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="150">
-        <h2 style="margin:20px 0; color:var(--dark);">TI Maestro v43.0</h2>
-        <input type="password" id="loginPass" placeholder="Clave de Acceso" style="text-align:center; padding:12px; border:1px solid #ccc; width:100%; border-radius:8px;">
-        <button onclick="iniciarSesion()" style="width:100%; padding:14px; background:var(--secondary); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer; margin-top:15px;">INGRESAR</button>
+<div id="loginPage" style="position:fixed; inset:0; background:var(--primary); display:flex; align-items:center; justify-content:center; z-index:99999;">
+    <div style="background:white; padding:40px; border-radius:15px; width:340px; text-align:center;">
+        <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="140">
+        <h2 style="margin:20px 0 10px;">TI Maestro v44.0</h2>
+        <input type="password" id="passInput" placeholder="Clave de Acceso" style="text-align:center; margin-bottom:15px; border:1px solid #cbd5e1;">
+        <button onclick="intentarLogin()" style="width:100%; padding:12px; background:var(--secondary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">ACCEDER AL MAESTRO</button>
     </div>
 </div>
 
-<div id="appContainer" class="hidden" style="width:100%; display:flex;">
-    <div id="sidebar">
-        <div style="text-align:center; margin-bottom:30px;">
+<div id="app" class="hidden" style="width:100%; display:flex;">
+    <aside id="sidebar">
+        <div style="text-align:center; margin-bottom:25px;">
             <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="100">
-            <h4 style="margin-top:10px;">TI ASSETS</h4>
+            <p style="font-size:10px; margin-top:5px; opacity:0.8;">DOMINO'S PIZZA TI</p>
         </div>
         <nav>
-            <button class="nav-btn active" onclick="showView('viewInventory')"><i class="fas fa-database"></i> Maestro General</button>
-            <button class="nav-btn" onclick="abrirModalForm()"><i class="fas fa-plus-circle"></i> Nuevo Activo</button>
-            <button class="nav-btn" onclick="abrirModalCSV()"><i class="fas fa-file-import"></i> Cargar CSV</button>
+            <button class="nav-btn active" onclick="renderTable()"><i class="fas fa-table"></i> Inventario Total</button>
+            <button class="nav-btn" onclick="abrirForm()"><i class="fas fa-plus"></i> Nueva Ficha</button>
         </nav>
-        <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid white; color:white; padding:10px; border-radius:8px; cursor:pointer;">Cerrar Sesión</button>
-    </div>
+        <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid white; color:white; padding:8px; border-radius:5px; cursor:pointer;">Cerrar</button>
+    </aside>
 
     <main class="main-view">
-        <div id="viewInventory">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h1>Inventario de Hardware y Telefonía</h1>
-                <input type="text" id="searchInput" placeholder="Buscar por RUT, Nombre o Serie..." style="width:400px; padding:12px; border-radius:10px; border:1px solid var(--border);" oninput="renderTable()">
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>RUT</th><th>Persona</th><th>Área</th><th>Ubicación</th><th>Estado</th>
-                            <th>Serie PC</th><th>Marca PC</th><th>Modelo PC</th>
-                            <th>Celular</th><th>IMEI</th><th>SIM</th>
-                            <th>Mochila</th><th>Cargador</th><th>Doc. Firmado</th>
-                            <th>Fecha Ent.</th><th>Fecha Dev.</th><th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="mainTableBody"></tbody>
-                </table>
-            </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h1 style="font-size:18px;">Maestro de Hardware, Telefonía y Logística</h1>
+            <input type="text" id="busqueda" placeholder="Buscar por RUT, Nombre, Serie..." style="width:300px; padding:8px; border-radius:6px; border:1px solid #cbd5e1;" oninput="renderTable()">
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>RUT</th><th>Persona</th><th>Fecha Entrega</th><th>Estado</th><th>Correo</th>
+                        <th>Área</th><th>Ubicación</th><th>Marca PC</th><th>Modelo PC</th><th>Nº Serie PC</th>
+                        <th>Marca Cel</th><th>Modelo Cel</th><th>IMEI Cel</th><th>IMEI SIM</th>
+                        <th>Documento</th><th>Mochila</th><th>Cargador</th>
+                        <th>Entrega Informática</th><th>Entrega Usuario</th><th>Fecha Devolución</th><th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaBody"></tbody>
+            </table>
         </div>
     </main>
 </div>
 
-<div id="modalForm" class="hidden modal">
+<div id="modalFicha" class="hidden modal">
     <div class="modal-content">
-        <h2 id="formTitle">Ficha de Asignación</h2>
+        <h2 style="margin-bottom:15px; border-bottom:2px solid var(--secondary); padding-bottom:5px;">Nueva Ficha de Asignación</h2>
         <div class="form-grid">
-            <div class="section-title"><span>1. IDENTIFICACIÓN DEL COLABORADOR</span></div>
+            <div class="section-header">DATOS DEL RESPONSABLE</div>
             <div class="form-group"><label>RUT</label><input type="text" id="f_rut"></div>
             <div class="form-group"><label>Nombre Persona</label><input type="text" id="f_persona"></div>
             <div class="form-group"><label>Correo</label><input type="text" id="f_correo"></div>
             <div class="form-group"><label>Área</label><input type="text" id="f_area"></div>
             <div class="form-group"><label>Ubicación</label><input type="text" id="f_ubicacion"></div>
-            <div class="form-group"><label>Estado del Activo</label><input type="text" id="f_estado" value="Asignado"></div>
+            <div class="form-group"><label>Estado General</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Dañado</option><option>En Reparación</option></select></div>
 
-            <div class="section-title"><span>2. EQUIPAMIENTO COMPUTACIONAL</span></div>
+            <div class="section-header">ACTIVO COMPUTACIONAL</div>
             <div class="form-group"><label>Marca PC</label><input type="text" id="f_marca"></div>
             <div class="form-group"><label>Modelo PC</label><input type="text" id="f_modelo"></div>
-            <div class="form-group"><label>Nº de Serie</label><input type="text" id="f_serie"></div>
-            <div class="form-group"><label>Mochila</label><select id="f_moc"><option>No</option><option>Si</option></select></div>
-            <div class="form-group"><label>Cargador PC</label><select id="f_car"><option>No</option><option>Si</option></select></div>
+            <div class="form-group"><label>Nº de Serie PC</label><input type="text" id="f_serie"></div>
+            <div class="form-group"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
+            <div class="form-group"><label>Cargador PC</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
 
-            <div class="section-title"><span>3. TELEFONÍA MÓVIL</span></div>
+            <div class="section-header">TELEFONÍA MÓVIL</div>
             <div class="form-group"><label>Marca Celular</label><input type="text" id="f_marca_cel"></div>
             <div class="form-group"><label>Modelo Celular</label><input type="text" id="f_modelo_cel"></div>
             <div class="form-group"><label>IMEI Equipo</label><input type="text" id="f_imei_cel"></div>
             <div class="form-group"><label>IMEI SIM Card</label><input type="text" id="f_imei_sim"></div>
 
-            <div class="section-title"><span>4. LOGÍSTICA Y CONTROL</span></div>
+            <div class="section-header">FECHAS Y LOGÍSTICA</div>
             <div class="form-group"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div>
             <div class="form-group"><label>Fecha Devolución</label><input type="date" id="f_fecha_dev"></div>
             <div class="form-group"><label>Documento Firmado</label><select id="f_doc"><option>No</option><option>Si</option></select></div>
             <div class="form-group"><label>Entrega Informática</label><input type="text" id="f_ent_info"></div>
             <div class="form-group"><label>Entrega al Usuario</label><input type="text" id="f_ent_usu"></div>
-            <div class="form-group" style="grid-column: span 4;"><label>Observaciones</label><textarea id="f_obs" rows="2"></textarea></div>
+            <div class="form-group" style="grid-column: span 4;"><label>Observaciones Adicionales</label><textarea id="f_obs" rows="2"></textarea></div>
         </div>
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-            <button onclick="cerrarModalForm()" style="padding:10px 20px; border:none; cursor:pointer; border-radius:8px;">Cancelar</button>
-            <button onclick="guardarRegistro()" style="padding:10px 30px; background:var(--success); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">SINCRONIZAR A NUBE</button>
+            <button onclick="cerrarForm()" style="padding:10px 20px; border:none; cursor:pointer; border-radius:5px;">Descartar</button>
+            <button onclick="guardarTodo()" style="padding:10px 30px; background:var(--success); color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">GUARDAR FICHA COMPLETA</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
-    const HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" };
+    const URL = "https://ivjwxvhixrskraepqzse.supabase.co/rest/v1";
+    const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
+    const HEADERS = { "apikey": KEY, "Authorization": `Bearer ${KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" };
 
-    let masterData = [];
+    let DB = [];
 
-    function iniciarSesion() {
-        if(document.getElementById('loginPass').value === 'DominoTI2024') {
+    function intentarLogin() {
+        if(document.getElementById('passInput').value === 'DominoTI2024') {
             document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('appContainer').classList.remove('hidden');
-            fetchData();
+            document.getElementById('app').classList.remove('hidden');
+            cargarDatos();
         }
     }
 
-    async function fetchData() {
-        setLoading(true);
+    async function cargarDatos() {
+        setLoad(true);
         try {
             const [c, a] = await Promise.all([
-                fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json()),
-                fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS }).then(r => r.json())
+                fetch(`${URL}/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json()),
+                fetch(`${URL}/activos?select=*`, { headers: HEADERS }).then(r => r.json())
             ]);
-            masterData = a.map(act => {
+            DB = a.map(act => {
                 const col = c.find(u => u.rut === act.rut_responsable) || {};
                 return { ...act, persona: col.nombre, correo: col.correo };
             });
             renderTable();
-        } catch(e) { console.error(e); }
-        setLoading(false);
+        } catch(e) {}
+        setLoad(false);
     }
 
     function renderTable() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const body = document.getElementById('mainTableBody');
+        const q = document.getElementById('busqueda').value.toLowerCase();
+        const body = document.getElementById('tablaBody');
         
-        const filtered = masterData.filter(d => 
-            (d.rut_responsable || "").toLowerCase().includes(query) || 
-            (d.persona || "").toLowerCase().includes(query) || 
-            (d.serie || "").toLowerCase().includes(query)
+        const filtered = DB.filter(d => 
+            (d.rut_responsable || "").toLowerCase().includes(q) || 
+            (d.persona || "").toLowerCase().includes(q) || 
+            (d.serie || "").toLowerCase().includes(q)
         );
 
         body.innerHTML = filtered.map(d => `
             <tr>
-                <td><b>${d.rut_responsable}</b></td>
-                <td>${d.persona || ''}</td>
-                <td>${d.area || ''}</td>
-                <td>${d.ubicacion || ''}</td>
-                <td><small>${d.estado || ''}</small></td>
-                <td><code>${d.serie}</code></td>
-                <td>${d.marca || ''}</td>
-                <td>${d.modelo || ''}</td>
-                <td>${d.marca_cel || ''} ${d.modelo_cel || ''}</td>
-                <td><small>${d.imei_cel || ''}</small></td>
-                <td><small>${d.imei_sim || ''}</small></td>
-                <td>${d.mochila || ''}</td>
-                <td>${d.cargador || ''}</td>
-                <td>${d.doc_firmado || ''}</td>
-                <td>${d.fecha_entrega || ''}</td>
-                <td>${d.fecha_devolucion || ''}</td>
+                <td><b>${d.rut_responsable || '-'}</b></td>
+                <td>${d.persona || '-'}</td>
+                <td><span class="tag tag-blue">${d.fecha_entrega || '-'}</span></td>
+                <td>${d.estado || '-'}</td>
+                <td>${d.correo || '-'}</td>
+                <td>${d.area || '-'}</td>
+                <td>${d.ubicacion || '-'}</td>
+                <td>${d.marca || '-'}</td>
+                <td>${d.modelo || '-'}</td>
+                <td><code>${d.serie || '-'}</code></td>
+                <td>${d.marca_cel || '-'}</td>
+                <td>${d.modelo_cel || '-'}</td>
+                <td>${d.imei_cel || '-'}</td>
+                <td>${d.imei_sim || '-'}</td>
+                <td>${d.doc_firmado || '-'}</td>
+                <td>${d.mochila || '-'}</td>
+                <td>${d.cargador || '-'}</td>
+                <td>${d.entrega_informatica || '-'}</td>
+                <td>${d.entrega_usuario || '-'}</td>
+                <td><span class="tag">${d.fecha_devolucion || '-'}</span></td>
                 <td><button onclick="eliminar('${d.serie}')" style="color:red; border:none; background:none; cursor:pointer;"><i class="fas fa-trash"></i></button></td>
             </tr>
         `).join('');
     }
 
-    async function guardarRegistro() {
+    async function guardarTodo() {
         const d = {
             rut: document.getElementById('f_rut').value,
-            persona: document.getElementById('f_persona').value,
-            correo: document.getElementById('f_correo').value,
-            area: document.getElementById('f_area').value,
-            ubicacion: document.getElementById('f_ubicacion').value,
-            serie: document.getElementById('f_serie').value,
-            marca: document.getElementById('f_marca').value,
-            modelo: document.getElementById('f_modelo').value,
-            estado: document.getElementById('f_estado').value,
-            marca_cel: document.getElementById('f_marca_cel').value,
-            modelo_cel: document.getElementById('f_modelo_cel').value,
-            imei_cel: document.getElementById('f_imei_cel').value,
-            imei_sim: document.getElementById('f_imei_sim').value,
-            fecha_ent: document.getElementById('f_fecha_ent').value,
-            fecha_dev: document.getElementById('f_fecha_dev').value,
+            nom: document.getElementById('f_persona').value,
+            cor: document.getElementById('f_correo').value,
+            are: document.getElementById('f_area').value,
+            ubi: document.getElementById('f_ubicacion').value,
+            est: document.getElementById('f_estado').value,
+            ser: document.getElementById('f_serie').value,
+            mar: document.getElementById('f_marca').value,
+            mod: document.getElementById('f_modelo').value,
+            moc: document.getElementById('f_mochila').value,
+            car: document.getElementById('f_cargador').value,
+            m_c: document.getElementById('f_marca_cel').value,
+            m_l: document.getElementById('f_modelo_cel').value,
+            i_e: document.getElementById('f_imei_cel').value,
+            i_s: document.getElementById('f_imei_sim').value,
+            f_e: document.getElementById('f_fecha_ent').value,
+            f_d: document.getElementById('f_fecha_dev').value,
             doc: document.getElementById('f_doc').value,
-            moc: document.getElementById('f_moc').value,
-            car: document.getElementById('f_car').value,
-            ent_info: document.getElementById('f_ent_info').value,
-            ent_usu: document.getElementById('f_ent_usu').value,
+            e_i: document.getElementById('f_ent_info').value,
+            e_u: document.getElementById('f_ent_usu').value,
             obs: document.getElementById('f_obs').value
         };
 
-        setLoading(true);
+        if(!d.rut || !d.ser) return alert("RUT y Serie son obligatorios");
+
+        setLoad(true);
         try {
-            // 1. Colaborador
-            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
+            await fetch(`${URL}/colaboradores`, {
                 method: 'POST', headers: HEADERS,
-                body: JSON.stringify({ rut: d.rut, nombre: d.persona, correo: d.correo, area: d.area })
+                body: JSON.stringify({ rut: d.rut, nombre: d.nom, correo: d.cor, area: d.are })
             });
-            // 2. Activo con Columnas Propias de Telefonía
-            await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
+            await fetch(`${URL}/activos`, {
                 method: 'POST', headers: HEADERS,
                 body: JSON.stringify({
-                    serie: d.serie, marca: d.marca, modelo: d.modelo, estado: d.estado,
-                    ubicacion: d.ubicacion, area: d.area, fecha_entrega: d.fecha_ent,
+                    serie: d.ser, marca: d.mar, modelo: d.mod, estado: d.est,
+                    ubicacion: d.ubi, area: d.are, fecha_entrega: d.f_e,
                     mochila: d.moc, cargador: d.car, doc_firmado: d.doc,
-                    marca_cel: d.marca_cel, modelo_cel: d.modelo_cel, 
-                    imei_cel: d.imei_cel, imei_sim: d.imei_sim,
-                    entrega_informatica: d.ent_info, entrega_usuario: d.ent_usu,
-                    fecha_devolucion: d.fecha_dev, observaciones: d.obs, 
-                    rut_responsable: d.rut
+                    marca_cel: d.m_c, modelo_cel: d.m_l, imei_cel: d.i_e, imei_sim: d.i_s,
+                    entrega_informatica: d.e_i, entrega_usuario: d.e_u,
+                    fecha_devolucion: d.f_d, observaciones: d.obs, rut_responsable: d.rut
                 })
             });
-            cerrarModalForm();
-            fetchData();
-        } catch(e) { alert("Error al guardar. Asegúrate de añadir las columnas en Supabase."); }
-        setLoading(false);
+            cerrarForm();
+            cargarDatos();
+        } catch(e) { alert("Error al sincronizar datos."); }
+        setLoad(false);
     }
 
-    async function eliminar(serie) {
-        if(!confirm("¿Eliminar?")) return;
-        setLoading(true);
-        await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${serie}`, { method: 'DELETE', headers: HEADERS });
-        fetchData();
+    async function eliminar(s) {
+        if(!confirm("¿Eliminar este registro permanentemente?")) return;
+        setLoad(true);
+        await fetch(`${URL}/activos?serie=eq.${s}`, { method: 'DELETE', headers: HEADERS });
+        cargarDatos();
     }
 
-    function abrirModalForm() { document.getElementById('modalForm').classList.remove('hidden'); }
-    function cerrarModalForm() { document.getElementById('modalForm').classList.add('hidden'); }
-    function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
-    function showView(v) {}
-    function abrirModalCSV() { alert("Para cargar CSV en esta versión, asegúrate de que el archivo tenga los 17 campos."); }
+    function abrirForm() { document.getElementById('modalFicha').classList.remove('hidden'); }
+    function cerrarForm() { document.getElementById('modalFicha').classList.add('hidden'); }
+    function setLoad(v) { document.getElementById('loader').style.transform = v ? 'scaleX(1)' : 'scaleX(0)'; }
 </script>
 </body>
 </html>
