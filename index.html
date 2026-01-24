@@ -3,46 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v40.5 - Enterprise Stable</title>
+    <title>TI Maestro v41.0 - Full Detail Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0066CC; --secondary: #E31837; --success: #22c55e;
-            --danger: #ef4444; --bg: #FFFFF5; --border: #e2e8f0;
+            --danger: #ef4444; --bg: #FFFFF5; --border: #e2e8f0; --dark: #1e293b;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; font-size: 14px; }
+        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; font-size: 13px; }
         
-        /* Sidebar */
-        #sidebar { width: 260px; background: var(--primary); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; margin-bottom: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .nav-btn:hover { background: rgba(255,255,255,0.2); }
+        #sidebar { width: 260px; background: var(--primary); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .nav-btn.active { background: var(--secondary); font-weight: bold; }
 
-        /* Main View */
-        .main-view { flex-grow: 1; padding: 25px; overflow-y: auto; background: #f8fafc; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .main-view { flex-grow: 1; padding: 20px; overflow-y: auto; background: #f8fafc; }
         
-        /* Table */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f1f5f9; padding: 15px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600; }
-        td { padding: 12px 15px; border-bottom: 1px solid #edf2f7; }
-        tr:hover { background-color: #fcfcfc; }
+        /* Tabla Principal */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th { background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600; position: sticky; top: 0; z-index: 5; }
+        td { padding: 10px; border-bottom: 1px solid #edf2f7; }
 
-        /* Modals */
+        /* Modales */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; color: #333; }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 95%; max-width: 900px; max-height: 95vh; overflow-y: auto; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-weight: 600; color: var(--dark); font-size: 11px; text-transform: uppercase; }
+        input, select, textarea { padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 100%; font-size: 13px; }
+        
         .hidden { display: none !important; }
-        
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px; }
-        .btn-save { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        
-        .btn-action { border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn-edit { background: #e0f2fe; color: #0369a1; margin-right: 5px; }
-        .btn-del { background: #fee2e2; color: #991b1b; }
-        
+        .btn-save { background: var(--success); color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         #loadingBar { position: fixed; top: 0; left: 0; height: 3px; background: var(--secondary); width: 0; transition: 0.3s; z-index: 20000; }
     </style>
 </head>
@@ -51,38 +45,39 @@
 <div id="loadingBar"></div>
 
 <div id="loginPage" style="display: flex; width:100%; height:100vh; align-items:center; justify-content:center; background: var(--primary);">
-    <div style="background:white; padding:40px; border-radius:20px; text-align:center; width:350px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+    <div style="background:white; padding:40px; border-radius:20px; text-align:center; width:350px;">
         <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="150">
-        <h2 style="margin: 20px 0 10px;">TI Maestro v40.5</h2>
-        <input type="password" id="loginPass" placeholder="Clave de Acceso" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;">
+        <h2 style="margin: 20px 0 10px;">TI Maestro v41.0</h2>
+        <input type="password" id="loginPass" placeholder="Clave Admin" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;">
         <button onclick="iniciarSesion()" style="width:100%; padding:12px; background:var(--secondary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">ACCEDER</button>
     </div>
 </div>
 
 <div id="appContainer" class="hidden" style="width: 100%; display: flex;">
     <div id="sidebar">
-        <h3 style="margin-bottom:20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom:10px;">TI MAESTRO</h3>
-        <nav>
+        <h3>TI MAESTRO</h3>
+        <nav style="margin-top:20px;">
             <button class="nav-btn active" onclick="showView('viewInventory')"><i class="fas fa-list"></i> Inventario</button>
-            <button class="nav-btn" onclick="abrirModalManual()"><i class="fas fa-plus"></i> Nuevo Activo</button>
+            <button class="nav-btn" onclick="abrirModalForm()"><i class="fas fa-plus"></i> Nuevo Activo</button>
             <button class="nav-btn" onclick="abrirModalCSV()"><i class="fas fa-file-upload"></i> Cargar CSV</button>
         </nav>
         <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid white; color:white; padding:10px; border-radius:8px; cursor:pointer;">Cerrar Sesión</button>
     </div>
 
     <main class="main-view">
-        <div id="viewInventory" class="view-content">
-            <div class="header">
-                <h1>Maestro de Activos TI</h1>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="searchInput" placeholder="Buscar por RUT o Nombre..." style="width:250px;" oninput="renderTable()">
-                    <button onclick="fetchData()" class="btn-action" style="background:#eee;"><i class="fas fa-sync"></i></button>
-                </div>
+        <div id="viewInventory">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h1>Maestro de Activos Completo</h1>
+                <input type="text" id="searchInput" placeholder="Buscar por RUT, Nombre, Serie o Área..." style="width:300px; padding:10px; border-radius:8px; border:1px solid #ccc;" oninput="renderTable()">
             </div>
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr><th>RUT</th><th>Colaborador</th><th>Serie</th><th>Detalle</th><th>Estado</th><th>Acciones</th></tr>
+                        <tr>
+                            <th>RUT</th><th>Persona</th><th>Correo</th><th>Área</th><th>Ubicación</th>
+                            <th>Serie</th><th>Marca/Modelo</th><th>Entrega</th><th>Mochila</th>
+                            <th>Cargador</th><th>Estado</th><th>Acciones</th>
+                        </tr>
                     </thead>
                     <tbody id="mainTableBody"></tbody>
                 </table>
@@ -91,81 +86,88 @@
     </main>
 </div>
 
-<div id="modalManual" class="hidden modal">
+<div id="modalForm" class="hidden modal">
     <div class="modal-content">
-        <h3 id="formTitle">Gestionar Activo</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
-            <div><label>RUT Responsable</label><input type="text" id="f_rut" placeholder="12345678-9"></div>
-            <div><label>Nombre Persona</label><input type="text" id="f_nombre" placeholder="Nombre completo"></div>
-            <div><label>Nº de Serie</label><input type="text" id="f_serie" placeholder="ID del equipo"></div>
-            <div><label>Marca/Modelo</label><input type="text" id="f_marca" placeholder="Ej: Dell Latitude"></div>
-            <div><label>Estado</label>
-                <select id="f_estado">
-                    <option>Buen Estado</option>
-                    <option>Dañado</option>
-                    <option>En Reparación</option>
-                </select>
-            </div>
+        <h3 id="formTitle">Ficha Completa de Activo</h3>
+        <div class="form-grid">
+            <div class="form-group"><label>RUT Responsable</label><input type="text" id="f_rut" placeholder="12345678-9"></div>
+            <div class="form-group"><label>Nombre Persona</label><input type="text" id="f_nombre"></div>
+            <div class="form-group"><label>Correo Electrónico</label><input type="email" id="f_correo"></div>
+            <div class="form-group"><label>Área / Depto</label><input type="text" id="f_area"></div>
+            <div class="form-group"><label>Ubicación / Ciudad</label><input type="text" id="f_ubicacion"></div>
+            
+            <div class="form-group"><label>Nº de Serie</label><input type="text" id="f_serie"></div>
+            <div class="form-group"><label>Marca</label><input type="text" id="f_marca"></div>
+            <div class="form-group"><label>Modelo</label><input type="text" id="f_modelo"></div>
+            <div class="form-group"><label>Tipo de Equipo</label><select id="f_tipo"><option>Laptop</option><option>Celular</option><option>Tablet</option><option>Otro</option></select></div>
+            <div class="form-group"><label>Estado Actual</label><select id="f_estado"><option>Asignado</option><option>No Asignado</option><option>Dañado</option><option>En Reparación</option></select></div>
+            
+            <div class="form-group"><label>Fecha Entrega</label><input type="date" id="f_fecha_entrega"></div>
+            <div class="form-group"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
+            <div class="form-group"><label>Cargador</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
+            <div class="form-group"><label>Documento Firmado</label><select id="f_documento"><option>No</option><option>Si</option></select></div>
+            <div class="form-group" style="grid-column: span 3;"><label>Observaciones</label><textarea id="f_obs" rows="2"></textarea></div>
         </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
-            <button onclick="cerrarModalManual()" style="padding:10px; border:none; cursor:pointer;">Cancelar</button>
-            <button onclick="guardarRegistro()" class="btn-save">Guardar en Base de Datos</button>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+            <button onclick="cerrarModalForm()" style="padding:10px; border:none; cursor:pointer;">Cancelar</button>
+            <button onclick="guardarRegistro()" class="btn-save">Guardar Registro Completo</button>
         </div>
     </div>
 </div>
 
 <div id="csvModal" class="hidden modal">
-    <div class="modal-content" style="max-width:800px;">
-        <h3>Importación Masiva CSV</h3>
+    <div class="modal-content" style="max-width:1000px;">
+        <h3>Importación Masiva (Mapeo Completo)</h3>
         <div id="csvPaso1">
             <input type="file" id="csvFile" accept=".csv" style="margin:20px 0;">
-            <button onclick="analizarCSV()" class="nav-btn" style="background:var(--primary); justify-content:center;">Analizar Archivo</button>
+            <button onclick="analizarColumnasCSV()" class="nav-btn" style="background:var(--primary); justify-content:center;">Analizar Archivo</button>
         </div>
         <div id="csvPaso2" class="hidden">
-            <div style="max-height:300px; overflow:auto; margin:15px 0; border:1px solid #eee;">
-                <table style="width:100%; font-size:11px;" id="csvTablePreview"></table>
+            <p>Vincula las columnas de tu archivo con el sistema:</p>
+            <div id="mapeoContainer" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin:15px 0; background:#f1f5f9; padding:15px; border-radius:10px;"></div>
+            <button onclick="procesarConMapeo()" class="btn-save" style="width:100%;">Previsualizar Datos</button>
+        </div>
+        <div id="csvPaso3" class="hidden">
+            <div style="max-height:350px; overflow:auto; border:1px solid #eee;">
+                <table id="csvTablePreview" style="font-size:10px;"></table>
             </div>
-            <button onclick="sincronizarCSV()" class="btn-save" style="width:100%;">Confirmar y Sincronizar</button>
+            <button onclick="sincronizarCSV()" class="btn-save" style="width:100%; margin-top:15px;">Sincronizar Todo a Supabase</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- CONFIGURACIÓN SEGURA ---
     const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
 
-    const HEADERS = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "resolution=merge-duplicates"
-    };
+    const HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" };
 
     let masterData = [];
-    let csvDataTemporal = [];
+    let lineasRaw = [];
+    let temporalData = [];
 
-    // --- FUNCIONES DE INICIO ---
+    // --- SESIÓN ---
     function iniciarSesion() {
         if(document.getElementById('loginPass').value === 'DominoTI2024') {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('appContainer').classList.remove('hidden');
             fetchData();
-        } else { alert("Contraseña incorrecta"); }
+        }
     }
 
+    // --- DATA ---
     async function fetchData() {
         setLoading(true);
         try {
             const colabs = await fetch(`${SUPABASE_URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json());
             const activos = await fetch(`${SUPABASE_URL}/rest/v1/activos?select=*`, { headers: HEADERS }).then(r => r.json());
             
-            masterData = activos.map(a => ({
-                ...a,
-                persona: colabs.find(c => c.rut === a.rut_responsable)?.nombre || 'No asignado'
-            }));
+            masterData = activos.map(a => {
+                const c = colabs.find(x => x.rut === a.rut_responsable) || {};
+                return { ...a, persona: c.nombre || 'N/A', correo: c.correo || 'N/A', area_c: c.area || 'N/A' };
+            });
             renderTable();
-        } catch(e) { console.error("Error cargando datos"); }
+        } catch(e) { console.error("Error cargando base de datos"); }
         setLoading(false);
     }
 
@@ -174,109 +176,84 @@
         const body = document.getElementById('mainTableBody');
         
         const filtered = masterData.filter(d => 
-            d.rut_responsable.toLowerCase().includes(query) || 
-            d.persona.toLowerCase().includes(query) || 
-            d.serie.toLowerCase().includes(query)
+            d.rut_responsable?.toLowerCase().includes(query) || 
+            d.persona?.toLowerCase().includes(query) || 
+            d.serie?.toLowerCase().includes(query) ||
+            d.area?.toLowerCase().includes(query)
         );
 
         body.innerHTML = filtered.map(d => `
             <tr>
                 <td><b>${d.rut_responsable}</b></td>
                 <td>${d.persona}</td>
+                <td>${d.correo || ''}</td>
+                <td><small>${d.area || ''}</small></td>
+                <td><small>${d.ubicacion || ''}</small></td>
                 <td><code>${d.serie}</code></td>
-                <td>${d.marca || ''}</td>
-                <td><span style="color:${d.estado.includes('Buen')?'green':'red'}">${d.estado}</span></td>
-                <td>
-                    <button class="btn-action btn-edit" onclick="prepararEdicion('${d.serie}')"><i class="fas fa-edit"></i></button>
-                    <button class="btn-action btn-del" onclick="eliminarActivo('${d.serie}')"><i class="fas fa-trash"></i></button>
+                <td>${d.marca} ${d.modelo}</td>
+                <td>${d.fecha_entrega || ''}</td>
+                <td>${d.mochila}</td>
+                <td>${d.cargador}</td>
+                <td><span style="color:${d.estado?.includes('Buen')?'green':'red'}">${d.estado}</span></td>
+                <td style="white-space:nowrap;">
+                    <button class="nav-btn" style="width:auto; padding:5px; background:#e0f2fe; color:#0369a1;" onclick="editar('${d.serie}')"><i class="fas fa-edit"></i></button>
+                    <button class="nav-btn" style="width:auto; padding:5px; background:#fee2e2; color:#991b1b;" onclick="eliminar('${d.serie}')"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
         `).join('');
     }
 
-    // --- ACCIONES CRUD ---
+    // --- CRUD ---
     async function guardarRegistro() {
-        const payload = {
-            rut: document.getElementById('f_rut').value.trim(),
-            nombre: document.getElementById('f_nombre').value.trim(),
-            serie: document.getElementById('f_serie').value.trim(),
-            marca: document.getElementById('f_marca').value.trim(),
-            estado: document.getElementById('f_estado').value
+        const data = {
+            rut: document.getElementById('f_rut').value,
+            nombre: document.getElementById('f_nombre').value,
+            correo: document.getElementById('f_correo').value,
+            area: document.getElementById('f_area').value,
+            ubicacion: document.getElementById('f_ubicacion').value,
+            serie: document.getElementById('f_serie').value,
+            marca: document.getElementById('f_marca').value,
+            modelo: document.getElementById('f_modelo').value,
+            tipo: document.getElementById('f_tipo').value,
+            estado: document.getElementById('f_estado').value,
+            fecha_entrega: document.getElementById('f_fecha_entrega').value,
+            mochila: document.getElementById('f_mochila').value,
+            cargador: document.getElementById('f_cargador').value,
+            documento: document.getElementById('f_documento').value,
+            obs: document.getElementById('f_obs').value
         };
 
-        if(!payload.rut || !payload.serie) return alert("RUT y Serie son obligatorios");
+        if(!data.rut || !data.serie) return alert("RUT y Serie son obligatorios");
 
         setLoading(true);
         try {
-            // 1. Guardar Colaborador
+            // Upsert Colaborador (incluyendo correo y ubicación)
             await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, {
                 method: 'POST', headers: HEADERS,
-                body: JSON.stringify({ rut: payload.rut, nombre: payload.nombre })
+                body: JSON.stringify({ rut: data.rut, nombre: data.nombre, correo: data.correo, area: data.area })
             });
-            // 2. Guardar Activo
+            // Upsert Activo (con todos los detalles)
             await fetch(`${SUPABASE_URL}/rest/v1/activos`, {
                 method: 'POST', headers: HEADERS,
                 body: JSON.stringify({ 
-                    serie: payload.serie, marca: payload.marca, 
-                    estado: payload.estado, rut_responsable: payload.rut 
+                    serie: data.serie, marca: data.marca, modelo: data.modelo, tipo: data.tipo,
+                    estado: data.estado, ubicacion: data.ubicacion, area: data.area,
+                    fecha_entrega: data.fecha_entrega, mochila: data.mochila, 
+                    cargador: data.cargador, doc_firmado: data.documento,
+                    observaciones: data.obs, rut_responsable: data.rut 
                 })
             });
-            cerrarModalManual();
+            cerrarModalForm();
             fetchData();
-        } catch(e) { alert("Error al guardar"); }
-        setLoading(false);
-    }
-
-    async function eliminarActivo(serie) {
-        if(!confirm("¿Eliminar este equipo definitivamente?")) return;
-        setLoading(true);
-        await fetch(`${SUPABASE_URL}/rest/v1/activos?serie=eq.${serie}`, {
-            method: 'DELETE', headers: HEADERS
-        });
-        fetchData();
-    }
-
-    // --- LÓGICA CSV ---
-    async function analizarCSV() {
-        const file = document.getElementById('csvFile').files[0];
-        if(!file) return;
-        const text = await file.text();
-        const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
-        const sep = lines[0].includes(';') ? ';' : ',';
-        
-        csvDataTemporal = lines.slice(1).map(line => {
-            const cols = line.split(sep).map(c => c.trim().replace(/"/g, ''));
-            return { rut: cols[0], nombre: cols[1], serie: cols[2], marca: cols[4], estado: "Asignado" };
-        }).filter(d => d.rut && d.serie);
-
-        document.getElementById('csvTablePreview').innerHTML = `
-            <thead><tr><th>RUT</th><th>Nombre</th><th>Serie</th></tr></thead>
-            <tbody>${csvDataTemporal.slice(0,5).map(d => `<tr><td>${d.rut}</td><td>${d.nombre}</td><td>${d.serie}</td></tr>`).join('')}</tbody>
-        `;
-        document.getElementById('csvPaso1').classList.add('hidden');
-        document.getElementById('csvPaso2').classList.remove('hidden');
-    }
-
-    async function sincronizarCSV() {
-        setLoading(true);
-        const colabs = Array.from(new Map(csvDataTemporal.map(i => [i.rut, {rut: i.rut, nombre: i.nombre}])).values());
-        const activos = csvDataTemporal.map(i => ({ serie: i.serie, marca: i.marca, estado: i.estado, rut_responsable: i.rut }));
-
-        try {
-            await fetch(`${SUPABASE_URL}/rest/v1/colaboradores`, { method: 'POST', headers: HEADERS, body: JSON.stringify(colabs) });
-            await fetch(`${SUPABASE_URL}/rest/v1/activos`, { method: 'POST', headers: HEADERS, body: JSON.stringify(activos) });
-            alert("¡Sincronización Exitosa!");
-            location.reload();
         } catch(e) { alert("Error de red"); }
         setLoading(false);
     }
 
-    // --- UTILS ---
-    function setLoading(v) { document.getElementById('loadingBar').style.width = v ? '100%' : '0'; }
-    function abrirModalManual() { document.getElementById('modalManual').classList.remove('hidden'); }
-    function cerrarModalManual() { document.getElementById('modalManual').classList.add('hidden'); }
-    function abrirModalCSV() { document.getElementById('csvModal').classList.remove('hidden'); }
-    function showView(v) { /* Solo hay una vista funcional en esta versión */ }
-</script>
-</body>
-</html>
+    // --- CSV ENGINE ---
+    async function analizarColumnasCSV() {
+        const file = document.getElementById('csvFile').files[0];
+        if(!file) return;
+        const text = await file.text();
+        lineasRaw = text.split(/\r?\n/).filter(l => l.trim() !== '');
+        const header = lineasRaw[0];
+        const sep = header.includes(';') ? ';' : ',';
