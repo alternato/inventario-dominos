@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v53.5 - Fix Supabase</title>
+    <title>TI Maestro v54.0 - Restauración Total</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #0066CC; --secondary: #E31837; --success: #22c55e;
@@ -21,25 +20,26 @@
         .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 10px; width: 100%; margin-bottom: 10px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 13px; }
         .nav-btn.active { background: var(--secondary); font-weight: bold; }
 
-        /* Main Content */
+        /* Content Area */
         .main-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
         header { background: white; padding: 15px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .content-area { padding: 20px; overflow-y: auto; flex-grow: 1; }
+        .content-area { padding: 30px; overflow-y: auto; flex-grow: 1; }
 
         /* Table */
         .table-container { background: white; border-radius: 15px; border: 1px solid var(--border); overflow: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 2600px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; min-width: 2800px; font-size: 12px; }
         th { background: #f8fafc; padding: 15px; text-align: left; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 10; }
         td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; }
 
         /* Modal & Form */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 92vh; overflow-y: auto; }
-        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         .section-tag { grid-column: span 4; font-size: 11px; font-weight: 800; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 15px; text-transform: uppercase; }
         input, select, textarea { padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; width: 100%; }
         input:disabled { background: #f1f5f9; cursor: not-allowed; opacity: 0.5; }
 
+        /* Logic Switches */
         .tel-toggle-box { grid-column: span 2; background: #f0f7ff; padding: 15px; border-radius: 12px; border: 1px solid #d0e4ff; display: flex; align-items: center; justify-content: space-between; }
         .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -72,7 +72,7 @@
         </div>
         <nav>
             <button id="navDash" class="nav-btn active" onclick="showView('dashboard')"><i class="fas fa-chart-line"></i> Inicio</button>
-            <button id="navInv" class="nav-btn" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario Maestro</button>
+            <button id="navInv" class="nav-btn" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario</button>
             <hr style="opacity:0.1; margin:20px 0;">
             <button class="nav-btn" style="background:var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> Nuevo Registro</button>
         </nav>
@@ -81,7 +81,7 @@
 
     <div class="main-container">
         <header>
-            <h2 id="viewTitle">Gestión TI</h2>
+            <h2 id="viewTitle">Gestión TI Domino's</h2>
             <span style="font-weight:600; font-size:12px; color:var(--primary);">Admin Chile</span>
         </header>
 
@@ -89,15 +89,15 @@
             <div id="view-dashboard">
                 <div style="background:white; padding:40px; border-radius:20px; border:1px solid var(--border); text-align:center;">
                     <i class="fas fa-database" style="font-size:40px; color:var(--primary); margin-bottom:15px;"></i>
-                    <h3>Base de Datos Conectada</h3>
-                    <p style="color:#64748b; margin-top:10px;">Total de activos registrados: <b id="stat-total">0</b></p>
+                    <h3>Base de Datos Activa</h3>
+                    <p style="color:#64748b; margin-top:10px;">Registros totales: <b id="stat-total">0</b></p>
                 </div>
             </div>
 
             <div id="view-inventory" class="hidden">
                 <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
                     <h3>Inventario Hardware y Telefonía</h3>
-                    <input type="text" id="mainSearch" placeholder="Buscar..." style="width:350px;" oninput="renderMasterTable()">
+                    <input type="text" id="mainSearch" placeholder="Buscar por RUT, Nombre o Serie..." style="width:400px;" oninput="renderMasterTable()">
                 </div>
                 <div class="table-container">
                     <table>
@@ -105,7 +105,7 @@
                             <tr>
                                 <th>RUT</th><th>Persona</th><th>Estado</th><th>Área</th><th>Tienda</th>
                                 <th>Marca PC</th><th>Modelo PC</th><th>Serie PC</th>
-                                <th>Celular</th><th>IMEI</th><th>SIM</th><th>Doc.</th><th>Acciones</th>
+                                <th>Celular</th><th>IMEI</th><th>SIM</th><th>Mochila</th><th>Cargador</th><th>Doc.</th><th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="masterTableBody"></tbody>
@@ -118,13 +118,13 @@
 
 <div id="modalFicha" class="hidden modal">
     <div class="modal-content">
-        <h2 style="color:var(--primary); margin-bottom:25px;">Ficha de Activo</h2>
+        <h2 style="color:var(--primary); margin-bottom:25px;">Ficha Integral de Activo</h2>
         
         <div class="form-grid">
-            <div class="section-tag">1. Identificación</div>
+            <div class="section-tag">1. Identificación del Colaborador</div>
             <div class="form-group"><label>Nombre Completo</label><input type="text" id="f_persona" onblur="sugerirEmail(this.value)"></div>
             <div class="form-group"><label>Correo Corporativo</label><input type="email" id="f_correo"></div>
-            <div class="form-group"><label>RUT</label><input type="text" id="f_rut" maxlength="12" oninput="formatRUT(this)"></div>
+            <div class="form-group"><label>RUT Responsable</label><input type="text" id="f_rut" maxlength="12" oninput="formatRUT(this)"></div>
             <div class="form-group">
                 <label>Área</label>
                 <select id="f_area">
@@ -133,23 +133,23 @@
                 </select>
             </div>
 
-            <div class="section-tag">2. Tienda y Estado</div>
+            <div class="section-tag">2. Ubicación y Estado</div>
             <div class="form-group" style="grid-column: span 2;">
-                <label>Tienda</label>
+                <label>Tienda / Ubicación</label>
                 <select id="f_ubicacion">
                     <option value="">-- Seleccionar Tienda --</option>
                     <option>Antofagasta - Estadio Regional</option><option>Antofagasta - Sector Norte</option><option>Arica</option><option>Buin</option><option>Bustamante</option><option>Calama</option><option>Chiguayante</option><option>Chillán</option><option>Concepcion - Plaza Acevedo</option><option>Concón</option><option>Copiapó</option><option>Curicó</option><option>Froilan Roa</option><option>General Velasquez</option><option>Gran Avenida</option><option>Hualpén</option><option>Iquique</option><option>Irarrázaval</option><option>La Florida (Santa Amalia)</option><option>La Serena (Balmaceda)</option><option>La Serena (B. Universitario)</option><option>Lautaro</option><option>Luis Pasteur</option><option>Machalí</option><option>Macul</option><option>Maipu 1</option><option>Mall del Centro*</option><option>Mall Paseo Los Dominicos</option><option>Manuel Montt</option><option>Osorno 2 Centro</option><option>Osorno 1 Rahue</option><option>Parque Angamos</option><option>Pedro Fontova</option><option>Peñalolén</option><option>Plaza Atenas</option><option>Pto. Montt 2 (Cardonal)</option><option>Pto. Montt 1 (Ejercito)</option><option>Puente Alto</option><option>Punta Arenas</option><option>Quilicura</option><option>Quilpué</option><option>Recoleta</option><option>San Francisco</option><option>San Pedro de la Paz</option><option>Santa Ana</option><option>Talca</option><option>Temuco</option><option>Tobalaba</option><option>Viña del Mar</option><option>Casa Matriz</option>
                 </select>
             </div>
-            <div class="form-group" style="grid-column: span 2;"><label>Estado</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Dañado</option></select></div>
+            <div class="form-group" style="grid-column: span 2;"><label>Estado Actual</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Dañado</option></select></div>
 
-            <div class="section-tag">3. Computación</div>
+            <div class="section-tag">3. Activo Computacional</div>
             <div class="form-group"><label>Marca PC</label><input type="text" id="f_marca"></div>
             <div class="form-group"><label>Modelo PC</label><input type="text" id="f_modelo"></div>
-            <div class="form-group"><label>Nº Serie PC</label><input type="text" id="f_serie"></div>
+            <div class="form-group"><label>Nº de Serie PC</label><input type="text" id="f_serie"></div>
             <div class="form-group"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div>
 
-            <div class="section-tag">4. Telefonía</div>
+            <div class="section-tag">4. Telefonía Móvil</div>
             <div class="tel-toggle-box">
                 <span>Equipo Celular</span>
                 <label class="switch"><input type="checkbox" id="sw_equipo" onchange="toggleTelFields()"><span class="slider"></span></label>
@@ -162,11 +162,17 @@
             <div class="form-group"><label>Modelo Celular</label><input type="text" id="f_modelo_cel" disabled></div>
             <div class="form-group"><label>IMEI Equipo</label><input type="text" id="f_imei_cel" disabled></div>
             <div class="form-group"><label>IMEI SIM</label><input type="text" id="f_imei_sim" disabled></div>
+
+            <div class="section-tag">5. Categorías y Logística</div>
+            <div class="form-group"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
+            <div class="form-group"><label>Cargador</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
+            <div class="form-group"><label>Documento Firmado</label><select id="f_doc"><option>No</option><option>Si</option></select></div>
+            <div class="form-group"><label>Observaciones</label><textarea id="f_obs" rows="1"></textarea></div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
-            <button onclick="cerrarFicha()" style="padding:12px 25px; border:none; cursor:pointer;">Cancelar</button>
-            <button onclick="guardarFicha()" class="btn-save" style="background:var(--success);">GUARDAR EN LA NUBE</button>
+            <button onclick="cerrarFicha()" style="padding:12px 25px; border:none; cursor:pointer; border-radius:10px;">Cancelar</button>
+            <button onclick="guardarFicha()" class="btn-save" style="background:var(--success);">GUARDAR EN SUPABASE</button>
         </div>
     </div>
 </div>
@@ -218,7 +224,7 @@
             DB_MASTER = aR.map(a => ({ ...a, p: cR.find(u => u.rut === a.rut_responsable) || {} }));
             document.getElementById('stat-total').textContent = DB_MASTER.length;
             renderMasterTable();
-        } catch(e) { alert("Error al conectar con Supabase"); }
+        } catch(e) { alert("Error de conexión"); }
         document.getElementById('loader').style.width = "0";
     }
 
@@ -233,13 +239,12 @@
                 <td>${d.estado}</td><td>${d.area || '-'}</td><td>${d.ubicacion || '-'}</td>
                 <td>${d.marca || '-'}</td><td>${d.modelo || '-'}</td><td><code>${d.serie}</code></td>
                 <td>${d.marca_cel || '-'}</td><td>${d.imei_cel || '-'}</td><td>${d.imei_sim || '-'}</td>
-                <td>${d.doc_firmado || '-'}</td>
+                <td>${d.mochila || '-'}</td><td>${d.cargador || '-'}</td><td>${d.doc_firmado || '-'}</td>
                 <td><button onclick="eliminar('${d.serie}')" style="color:red; border:none; background:none; cursor:pointer;"><i class="fas fa-trash"></i></button></td>
             </tr>
         `).join('');
     }
 
-    // --- FUNCIÓN DE GUARDADO REFORZADA ---
     async function guardarFicha() {
         const d = {
             rut: document.getElementById('f_rut').value.trim(),
@@ -252,6 +257,10 @@
             mar: document.getElementById('f_marca').value.trim(),
             mod: document.getElementById('f_modelo').value.trim(),
             f_e: document.getElementById('f_fecha_ent').value,
+            moc: document.getElementById('f_mochila').value,
+            car: document.getElementById('f_cargador').value,
+            doc: document.getElementById('f_doc').value,
+            obs: document.getElementById('f_obs').value,
             m_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_marca_cel').value : null,
             mo_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_modelo_cel').value : null,
             i_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei_cel').value : null,
@@ -262,31 +271,27 @@
 
         document.getElementById('loader').style.width = "100%";
         try {
-            // 1. Guardar Colaborador
             const resColab = await fetch(`${URL}/colaboradores`, {
                 method: 'POST', headers: HEADERS,
                 body: JSON.stringify({ rut: d.rut, nombre: d.nom, correo: d.cor, area: d.are })
             });
-            if (!resColab.ok) throw new Error("Falla al guardar Colaborador: " + await resColab.text());
+            if (!resColab.ok) throw new Error("Falla Colaborador: " + await resColab.text());
 
-            // 2. Guardar Activo
             const resActivo = await fetch(`${URL}/activos`, {
                 method: 'POST', headers: HEADERS,
                 body: JSON.stringify({
                     serie: d.ser, marca: d.mar, modelo: d.mod, estado: d.est, ubicacion: d.ubi,
+                    mochila: d.moc, cargador: d.car, doc_firmado: d.doc, observaciones: d.obs,
                     marca_cel: d.m_c, modelo_cel: d.mo_c, imei_cel: d.i_c, imei_sim: d.i_s,
                     fecha_entrega: d.f_e, rut_responsable: d.rut, area: d.are
                 })
             });
-            if (!resActivo.ok) throw new Error("Falla al guardar Activo: " + await resActivo.text());
+            if (!resActivo.ok) throw new Error("Falla Activo: " + await resActivo.text());
 
-            alert("✅ Registro guardado exitosamente");
+            alert("✅ Registro guardado");
             cerrarFicha();
             cargarDatos();
-        } catch(e) {
-            alert("❌ ERROR CRÍTICO:\n" + e.message);
-            console.error(e);
-        }
+        } catch(e) { alert("❌ ERROR:\n" + e.message); }
         document.getElementById('loader').style.width = "0";
     }
 
