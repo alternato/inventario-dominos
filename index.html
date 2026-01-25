@@ -187,14 +187,18 @@
                 return { ...act, persona: col.nombre, correo: col.correo };
             });
             renderTable();
-        } catch(e) {}
+        } catch(e) {
+            console.error("Error cargando datos:", e);
+        }
         setLoad(false);
     }
 
     function renderTable() {
         const q = document.getElementById('busqueda').value.toLowerCase();
         const body = document.getElementById('tablaBody');
-        const filtered = DB.filter(d => (d.rut_responsable + d.persona + d.serie).toLowerCase().includes(q));
+        const filtered = DB.filter(d => 
+            (d.rut_responsable + d.persona + d.serie + d.marca_cel + d.imei_cel).toLowerCase().includes(q)
+        );
 
         body.innerHTML = filtered.map(d => `
             <tr>
@@ -208,7 +212,7 @@
                 <td>${d.marca || '-'}</td>
                 <td>${d.modelo || '-'}</td>
                 <td><code>${d.serie || '-'}</code></td>
-                <td>${d.marca_cel || '-'}</td>
+                <td>${d.marca_cel ? `${d.marca_cel} ${d.modelo_cel}` : '-'}</td>
                 <td>${d.imei_cel || '-'}</td>
                 <td>${d.imei_sim || '-'}</td>
                 <td>${d.mochila || '-'}</td>
@@ -231,41 +235,139 @@
         document.getElementById('f_modelo_cel').disabled = !eq;
         document.getElementById('f_imei_cel').disabled = !eq;
         document.getElementById('f_imei_sim').disabled = !sim;
+        
+        // Limpiar campos si se desactivan
+        if(!eq) {
+            document.getElementById('f_marca_cel').value = '';
+            document.getElementById('f_modelo_cel').value = '';
+            document.getElementById('f_imei_cel').value = '';
+        }
+        if(!sim) {
+            document.getElementById('f_imei_sim').value = '';
+        }
     }
 
-    // PROCESADOR CSV
+    // PROCESADOR CSV CORREGIDO
     async function procesarCSV() {
         const file = document.getElementById('archivoCSV').files[0];
         if(!file) return;
         const text = await file.text();
-        const rows = text.split('\n').slice(1);
+        const rows = text.split('\n').slice(1).filter(row => row.trim());
         const sep = text.includes(';') ? ';' : ',';
 
         csvTemp = rows.map(row => {
             const c = row.split(sep).map(v => v.trim().replace(/"/g, ''));
             if(c.length < 10) return null;
+            
+            // Mapeo corregido según el orden especificado en el modal
             return {
-                rut: c[0], persona: c[1], fecha_e: c[2], estado: c[3], correo: c[4], area: c[5],
-                ubi: c[6], mar: c[7], mod: c[8], ser: c[9], doc: c[10], moc: c[11], car: c[12],
-                e_i: c[13], e_u: c[14], obs: c[15], fecha_d: c[16]
+                rut: c[0], 
+                persona: c[1], 
+                fecha_e: c[2], 
+                estado: c[3], 
+                correo: c[4], 
+                area: c[5],
+                ubicacion: c[6], 
+                marca: c[7], 
+                modelo: c[8], 
+                serie: c[9], 
+                doc: c[10], 
+                mochila: c[11], 
+                cargador: c[12],
+                entrega_info: c[13], 
+                entrega_usu: c[14], 
+                observaciones: c[15], 
+                fecha_dev: c[16]
             };
-        }).filter(x => x);
+        }).filter(x => x && x.serie); // Filtrar nulos y sin serie
 
-        document.getElementById('previewCSV').innerHTML = `<table><tr><th>RUT</th><th>Serie</th></tr>${csvTemp.map(x => `<tr><td>${x.rut}</td><td>${x.ser}</td></tr>`).join('')}</table>`;
+        document.getElementById('previewCSV').innerHTML = `
+            <table style="width:100%;">
+                <tr>
+                    <th>RUT</th><th>Persona</th><th>Serie</th><th>Estado</th><th>Marca</th>
+                </tr>
+                ${csvTemp.map(x => `
+                    <tr>
+                        <td>${x.rut}</td>
+                        <td>${x.persona}</td>
+                        <td><code>${x.serie}</code></td>
+                        <td>${x.estado}</td>
+                        <td>${x.marca}</td>
+                    </tr>
+                `).join('')}
+            </table>
+        `;
         document.getElementById('btnSubirCSV').classList.remove('hidden');
     }
 
     async function subirCSV() {
         setLoad(true);
-        for(let d of csvTemp) {
-            await fetch(`${URL}/colaboradores`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ rut: d.rut, nombre: d.persona, correo: d.correo, area: d.area }) });
-            await fetch(`${URL}/activos`, { method: 'POST', headers: HEADERS, body: JSON.stringify({
-                serie: d.ser, marca: d.mar, modelo: d.mod, estado: d.estado, ubicacion: d.ubi, area: d.area, 
-                fecha_entrega: d.fecha_e, mochila: d.moc, cargador: d.car, doc_firmado: d.doc,
-                entrega_informatica: d.e_i, entrega_usuario: d.e_u, fecha_devolucion: d.fecha_d, 
-                observaciones: d.obs, rut_responsable: d.rut
-            }) });
+        const errores = [];
+        
+        for(let i = 0; i < csvTemp.length; i++) {
+            const d = csvTemp[i];
+            try {
+                // Insertar colaborador
+                await fetch(`${URL}/colaboradores`, {
+                    method: 'POST',
+                    headers: HEADERS,
+                    body: JSON.stringify({
+                        rut: d.rut,
+                        nombre: d.persona,
+                        correo: d.correo,
+                        area: d.area
+                    })
+                }).catch(err => {
+                    // Ignorar error si ya existe (código 23505 es violación de unique constraint)
+                    if(err.message.includes('23505')) {
+                        console.log(`Colaborador ${d.rut} ya existe`);
+                    }
+                });
+
+                // Insertar activo
+                const activoData = {
+                    serie: d.serie,
+                    marca: d.marca,
+                    modelo: d.modelo,
+                    estado: d.estado || 'Asignado',
+                    ubicacion: d.ubicacion,
+                    area: d.area,
+                    fecha_entrega: d.fecha_e,
+                    fecha_devolucion: d.fecha_dev || null,
+                    mochila: d.mochila || 'No',
+                    cargador: d.cargador || 'No',
+                    doc_firmado: d.doc || 'No',
+                    entrega_informatica: d.entrega_info || '',
+                    entrega_usuario: d.entrega_usu || '',
+                    observaciones: d.observaciones || '',
+                    rut_responsable: d.rut,
+                    marca_cel: null,
+                    modelo_cel: null,
+                    imei_cel: null,
+                    imei_sim: null
+                };
+
+                const response = await fetch(`${URL}/activos`, {
+                    method: 'POST',
+                    headers: HEADERS,
+                    body: JSON.stringify(activoData)
+                });
+
+                if(!response.ok) {
+                    errores.push(`Fila ${i+1}: ${await response.text()}`);
+                }
+
+            } catch(e) {
+                errores.push(`Fila ${i+1}: ${e.message}`);
+            }
         }
+        
+        if(errores.length > 0) {
+            alert(`Se completó con ${errores.length} errores:\n${errores.slice(0,5).join('\n')}`);
+        } else {
+            alert(`CSV procesado: ${csvTemp.length} registros insertados`);
+        }
+        
         cerrarCSV();
         cargarDatos();
     }
@@ -288,41 +390,115 @@
             doc: document.getElementById('f_doc').value,
             e_i: document.getElementById('f_ent_info').value,
             e_u: document.getElementById('f_ent_usu').value,
-            // Telefonia
-            m_c: document.getElementById('f_marca_cel').value,
-            mod_c: document.getElementById('f_modelo_cel').value,
-            i_c: document.getElementById('f_imei_cel').value,
-            i_s: document.getElementById('f_imei_sim').value
+            // Telefonía - solo incluir si están habilitados
+            m_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_marca_cel').value : null,
+            mod_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_modelo_cel').value : null,
+            i_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei_cel').value : null,
+            i_s: document.getElementById('sw_sim').checked ? document.getElementById('f_imei_sim').value : null
         };
+
+        // Validaciones básicas
+        if(!d.rut || !d.ser) {
+            alert("RUT y Nº de Serie son obligatorios");
+            return;
+        }
 
         setLoad(true);
         try {
-            await fetch(`${URL}/colaboradores`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ rut: d.rut, nombre: d.nom, correo: d.cor, area: d.are }) });
-            await fetch(`${URL}/activos`, { method: 'POST', headers: HEADERS, body: JSON.stringify({
-                serie: d.ser, marca: d.mar, modelo: d.mod, estado: d.est, ubicacion: d.ubi, area: d.are,
-                fecha_entrega: d.f_e, fecha_devolucion: d.f_d, mochila: d.moc, cargador: d.car,
-                doc_firmado: d.doc, entrega_informatica: d.e_i, entrega_usuario: d.e_u,
-                marca_cel: d.m_c, modelo_cel: d.mod_c, imei_cel: d.i_c, imei_sim: d.i_s, rut_responsable: d.rut
-            }) });
+            // Insertar/actualizar colaborador
+            await fetch(`${URL}/colaboradores`, {
+                method: 'POST',
+                headers: HEADERS,
+                body: JSON.stringify({
+                    rut: d.rut,
+                    nombre: d.nom,
+                    correo: d.cor,
+                    area: d.are
+                })
+            }).catch(() => {}); // Ignorar error si ya existe
+
+            // Insertar activo
+            await fetch(`${URL}/activos`, {
+                method: 'POST',
+                headers: HEADERS,
+                body: JSON.stringify({
+                    serie: d.ser,
+                    marca: d.mar,
+                    modelo: d.mod,
+                    estado: d.est,
+                    ubicacion: d.ubi,
+                    area: d.are,
+                    fecha_entrega: d.f_e,
+                    fecha_devolucion: d.f_d,
+                    mochila: d.moc,
+                    cargador: d.car,
+                    doc_firmado: d.doc,
+                    entrega_informatica: d.e_i,
+                    entrega_usuario: d.e_u,
+                    marca_cel: d.m_c,
+                    modelo_cel: d.mod_c,
+                    imei_cel: d.i_c,
+                    imei_sim: d.i_s,
+                    rut_responsable: d.rut
+                })
+            });
+
+            alert("Registro guardado exitosamente");
             cerrarForm();
             cargarDatos();
-        } catch(e) { alert("Error al guardar."); }
+        } catch(e) {
+            console.error("Error al guardar:", e);
+            alert("Error al guardar. Verifique la consola.");
+        }
         setLoad(false);
     }
 
     async function eliminar(s) {
-        if(confirm("¿Eliminar registro?")) {
+        if(confirm("¿Eliminar registro permanentemente?")) {
             setLoad(true);
-            await fetch(`${URL}/activos?serie=eq.${s}`, { method: 'DELETE', headers: HEADERS });
-            cargarDatos();
+            try {
+                await fetch(`${URL}/activos?serie=eq.${s}`, {
+                    method: 'DELETE',
+                    headers: HEADERS
+                });
+                cargarDatos();
+            } catch(e) {
+                alert("Error al eliminar");
+            }
         }
     }
 
-    function abrirForm() { document.getElementById('modalFicha').classList.remove('hidden'); }
-    function cerrarForm() { document.getElementById('modalFicha').classList.add('hidden'); }
-    function abrirCSV() { document.getElementById('modalCSV').classList.remove('hidden'); }
-    function cerrarCSV() { document.getElementById('modalCSV').classList.add('hidden'); }
-    function setLoad(v) { document.getElementById('loader').style.transform = v ? 'scaleX(1)' : 'scaleX(0)'; }
+    function abrirForm() {
+        // Limpiar formulario
+        document.querySelectorAll('#modalFicha input').forEach(input => input.value = '');
+        document.getElementById('f_estado').value = 'Asignado';
+        document.getElementById('f_fecha_ent').valueAsDate = new Date();
+        document.getElementById('sw_equipo').checked = false;
+        document.getElementById('sw_sim').checked = false;
+        toggleTel();
+        
+        document.getElementById('modalFicha').classList.remove('hidden');
+    }
+    
+    function cerrarForm() { 
+        document.getElementById('modalFicha').classList.add('hidden'); 
+    }
+    
+    function abrirCSV() { 
+        csvTemp = [];
+        document.getElementById('previewCSV').innerHTML = '';
+        document.getElementById('btnSubirCSV').classList.add('hidden');
+        document.getElementById('archivoCSV').value = '';
+        document.getElementById('modalCSV').classList.remove('hidden'); 
+    }
+    
+    function cerrarCSV() { 
+        document.getElementById('modalCSV').classList.add('hidden'); 
+    }
+    
+    function setLoad(v) { 
+        document.getElementById('loader').style.transform = v ? 'scaleX(1)' : 'scaleX(0)'; 
+    }
 </script>
 </body>
 </html>
