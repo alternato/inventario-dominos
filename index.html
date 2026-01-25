@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v45.0 - CSV & Telephony Logic</title>
+    <title>TI Maestro v46.0 - Domino's Pizza</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -16,131 +16,38 @@
         
         /* Layout */
         #sidebar { width: 240px; background: var(--primary); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); }
         .nav-btn.active { background: var(--secondary); font-weight: bold; }
 
         .main-view { flex-grow: 1; padding: 15px; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* Tabla FIXED - Columnas ajustables */
-        .table-wrapper { 
-            background: white; 
-            border-radius: 10px; 
-            border: 1px solid var(--border); 
-            overflow: auto; 
-            flex-grow: 1; 
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); 
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            /* REMOVED min-width para que se ajuste */
-        }
-        th { 
-            background: #f8fafc; 
-            padding: 8px 10px; /* Reducido padding */
-            text-align: left; 
-            border-bottom: 2px solid var(--border); 
-            position: sticky; 
-            top: 0; 
-            z-index: 10; 
-            font-size: 10px;
-            white-space: nowrap; 
-            max-width: 150px; /* Ancho máximo para columnas */
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        td { 
-            padding: 6px 10px; /* Reducido padding */
-            border-bottom: 1px solid #f1f5f9; 
-            max-width: 150px; /* Ancho máximo */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        /* Columnas específicas más pequeñas */
-        td:nth-child(1), th:nth-child(1) { width: 100px; } /* RUT */
-        td:nth-child(2), th:nth-child(2) { width: 120px; } /* Persona */
-        td:nth-child(3), th:nth-child(3) { width: 100px; } /* Fecha Entrega */
-        td:nth-child(4), th:nth-child(4) { width: 80px; } /* Estado */
-        td:nth-child(5), th:nth-child(5) { width: 150px; } /* Correo */
-        td:nth-child(6), th:nth-child(6) { width: 100px; } /* Área */
-        td:nth-child(7), th:nth-child(7) { width: 100px; } /* Ubicación */
-        td:nth-child(8), th:nth-child(8) { width: 80px; } /* Marca PC */
-        td:nth-child(9), th:nth-child(9) { width: 100px; } /* Modelo PC */
-        td:nth-child(10), th:nth-child(10) { width: 120px; } /* Serie PC */
-        td:nth-child(11), th:nth-child(11) { width: 100px; } /* Celular */
-        td:nth-child(12), th:nth-child(12) { width: 120px; } /* IMEI */
-        td:nth-child(13), th:nth-child(13) { width: 100px; } /* SIM */
-        td:nth-child(14), th:nth-child(14) { width: 70px; } /* Mochila */
-        td:nth-child(15), th:nth-child(15) { width: 70px; } /* Cargador */
-        td:nth-child(16), th:nth-child(16) { width: 70px; } /* Firmado */
-        td:nth-child(17), th:nth-child(17) { width: 100px; } /* Ent. Info */
-        td:nth-child(18), th:nth-child(18) { width: 100px; } /* Ent. Usu */
-        td:nth-child(19), th:nth-child(19) { width: 100px; } /* Devolución */
-        td:nth-child(20), th:nth-child(20) { width: 60px; } /* Acciones */
+        /* Table Styling */
+        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border); overflow: auto; flex-grow: 1; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 2800px; }
+        th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 10; white-space: nowrap; }
+        td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
 
-        /* Switches Telefonía */
+        /* Telefonía Switches */
         .switch-container { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider:before { transform: translateX(16px); }
 
-        /* Modales */
+        /* Modals */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; }
-        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .section-header { grid-column: span 4; padding: 8px 0; border-bottom: 1px solid #eee; font-weight: 800; color: var(--primary); margin-top: 8px; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; }
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .section-header { grid-column: span 4; padding: 8px 0; border-bottom: 1px solid #eee; font-weight: 800; color: var(--primary); margin-top: 10px; }
         
-        input, select, textarea { width: 100%; padding: 6px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 11px; }
-        input:disabled { background: #f1f5f9; cursor: not-allowed; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 11px; }
+        input:disabled { background: #f1f5f9; cursor: not-allowed; opacity: 0.6; }
 
         .hidden { display: none !important; }
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: var(--secondary); z-index: 11000; transform: scaleX(0); transition: 0.3s; transform-origin: left; }
-        
-        /* Tooltip para texto largo */
-        td:hover { 
-            overflow: visible; 
-            position: relative; 
-            z-index: 1; 
-            background: white; 
-            box-shadow: 0 0 5px rgba(0,0,0,0.1); 
-            white-space: normal; 
-            word-break: break-word;
-        }
-        
-        .status-badge {
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 9px;
-            font-weight: bold;
-        }
-        .status-activo { background: #dcfce7; color: #166534; }
-        .status-baja { background: #fee2e2; color: #991b1b; }
-        .status-mantenimiento { background: #fef3c7; color: #92400e; }
-        
-        /* Botones */
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 10px;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -148,10 +55,10 @@
 <div id="loader"></div>
 
 <div id="loginPage" style="position:fixed; inset:0; background:var(--primary); display:flex; align-items:center; justify-content:center; z-index:99999;">
-    <div style="background:white; padding:40px; border-radius:15px; width:340px; text-align:center;">
+    <div style="background:white; padding:40px; border-radius:15px; width:340px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
         <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="140">
-        <h2 style="margin:20px 0 10px;">TI Maestro v45.0</h2>
-        <input type="password" id="passInput" placeholder="Clave de Acceso" style="text-align:center; margin-bottom:15px;">
+        <h2 style="margin:20px 0 10px; color:var(--dark);">TI Maestro v46.0</h2>
+        <input type="password" id="passInput" placeholder="Clave de Acceso" style="text-align:center; margin-bottom:15px; border: 1px solid #cbd5e1;">
         <button onclick="intentarLogin()" style="width:100%; padding:12px; background:var(--secondary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">ACCEDER</button>
     </div>
 </div>
@@ -162,29 +69,21 @@
             <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="100">
         </div>
         <nav>
-            <button class="nav-btn active" onclick="cargarDatos()"><i class="fas fa-list"></i> Inventario Total</button>
+            <button class="nav-btn active" id="btnList" onclick="cargarDatos()"><i class="fas fa-list"></i> Inventario Total</button>
             <button class="nav-btn" onclick="abrirForm()"><i class="fas fa-plus"></i> Nueva Ficha</button>
             <button class="nav-btn" onclick="abrirCSV()"><i class="fas fa-file-csv"></i> Importar CSV</button>
             <button class="nav-btn" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar Excel</button>
         </nav>
-        <div style="margin-top: auto;">
-            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-                <small>Registros cargados:</small>
-                <div id="contadorRegistros" style="font-weight: bold; font-size: 14px;">0</div>
-            </div>
-            <button onclick="location.reload()" style="background:none; border:1px solid white; color:white; padding:8px; border-radius:5px; width:100%;">Cerrar Sesión</button>
+        <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <p><small>Registros:</small> <span id="contadorReg" style="font-weight:bold">0</span></p>
+            <button onclick="location.reload()" style="background:none; border:1px solid white; color:white; padding:8px; border-radius:5px; width:100%; margin-top:10px; cursor:pointer;">Cerrar Sesión</button>
         </div>
     </aside>
 
     <main class="main-view">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h1 style="font-size: 16px;">Maestro Dominos TI (17 Campos + Telefonía)</h1>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="busqueda" placeholder="Buscar..." style="width:300px; padding: 8px;" oninput="renderTable()">
-                <button onclick="cargarDatos()" class="btn-primary">
-                    <i class="fas fa-sync-alt"></i> Actualizar
-                </button>
-            </div>
+            <h1>Maestro de Activos TI</h1>
+            <input type="text" id="busqueda" placeholder="Buscar por RUT, Nombre o Serie..." style="width:350px; padding:10px; border-radius:8px; border:1px solid var(--border);" oninput="renderTable()">
         </div>
 
         <div class="table-wrapper">
@@ -203,24 +102,23 @@
     </main>
 </div>
 
-<!-- Modal Ficha -->
 <div id="modalFicha" class="hidden modal">
     <div class="modal-content">
-        <h2 style="margin-bottom:15px; color:var(--primary);">Ficha Integral de Activo</h2>
+        <h2 style="margin-bottom:15px; color:var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px;">Ficha Integral de Activo</h2>
         <div class="form-grid">
-            <div class="section-header">DATOS DEL RESPONSABLE</div>
-            <div class="form-group"><label>RUT</label><input type="text" id="f_rut"></div>
+            <div class="section-header">1. DATOS DEL RESPONSABLE</div>
+            <div class="form-group"><label>RUT</label><input type="text" id="f_rut" placeholder="12345678-9"></div>
             <div class="form-group"><label>Nombre Persona</label><input type="text" id="f_persona"></div>
             <div class="form-group"><label>Correo</label><input type="text" id="f_correo"></div>
             <div class="form-group"><label>Área</label><input type="text" id="f_area"></div>
 
-            <div class="section-header">EQUIPAMIENTO PC</div>
+            <div class="section-header">2. EQUIPAMIENTO PC</div>
             <div class="form-group"><label>Marca PC</label><input type="text" id="f_marca"></div>
             <div class="form-group"><label>Modelo PC</label><input type="text" id="f_modelo"></div>
             <div class="form-group"><label>Nº de Serie PC</label><input type="text" id="f_serie"></div>
             <div class="form-group"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
 
-            <div class="section-header">LÓGICA DE TELEFONÍA (On/Off)</div>
+            <div class="section-header">3. TELEFONÍA MÓVIL</div>
             <div style="grid-column: span 2;" class="switch-container">
                 <label class="switch"><input type="checkbox" id="sw_equipo" onchange="toggleTel()"><span class="slider"></span></label>
                 <span>Asignar Equipo Celular</span>
@@ -229,125 +127,82 @@
                 <label class="switch"><input type="checkbox" id="sw_sim" onchange="toggleTel()"><span class="slider"></span></label>
                 <span>Asignar Tarjeta SIM</span>
             </div>
-            
             <div class="form-group"><label>Marca Celular</label><input type="text" id="f_marca_cel" disabled></div>
             <div class="form-group"><label>Modelo Celular</label><input type="text" id="f_modelo_cel" disabled></div>
             <div class="form-group"><label>IMEI Equipo</label><input type="text" id="f_imei_cel" disabled></div>
             <div class="form-group"><label>IMEI SIM</label><input type="text" id="f_imei_sim" disabled></div>
 
-            <div class="section-header">CONTROL Y LOGÍSTICA</div>
+            <div class="section-header">4. LOGÍSTICA Y ESTADO</div>
             <div class="form-group"><label>Ubicación</label><input type="text" id="f_ubicacion"></div>
-            <div class="form-group"><label>Estado</label>
-                <select id="f_estado">
-                    <option>Asignado</option>
-                    <option>En Bodega</option>
-                    <option>Mantenimiento</option>
-                    <option>Baja</option>
-                </select>
-            </div>
+            <div class="form-group"><label>Estado</label><select id="f_estado"><option>Asignado</option><option>Bodega</option><option>Dañado</option></select></div>
             <div class="form-group"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div>
             <div class="form-group"><label>Fecha Devolución</label><input type="date" id="f_fecha_dev"></div>
             <div class="form-group"><label>Doc. Firmado</label><select id="f_doc"><option>No</option><option>Si</option></select></div>
-            <div class="form-group"><label>Entrega Informática</label><input type="text" id="f_ent_info"></div>
-            <div class="form-group"><label>Entrega al Usuario</label><input type="text" id="f_ent_usu"></div>
             <div class="form-group"><label>Cargador PC</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
+            <div class="form-group" style="grid-column: span 2;"><label>Observaciones</label><textarea id="f_obs" rows="1"></textarea></div>
         </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-            <button onclick="cerrarForm()" style="padding:8px 16px;">Cancelar</button>
-            <button onclick="guardarRegistro()" style="padding:8px 24px; background:var(--success); color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">GUARDAR REGISTRO</button>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top: 1px solid #eee; padding-top: 15px;">
+            <button onclick="cerrarForm()" style="padding:10px 20px; border-radius:5px; border:1px solid #ccc; cursor:pointer;">Cancelar</button>
+            <button onclick="guardarRegistro()" style="padding:10px 30px; background:var(--success); color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">GUARDAR FICHA</button>
         </div>
     </div>
 </div>
 
-<!-- Modal CSV -->
 <div id="modalCSV" class="hidden modal">
-    <div class="modal-content">
-        <h3>Importador Maestro CSV (17 Columnas)</h3>
-        <p style="margin-bottom:15px; color:#666;">El archivo debe respetar el orden: RUT, Persona, Fecha Ent, Estado, Correo, Área, Ubicación, Marca, Modelo, Serie, Doc, Mochila, Cargador, Ent Info, Ent Usu, Obs, Fecha Dev.</p>
-        <input type="file" id="archivoCSV" accept=".csv" style="margin-bottom:15px;">
-        <div id="previewCSV" style="max-height:300px; overflow:auto; border:1px solid #eee; margin-bottom:15px;"></div>
+    <div class="modal-content" style="max-width:800px;">
+        <h3>Importador CSV Profesional</h3>
+        <p style="margin-bottom:15px; color:#666;">Seleccione el archivo CSV. El sistema detectará automáticamente si usa comas o punto y coma.</p>
+        <input type="file" id="archivoCSV" accept=".csv" style="margin-bottom:20px;">
+        <div id="previewCSV" style="max-height:250px; overflow:auto; border:1px solid #eee; margin-bottom:15px; border-radius:8px;"></div>
         <div style="display:flex; justify-content:flex-end; gap:10px;">
-            <button onclick="cerrarCSV()">Cancelar</button>
-            <button onclick="procesarCSV()" style="background:var(--primary); color:white; padding:8px 16px; border:none; border-radius:5px; cursor:pointer;">Procesar y Validar</button>
-            <button id="btnSubirCSV" class="hidden" onclick="subirCSV()" style="background:var(--success); color:white; padding:8px 16px; border:none; border-radius:5px; cursor:pointer;">Subir a Base de Datos</button>
+            <button onclick="cerrarCSV()" style="padding:10px;">Cerrar</button>
+            <button onclick="procesarCSV()" style="background:var(--primary); color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Analizar Archivo</button>
+            <button id="btnSubirCSV" class="hidden" onclick="subirCSV()" style="background:var(--success); color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Sincronizar a Supabase</button>
         </div>
     </div>
 </div>
 
 <script>
+    // --- CREDENCIALES ---
     const SUPABASE_URL = "https://ivjwxvhixrskraepqzse.supabase.co/rest/v1";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
-    
-    const HEADERS = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "resolution=merge-duplicates,return=representation"
-    };
+    const HEADERS = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" };
 
     let DB = [];
     let csvTemp = [];
 
+    // --- SEGURIDAD ---
     function intentarLogin() {
-        const password = document.getElementById('passInput').value;
-        if(password === 'DominoTI2024') {
+        if(document.getElementById('passInput').value === 'DominoTI2024') {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             cargarDatos();
-        } else {
-            alert('Contraseña incorrecta');
-        }
+        } else { alert("Contraseña incorrecta"); }
     }
 
+    // --- MOTOR DE DATOS ---
     async function cargarDatos() {
         setLoad(true);
-        console.log("Iniciando carga de datos...");
         try {
-            // Primero, cargar activos desde la tabla 'activos'
-            const response = await fetch(`${SUPABASE_URL}/activos?select=*`, {
-                headers: HEADERS
+            const [respColabs, respActivos] = await Promise.all([
+                fetch(`${SUPABASE_URL}/colaboradores?select=*`, { headers: HEADERS }),
+                fetch(`${SUPABASE_URL}/activos?select=*`, { headers: HEADERS })
+            ]);
+
+            if(!respActivos.ok) throw new Error("Error en tabla Activos: " + respActivos.statusText);
+
+            const c = await respColabs.json();
+            const a = await respActivos.json();
+
+            DB = a.map(act => {
+                const col = c.find(u => u.rut === act.rut_responsable) || {};
+                return { ...act, persona: col.nombre || '-', correo: col.correo || '-' };
             });
-            
-            if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
-            }
-            
-            const activos = await response.json();
-            console.log("Activos cargados:", activos.length);
-            
-            // Luego, cargar colaboradores
-            const colResponse = await fetch(`${SUPABASE_URL}/colaboradores?select=*`, {
-                headers: HEADERS
-            });
-            
-            const colaboradores = colResponse.ok ? await colResponse.json() : [];
-            console.log("Colaboradores cargados:", colaboradores.length);
-            
-            // Mapear datos: unir colaboradores con activos
-            DB = activos.map(act => {
-                const col = colaboradores.find(u => u.rut === act.rut_responsable) || {};
-                return {
-                    ...act,
-                    persona: col.nombre || act.nombre_persona || '-',
-                    correo: col.correo || act.correo || '-',
-                    area: col.area || act.area || '-'
-                };
-            });
-            
-            console.log("Datos finales DB:", DB.length, "registros");
-            
-            // Actualizar contador
-            document.getElementById('contadorRegistros').textContent = DB.length;
-            
-            // Renderizar tabla
+
+            document.getElementById('contadorReg').textContent = DB.length;
             renderTable();
-            
-        } catch(error) {
-            console.error("Error en cargarDatos:", error);
-            alert("Error al cargar datos: " + error.message);
-            // Mostrar datos vacíos para que la interfaz no se rompa
-            DB = [];
-            renderTable();
+        } catch(e) {
+            alert("Fallo Crítico al cargar base de datos: " + e.message);
         }
         setLoad(false);
     }
@@ -355,55 +210,21 @@
     function renderTable() {
         const q = document.getElementById('busqueda').value.toLowerCase();
         const body = document.getElementById('tablaBody');
-        
-        const filtered = DB.filter(d => {
-            const searchText = [
-                d.rut_responsable || '',
-                d.persona || '',
-                d.serie || '',
-                d.marca_cel || '',
-                d.imei_cel || '',
-                d.correo || '',
-                d.area || '',
-                d.ubicacion || ''
-            ].join(' ').toLowerCase();
-            return searchText.includes(q);
-        });
+        const filtered = DB.filter(d => (d.rut_responsable + d.persona + d.serie).toLowerCase().includes(q));
 
-        // Actualizar contador
-        document.getElementById('contadorRegistros').textContent = DB.length;
-
-        if (filtered.length === 0) {
-            body.innerHTML = `
-                <tr>
-                    <td colspan="20" style="text-align:center; padding: 40px; color: #666;">
-                        <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 10px; opacity: 0.5;"></i><br>
-                        ${DB.length === 0 ? 'No hay datos cargados. Use "Importar CSV" o "Nueva Ficha".' : 'No se encontraron resultados.'}
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        body.innerHTML = filtered.map(d => {
-            // Determinar clase de estado
-            let estadoClass = 'status-activo';
-            if (d.estado?.includes('Baja')) estadoClass = 'status-baja';
-            else if (d.estado?.includes('Mantenimiento')) estadoClass = 'status-mantenimiento';
-
-            return `
+        body.innerHTML = filtered.map(d => `
             <tr>
                 <td><b>${d.rut_responsable || '-'}</b></td>
                 <td>${d.persona || '-'}</td>
                 <td>${d.fecha_entrega || '-'}</td>
-                <td><span class="status-badge ${estadoClass}">${d.estado || '-'}</span></td>
+                <td><span style="color:${d.estado?.includes('Asignado')?'green':'orange'}">${d.estado || '-'}</span></td>
                 <td>${d.correo || '-'}</td>
                 <td>${d.area || '-'}</td>
                 <td>${d.ubicacion || '-'}</td>
                 <td>${d.marca || '-'}</td>
                 <td>${d.modelo || '-'}</td>
                 <td><code>${d.serie || '-'}</code></td>
-                <td>${d.marca_cel ? `${d.marca_cel} ${d.modelo_cel || ''}`.trim() : '-'}</td>
+                <td>${d.marca_cel || '-'}</td>
                 <td>${d.imei_cel || '-'}</td>
                 <td>${d.imei_sim || '-'}</td>
                 <td>${d.mochila || 'No'}</td>
@@ -412,437 +233,103 @@
                 <td>${d.entrega_informatica || '-'}</td>
                 <td>${d.entrega_usuario || '-'}</td>
                 <td>${d.fecha_devolucion || '-'}</td>
-                <td>
-                    <button onclick="eliminar('${d.serie}')" class="btn-danger" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
+                <td><button onclick="eliminar('${d.serie}')" style="color:red; border:none; background:none; cursor:pointer;"><i class="fas fa-trash"></i></button></td>
             </tr>
-        `}).join('');
+        `).join('');
     }
 
-    // LÓGICA SWITCH TELEFONÍA
+    // --- LÓGICA TELEFONÍA ---
     function toggleTel() {
         const eq = document.getElementById('sw_equipo').checked;
         const sim = document.getElementById('sw_sim').checked;
-        
-        const marcaCel = document.getElementById('f_marca_cel');
-        const modeloCel = document.getElementById('f_modelo_cel');
-        const imeiCel = document.getElementById('f_imei_cel');
-        const imeiSim = document.getElementById('f_imei_sim');
-        
-        marcaCel.disabled = !eq;
-        modeloCel.disabled = !eq;
-        imeiCel.disabled = !eq;
-        imeiSim.disabled = !sim;
-        
-        if (!eq) {
-            marcaCel.value = '';
-            modeloCel.value = '';
-            imeiCel.value = '';
-        }
-        if (!sim) {
-            imeiSim.value = '';
-        }
+        document.getElementById('f_marca_cel').disabled = !eq;
+        document.getElementById('f_modelo_cel').disabled = !eq;
+        document.getElementById('f_imei_cel').disabled = !eq;
+        document.getElementById('f_imei_sim').disabled = !sim;
     }
 
-    // PROCESADOR CSV
+    // --- MOTOR CSV ---
     async function procesarCSV() {
         const file = document.getElementById('archivoCSV').files[0];
-        if(!file) {
-            alert('Por favor seleccione un archivo CSV');
-            return;
-        }
+        if(!file) return alert("Seleccione archivo");
         
-        try {
-            const text = await file.text();
-            const rows = text.split('\n').filter(row => row.trim());
-            const sep = text.includes(';') ? ';' : ',';
-            
-            if (rows.length < 2) {
-                alert('El archivo CSV está vacío o no tiene datos');
-                return;
-            }
-            
-            // Procesar filas (saltar encabezado)
-            csvTemp = rows.slice(1).map((row, index) => {
-                const columns = row.split(sep).map(v => v.trim().replace(/"/g, ''));
-                
-                if(columns.length < 10) {
-                    console.warn(`Fila ${index + 2}: Insuficientes columnas (${columns.length})`);
-                    return null;
-                }
-                
-                return {
-                    rut: columns[0] || '',
-                    persona: columns[1] || '',
-                    fecha_e: columns[2] || '',
-                    estado: columns[3] || 'Asignado',
-                    correo: columns[4] || '',
-                    area: columns[5] || '',
-                    ubicacion: columns[6] || '',
-                    marca: columns[7] || '',
-                    modelo: columns[8] || '',
-                    serie: columns[9] || '',
-                    doc: columns[10] || 'No',
-                    mochila: columns[11] || 'No',
-                    cargador: columns[12] || 'No',
-                    entrega_info: columns[13] || '',
-                    entrega_usu: columns[14] || '',
-                    observaciones: columns[15] || '',
-                    fecha_dev: columns[16] || ''
-                };
-            }).filter(x => x && x.serie && x.rut);
+        const text = await file.text();
+        const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+        const sep = text.includes(';') ? ';' : ',';
 
-            if (csvTemp.length === 0) {
-                alert('No se encontraron registros válidos en el CSV');
-                return;
-            }
+        csvTemp = lines.slice(1).map(row => {
+            const c = row.split(sep).map(v => v.trim().replace(/"/g, ''));
+            if(c.length < 5) return null;
+            return {
+                rut: c[0], persona: c[1], f_e: c[2], est: c[3], cor: c[4], are: c[5], ubi: c[6],
+                mar: c[7], mod: c[8], ser: c[9], doc: c[10], moc: c[11], car: c[12],
+                e_i: c[13], e_u: c[14], obs: c[15], f_d: c[16]
+            };
+        }).filter(x => x);
 
-            // Mostrar preview
-            const previewHTML = `
-                <table style="width:100%; border-collapse:collapse;">
-                    <thead>
-                        <tr style="background:#f3f4f6;">
-                            <th style="padding:4px; border:1px solid #ddd;">#</th>
-                            <th style="padding:4px; border:1px solid #ddd;">RUT</th>
-                            <th style="padding:4px; border:1px solid #ddd;">Persona</th>
-                            <th style="padding:4px; border:1px solid #ddd;">Serie</th>
-                            <th style="padding:4px; border:1px solid #ddd;">Marca</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${csvTemp.slice(0, 50).map((x, i) => `
-                            <tr>
-                                <td style="padding:4px; border:1px solid #ddd;">${i+1}</td>
-                                <td style="padding:4px; border:1px solid #ddd;">${x.rut}</td>
-                                <td style="padding:4px; border:1px solid #ddd;">${x.persona}</td>
-                                <td style="padding:4px; border:1px solid #ddd;"><code>${x.serie}</code></td>
-                                <td style="padding:4px; border:1px solid #ddd;">${x.marca}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                ${csvTemp.length > 50 ? `<p style="color:#666; text-align:center; margin-top:10px;">... y ${csvTemp.length - 50} más</p>` : ''}
-            `;
-            
-            document.getElementById('previewCSV').innerHTML = previewHTML;
-            document.getElementById('btnSubirCSV').classList.remove('hidden');
-            
-        } catch(error) {
-            console.error("Error procesando CSV:", error);
-            alert("Error al procesar CSV: " + error.message);
-        }
+        document.getElementById('previewCSV').innerHTML = `<table style="width:100%; font-size:10px;"><tr><th>RUT</th><th>Serie</th></tr>${csvTemp.slice(0,10).map(x => `<tr><td>${x.rut}</td><td>${x.ser}</td></tr>`).join('')}</table>`;
+        document.getElementById('btnSubirCSV').classList.remove('hidden');
     }
 
     async function subirCSV() {
-        if (!csvTemp.length) {
-            alert('No hay datos para subir');
-            return;
-        }
-        
         setLoad(true);
-        const errores = [];
-        let exitosos = 0;
-        
-        for(let i = 0; i < csvTemp.length; i++) {
-            const d = csvTemp[i];
-            try {
-                // 1. Insertar/actualizar colaborador
-                await fetch(`${SUPABASE_URL}/colaboradores`, {
-                    method: 'POST',
-                    headers: HEADERS,
-                    body: JSON.stringify({
-                        rut: d.rut,
-                        nombre: d.persona,
-                        correo: d.correo,
-                        area: d.area
-                    })
-                }).catch(err => {
-                    // Ignorar error de duplicado (código 23505)
-                    if (!err.message.includes('23505')) {
-                        console.warn(`Error colaborador ${d.rut}:`, err);
-                    }
-                });
-
-                // 2. Insertar/actualizar activo
-                const activoData = {
-                    serie: d.serie,
-                    marca: d.marca,
-                    modelo: d.modelo,
-                    estado: d.estado || 'Asignado',
-                    ubicacion: d.ubicacion,
-                    area: d.area,
-                    fecha_entrega: d.fecha_e,
-                    fecha_devolucion: d.fecha_dev || null,
-                    mochila: d.mochila || 'No',
-                    cargador: d.cargador || 'No',
-                    doc_firmado: d.doc || 'No',
-                    entrega_informatica: d.entrega_info || '',
-                    entrega_usuario: d.entrega_usu || '',
-                    observaciones: d.observaciones || '',
+        try {
+            for(let d of csvTemp) {
+                await fetch(`${SUPABASE_URL}/colaboradores`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ rut: d.rut, nombre: d.persona, correo: d.cor, area: d.are }) });
+                await fetch(`${SUPABASE_URL}/activos`, { method: 'POST', headers: HEADERS, body: JSON.stringify({
+                    serie: d.ser, marca: d.mar, modelo: d.mod, estado: d.est, ubicacion: d.ubi, area: d.are, 
+                    fecha_entrega: d.f_e, mochila: d.moc, cargador: d.car, doc_firmado: d.doc,
                     rut_responsable: d.rut
-                };
-
-                const response = await fetch(`${SUPABASE_URL}/activos`, {
-                    method: 'POST',
-                    headers: HEADERS,
-                    body: JSON.stringify(activoData)
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    errores.push(`Fila ${i+2}: ${errorText}`);
-                } else {
-                    exitosos++;
-                }
-
-                // Pequeña pausa para no sobrecargar
-                if (i % 10 === 0) await new Promise(resolve => setTimeout(resolve, 100));
-                
-            } catch(error) {
-                errores.push(`Fila ${i+2}: ${error.message}`);
+                }) });
             }
-        }
-        
-        let mensaje = `Proceso completado.\n\n`;
-        mensaje += `Registros exitosos: ${exitosos}/${csvTemp.length}\n`;
-        
-        if (errores.length > 0) {
-            mensaje += `Errores: ${errores.length}\n`;
-            if (errores.length <= 5) {
-                mensaje += errores.join('\n');
-            } else {
-                mensaje += errores.slice(0, 5).join('\n');
-                mensaje += `\n... y ${errores.length - 5} errores más`;
-            }
-        }
-        
-        alert(mensaje);
-        cerrarCSV();
-        await cargarDatos();
+            alert("Importación Exitosa");
+            cerrarCSV();
+            cargarDatos();
+        } catch(e) { alert("Error al subir registros."); }
+        setLoad(false);
     }
 
     async function guardarRegistro() {
         const d = {
-            rut: document.getElementById('f_rut').value.trim(),
-            nom: document.getElementById('f_persona').value.trim(),
-            cor: document.getElementById('f_correo').value.trim(),
-            are: document.getElementById('f_area').value.trim(),
-            ser: document.getElementById('f_serie').value.trim(),
-            mar: document.getElementById('f_marca').value.trim(),
-            mod: document.getElementById('f_modelo').value.trim(),
-            est: document.getElementById('f_estado').value,
-            ubi: document.getElementById('f_ubicacion').value.trim(),
-            f_e: document.getElementById('f_fecha_ent').value,
-            f_d: document.getElementById('f_fecha_dev').value,
-            moc: document.getElementById('f_mochila').value,
-            car: document.getElementById('f_cargador').value,
-            doc: document.getElementById('f_doc').value,
-            e_i: document.getElementById('f_ent_info').value.trim(),
-            e_u: document.getElementById('f_ent_usu').value.trim(),
-            m_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_marca_cel').value.trim() : null,
-            mod_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_modelo_cel').value.trim() : null,
-            i_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei_cel').value.trim() : null,
-            i_s: document.getElementById('sw_sim').checked ? document.getElementById('f_imei_sim').value.trim() : null
+            rut: document.getElementById('f_rut').value,
+            nom: document.getElementById('f_persona').value,
+            ser: document.getElementById('f_serie').value
         };
 
-        // Validaciones
-        if (!d.rut) { alert("RUT es obligatorio"); return; }
-        if (!d.ser) { alert("Número de Serie es obligatorio"); return; }
-        if (!d.nom) { alert("Nombre de Persona es obligatorio"); return; }
+        if(!d.rut || !d.ser) return alert("RUT y Serie son campos obligatorios");
 
         setLoad(true);
         try {
-            // Insertar/actualizar colaborador
-            await fetch(`${SUPABASE_URL}/colaboradores`, {
-                method: 'POST',
-                headers: HEADERS,
-                body: JSON.stringify({
-                    rut: d.rut,
-                    nombre: d.nom,
-                    correo: d.cor,
-                    area: d.are
-                })
-            }).catch(err => console.log("Colaborador:", err.message));
-
-            // Insertar/actualizar activo
-            await fetch(`${SUPABASE_URL}/activos`, {
-                method: 'POST',
-                headers: HEADERS,
-                body: JSON.stringify({
-                    serie: d.ser,
-                    marca: d.mar,
-                    modelo: d.mod,
-                    estado: d.est,
-                    ubicacion: d.ubi,
-                    area: d.are,
-                    fecha_entrega: d.f_e,
-                    fecha_devolucion: d.f_d,
-                    mochila: d.moc,
-                    cargador: d.car,
-                    doc_firmado: d.doc,
-                    entrega_informatica: d.e_i,
-                    entrega_usuario: d.e_u,
-                    marca_cel: d.m_c,
-                    modelo_cel: d.mod_c,
-                    imei_cel: d.i_c,
-                    imei_sim: d.i_s,
-                    rut_responsable: d.rut
-                })
-            });
-
-            alert("Registro guardado exitosamente");
+            await fetch(`${SUPABASE_URL}/colaboradores`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ rut: d.rut, nombre: d.nom, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value }) });
+            await fetch(`${SUPABASE_URL}/activos`, { method: 'POST', headers: HEADERS, body: JSON.stringify({
+                serie: d.ser, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value,
+                estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_ubicacion').value,
+                fecha_entrega: document.getElementById('f_fecha_ent').value, fecha_devolucion: document.getElementById('f_fecha_dev').value,
+                mochila: document.getElementById('f_mochila').value, cargador: document.getElementById('f_cargador').value,
+                doc_firmado: document.getElementById('f_doc').value, area: document.getElementById('f_area').value,
+                marca_cel: document.getElementById('f_marca_cel').value, modelo_cel: document.getElementById('f_modelo_cel').value,
+                imei_cel: document.getElementById('f_imei_cel').value, imei_sim: document.getElementById('f_imei_sim').value,
+                rut_responsable: d.rut
+            }) });
             cerrarForm();
-            await cargarDatos();
-            
-        } catch(error) {
-            console.error("Error guardando:", error);
-            alert("Error al guardar: " + error.message);
-        }
+            cargarDatos();
+        } catch(e) { alert("Error al guardar ficha."); }
         setLoad(false);
     }
 
-    async function eliminar(serie) {
-        if(!serie) return;
-        
-        if(!confirm(`¿Está seguro de eliminar el registro con serie "${serie}"?`)) {
-            return;
+    async function eliminar(s) {
+        if(confirm("¿Eliminar este activo?")) {
+            setLoad(true);
+            await fetch(`${SUPABASE_URL}/activos?serie=eq.${s}`, { method: 'DELETE', headers: HEADERS });
+            cargarDatos();
         }
-        
-        setLoad(true);
-        try {
-            const response = await fetch(`${SUPABASE_URL}/activos?serie=eq.${encodeURIComponent(serie)}`, {
-                method: 'DELETE',
-                headers: HEADERS
-            });
-            
-            if(response.ok) {
-                alert("Registro eliminado");
-                await cargarDatos();
-            } else {
-                throw new Error("Error en la respuesta del servidor");
-            }
-        } catch(error) {
-            console.error("Error eliminando:", error);
-            alert("Error al eliminar: " + error.message);
-        }
-        setLoad(false);
     }
 
-    function exportarExcel() {
-        if (DB.length === 0) {
-            alert("No hay datos para exportar");
-            return;
-        }
-        
-        // Crear CSV para exportar
-        const headers = [
-            "RUT", "Persona", "Fecha Entrega", "Estado", "Correo", 
-            "Área", "Ubicación", "Marca PC", "Modelo PC", "Serie PC",
-            "Marca Celular", "Modelo Celular", "IMEI Celular", "IMEI SIM",
-            "Mochila", "Cargador", "Doc Firmado", "Entrega Informática",
-            "Entrega Usuario", "Fecha Devolución", "Observaciones"
-        ];
-        
-        const csvContent = [
-            headers.join(";"),
-            ...DB.map(d => [
-                d.rut_responsable || "",
-                d.persona || "",
-                d.fecha_entrega || "",
-                d.estado || "",
-                d.correo || "",
-                d.area || "",
-                d.ubicacion || "",
-                d.marca || "",
-                d.modelo || "",
-                d.serie || "",
-                d.marca_cel || "",
-                d.modelo_cel || "",
-                d.imei_cel || "",
-                d.imei_sim || "",
-                d.mochila || "",
-                d.cargador || "",
-                d.doc_firmado || "",
-                d.entrega_informatica || "",
-                d.entrega_usuario || "",
-                d.fecha_devolucion || "",
-                d.observaciones || ""
-            ].join(";"))
-        ].join("\n");
-        
-        // Descargar archivo
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `inventario_ti_${new Date().toISOString().split('T')[0]}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    function abrirForm() {
-        // Limpiar formulario
-        document.getElementById('f_rut').value = '';
-        document.getElementById('f_persona').value = '';
-        document.getElementById('f_correo').value = '';
-        document.getElementById('f_area').value = '';
-        document.getElementById('f_marca').value = '';
-        document.getElementById('f_modelo').value = '';
-        document.getElementById('f_serie').value = '';
-        document.getElementById('f_mochila').value = 'No';
-        document.getElementById('f_ubicacion').value = '';
-        document.getElementById('f_estado').value = 'Asignado';
-        document.getElementById('f_fecha_ent').valueAsDate = new Date();
-        document.getElementById('f_fecha_dev').value = '';
-        document.getElementById('f_doc').value = 'No';
-        document.getElementById('f_ent_info').value = '';
-        document.getElementById('f_ent_usu').value = '';
-        document.getElementById('f_cargador').value = 'No';
-        document.getElementById('f_marca_cel').value = '';
-        document.getElementById('f_modelo_cel').value = '';
-        document.getElementById('f_imei_cel').value = '';
-        document.getElementById('f_imei_sim').value = '';
-        document.getElementById('sw_equipo').checked = false;
-        document.getElementById('sw_sim').checked = false;
-        toggleTel();
-        
-        document.getElementById('modalFicha').classList.remove('hidden');
-    }
-    
-    function cerrarForm() { 
-        document.getElementById('modalFicha').classList.add('hidden'); 
-    }
-    
-    function abrirCSV() { 
-        csvTemp = [];
-        document.getElementById('previewCSV').innerHTML = '';
-        document.getElementById('btnSubirCSV').classList.add('hidden');
-        document.getElementById('archivoCSV').value = '';
-        document.getElementById('modalCSV').classList.remove('hidden'); 
-    }
-    
-    function cerrarCSV() { 
-        document.getElementById('modalCSV').classList.add('hidden'); 
-    }
-    
-    function setLoad(v) { 
-        document.getElementById('loader').style.transform = v ? 'scaleX(1)' : 'scaleX(0)'; 
-    }
-    
-    // Cargar datos al iniciar si ya está autenticado
-    document.addEventListener('DOMContentLoaded', () => {
-        // Agregar soporte para Enter en login
-        document.getElementById('passInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') intentarLogin();
-        });
-        
-        // Establecer fecha actual por defecto en formulario
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('f_fecha_ent').value = today;
-    });
+    function abrirForm() { document.getElementById('modalFicha').classList.remove('hidden'); }
+    function cerrarForm() { document.getElementById('modalFicha').classList.add('hidden'); }
+    function abrirCSV() { document.getElementById('modalCSV').classList.remove('hidden'); }
+    function cerrarCSV() { document.getElementById('modalCSV').classList.add('hidden'); }
+    function setLoad(v) { document.getElementById('loader').style.transform = v ? 'scaleX(1)' : 'scaleX(0)'; }
 </script>
 </body>
 </html>
