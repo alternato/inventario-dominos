@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v50.0 - Domino's Pizza Chile</title>
+    <title>TI Maestro v51.0 - Store Locations</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -29,7 +29,7 @@
 
         /* Mini Dashboards */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
         .stat-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .stat-info h3 { font-size: 22px; font-weight: 800; color: var(--dark); }
         .stat-info p { font-size: 12px; color: #64748b; }
@@ -41,29 +41,17 @@
         td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; }
         tr:hover { background-color: #fcfcfc; cursor: pointer; }
 
-        /* Modal & Form */
+        /* Modal */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; }
         .form-section { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
         .section-tag { grid-column: span 4; font-size: 11px; font-weight: 800; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px; text-transform: uppercase; }
         .form-group { display: flex; flex-direction: column; gap: 5px; }
         label { font-size: 11px; font-weight: 600; color: #64748b; }
-        input, select, textarea { padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; transition: 0.2s; }
-        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
-        input:disabled { background: #f1f5f9; opacity: 0.6; }
-
-        /* Switches */
-        .tel-toggle { grid-column: span 2; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
-        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--success); }
-        input:checked + .slider:before { transform: translateX(22px); }
+        input, select, textarea { padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; }
 
         .hidden { display: none !important; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         #loader { position: fixed; top: 0; left: 0; height: 4px; background: var(--secondary); z-index: 2000; width: 0; transition: 0.3s; }
     </style>
 </head>
@@ -72,11 +60,11 @@
 <div id="loader"></div>
 
 <div id="loginPage" style="position:fixed; inset:0; background:var(--primary); display:flex; align-items:center; justify-content:center; z-index:9999;">
-    <div style="background:white; padding:50px; border-radius:25px; width:360px; text-align:center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+    <div style="background:white; padding:50px; border-radius:25px; width:360px; text-align:center;">
         <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="160" style="margin-bottom:20px;">
-        <h2 style="color:var(--dark); margin-bottom:5px;">TI Maestro</h2>
-        <p style="color:#64748b; font-size:12px; margin-bottom:30px;">Gestión de Activos v50.0</p>
-        <input type="password" id="passInput" placeholder="Contraseña de Acceso" style="text-align:center; margin-bottom:15px; width:100%;">
+        <h2 style="color:var(--dark);">TI Maestro</h2>
+        <p style="color:#64748b; font-size:12px; margin-bottom:30px;">v51.0 | Stores & Assets</p>
+        <input type="password" id="passInput" placeholder="Contraseña de Acceso" style="text-align:center; margin-bottom:15px; width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;">
         <button onclick="intentarLogin()" style="width:100%; padding:15px; background:var(--secondary); color:white; border:none; border-radius:12px; font-weight:800; cursor:pointer;">ACCEDER</button>
     </div>
 </div>
@@ -89,20 +77,17 @@
         <nav>
             <button id="navDash" class="nav-btn active" onclick="showView('dashboard')"><i class="fas fa-th-large"></i> Inicio</button>
             <button id="navInv" class="nav-btn" onclick="showView('inventory')"><i class="fas fa-list"></i> Inventario Maestro</button>
-            <button id="navStats" class="nav-btn" onclick="showView('analytics')"><i class="fas fa-chart-line"></i> Analítica Detallada</button>
+            <button id="navStats" class="nav-btn" onclick="showView('analytics')"><i class="fas fa-chart-line"></i> Analítica</button>
             <hr style="opacity:0.1; margin:20px 0;">
             <button class="nav-btn" style="background:var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> Nuevo Registro</button>
         </nav>
-        <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid rgba(255,255,255,0.3); color:white; padding:10px; border-radius:8px; cursor:pointer; font-size:11px;">Cerrar Sesión</button>
+        <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid rgba(255,255,255,0.3); color:white; padding:10px; border-radius:8px; cursor:pointer;">Cerrar Sesión</button>
     </aside>
 
     <div class="main-container">
         <header>
             <h2 id="viewTitle">Panel de Inicio</h2>
-            <div style="display:flex; gap:15px; align-items:center;">
-                <span id="userName" style="font-weight:600; font-size:12px; color:var(--dark);">Admin TI Chile</span>
-                <div style="width:35px; height:35px; background:#eee; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--primary); font-weight:bold;">A</div>
-            </div>
+            <span style="font-weight:600; font-size:12px;">Admin TI Chile</span>
         </header>
 
         <div class="content-area">
@@ -113,46 +98,22 @@
                         <div class="stat-info"><h3 id="dash-total">0</h3><p>Total Activos</p></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:#f0fdf4; color:#16a34a;"><i class="fas fa-check-circle"></i></div>
-                        <div class="stat-info"><h3 id="dash-ok">0</h3><p>Equipos Operativos</p></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:#fff7ed; color:#ea580c;"><i class="fas fa-tools"></i></div>
-                        <div class="stat-info"><h3 id="dash-fix">0</h3><p>En Mantención</p></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:#fef2f2; color:#dc2626;"><i class="fas fa-exclamation-triangle"></i></div>
-                        <div class="stat-info"><h3 id="dash-bad">0</h3><p>Dañados / Baja</p></div>
-                    </div>
-                </div>
-                
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:25px;">
-                    <div class="table-container" style="height:400px; min-width:unset;">
-                        <div style="padding:15px; border-bottom:1px solid #eee; font-weight:bold;">Asignaciones Recientes</div>
-                        <table style="min-width:unset;">
-                            <thead><tr><th>RUT</th><th>Persona</th><th>Equipo</th><th>Estado</th></tr></thead>
-                            <tbody id="recentTable"></tbody>
-                        </table>
-                    </div>
-                    <div style="background:white; border-radius:15px; padding:20px; border:1px solid var(--border);">
-                        <canvas id="miniChart"></canvas>
+                        <div class="stat-icon" style="background:#f0fdf4; color:#16a34a;"><i class="fas fa-store"></i></div>
+                        <div class="stat-info"><h3 id="dash-ok">0</h3><p>Asignados</p></div>
                     </div>
                 </div>
             </div>
 
             <div id="view-inventory" class="hidden">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h3>Listado General de Activos</h3>
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" id="mainSearch" placeholder="Buscar por RUT, Nombre, Serie o Área..." style="width:350px;" oninput="renderMasterTable()">
-                        <button onclick="cargarDatos()" class="nav-btn" style="width:auto; background:var(--primary); margin:0;"><i class="fas fa-sync"></i></button>
-                    </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <h3>Inventario Hardware & Telefonía</h3>
+                    <input type="text" id="mainSearch" placeholder="Buscar..." style="width:350px; padding:10px; border-radius:8px; border:1px solid #ddd;" oninput="renderMasterTable()">
                 </div>
                 <div class="table-container">
-                    <table id="masterTable">
+                    <table>
                         <thead>
                             <tr>
-                                <th>RUT</th><th>Persona</th><th>Estado</th><th>Área</th><th>Ubicación</th>
+                                <th>RUT</th><th>Persona</th><th>Estado</th><th>Área</th><th>Ubicación (Tienda)</th>
                                 <th>Marca PC</th><th>Modelo PC</th><th>Serie PC</th>
                                 <th>Mochila</th><th>Cargador</th><th>Doc. Firmado</th>
                                 <th>Marca Cel</th><th>IMEI Cel</th><th>SIM</th>
@@ -167,12 +128,8 @@
             <div id="view-analytics" class="hidden">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
                     <div style="background:white; padding:30px; border-radius:20px; border:1px solid var(--border);">
-                        <h4>Distribución por Áreas</h4>
-                        <canvas id="chartArea" style="margin-top:20px;"></canvas>
-                    </div>
-                    <div style="background:white; padding:30px; border-radius:20px; border:1px solid var(--border);">
-                        <h4>Estado de Salud de la Flota</h4>
-                        <canvas id="chartStatus" style="margin-top:20px;"></canvas>
+                        <h4>Distribución por Tienda</h4>
+                        <canvas id="chartStore" style="margin-top:20px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -182,131 +139,126 @@
 
 <div id="modalFicha" class="hidden modal">
     <div class="modal-content">
-        <h2 id="modalTitle" style="color:var(--primary); margin-bottom:20px;">Nueva Ficha de Asignación</h2>
+        <h2 id="modalTitle" style="color:var(--primary); margin-bottom:20px;">Ficha de Asignación</h2>
         
         <div class="form-grid">
             <div class="section-tag">1. Identificación del Colaborador</div>
-            <div class="form-group"><label>RUT Responsable</label><input type="text" id="f_rut" placeholder="12345678-9"></div>
-            <div class="form-group"><label>Nombre Completo</label><input type="text" id="f_persona"></div>
+            <div class="form-group"><label>RUT Responsable</label><input type="text" id="f_rut"></div>
+            <div class="form-group"><label>Nombre Persona</label><input type="text" id="f_persona"></div>
             <div class="form-group"><label>Correo Corporativo</label><input type="email" id="f_correo"></div>
             <div class="form-group">
                 <label>Área / Departamento</label>
                 <select id="f_area">
-                    <option>Operaciones</option><option>Administración</option><option>Marketing</option>
-                    <option>RRHH</option><option>Informática</option><option>Logística</option>
+                    <option>Operaciones</option><option>Administración</option><option>Informática</option>
+                    <option>Marketing</option><option>Logística</option><option>RRHH</option>
                 </select>
             </div>
 
-            <div class="section-tag">2. Activo Computacional</div>
+            <div class="section-tag">2. Ubicación / Tienda</div>
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Seleccionar Tienda</label>
+                <select id="f_ubicacion">
+                    <option value="">-- Seleccionar Tienda --</option>
+                    <option>Antofagasta - Estadio Regional</option><option>Antofagasta - Sector Norte</option>
+                    <option>Arica</option><option>Buin</option><option>Bustamante</option>
+                    <option>Calama</option><option>Chiguayante</option><option>Chillán</option>
+                    <option>Concepcion - Plaza Acevedo</option><option>Concón</option><option>Copiapó</option>
+                    <option>Curicó</option><option>Froilan Roa</option><option>General Velasquez</option>
+                    <option>Gran Avenida</option><option>Hualpén</option><option>Iquique</option>
+                    <option>Irarrázaval</option><option>La Florida (Santa Amalia)</option>
+                    <option>La Serena (Balmaceda)</option><option>La Serena (B. Universitario)</option>
+                    <option>Lautaro</option><option>Luis Pasteur</option><option>Machalí</option>
+                    <option>Macul</option><option>Maipu 1</option><option>Mall del Centro*</option>
+                    <option>Mall Paseo Los Dominicos</option><option>Manuel Montt</option>
+                    <option>Osorno 2 Centro</option><option>Osorno 1 Rahue</option><option>Parque Angamos</option>
+                    <option>Pedro Fontova</option><option>Peñalolén</option><option>Plaza Atenas</option>
+                    <option>Pto. Montt 2 (Cardonal)</option><option>Pto. Montt 1 (Ejercito)</option>
+                    <option>Puente Alto</option><option>Punta Arenas</option><option>Quilicura</option>
+                    <option>Quilpué</option><option>Recoleta</option><option>San Francisco</option>
+                    <option>San Pedro de la Paz</option><option>Santa Ana</option><option>Talca</option>
+                    <option>Temuco</option><option>Tobalaba</option><option>Viña del Mar</option>
+                    <option>Commisary</option>
+                </select>
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+                <label>Estado General</label>
+                <select id="f_estado">
+                    <option>Asignado</option><option>En Bodega</option><option>Dañado</option>
+                </select>
+            </div>
+
+            <div class="section-tag">3. Activo Computacional</div>
             <div class="form-group"><label>Marca PC</label><input type="text" id="f_marca"></div>
             <div class="form-group"><label>Modelo PC</label><input type="text" id="f_modelo"></div>
             <div class="form-group"><label>Nº de Serie PC</label><input type="text" id="f_serie"></div>
-            <div class="form-group">
-                <label>Estado del Activo</label>
-                <select id="f_estado">
-                    <option>Asignado</option><option>En Bodega</option><option>Mantención</option><option>Dañado</option>
-                </select>
-            </div>
             <div class="form-group"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
-            <div class="form-group"><label>Cargador PC</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
 
-            <div class="section-tag">3. Telefonía Móvil</div>
-            <div class="tel-toggle">
-                <span>Asignar Equipo Celular</span>
-                <label class="switch"><input type="checkbox" id="sw_cel" onchange="toggleTel()"><span class="slider"></span></label>
-            </div>
-            <div class="tel-toggle">
-                <span>Asignar Tarjeta SIM</span>
-                <label class="switch"><input type="checkbox" id="sw_sim" onchange="toggleTel()"><span class="slider"></span></label>
-            </div>
-            <div class="form-group"><label>Marca Celular</label><input type="text" id="f_marca_cel" disabled></div>
-            <div class="form-group"><label>Modelo Celular</label><input type="text" id="f_modelo_cel" disabled></div>
-            <div class="form-group"><label>IMEI Equipo</label><input type="text" id="f_imei_cel" disabled></div>
-            <div class="form-group"><label>IMEI SIM Card</label><input type="text" id="f_imei_sim" disabled></div>
+            <div class="section-tag">4. Telefonía Móvil</div>
+            <div class="form-group"><label>Marca Celular</label><input type="text" id="f_marca_cel"></div>
+            <div class="form-group"><label>Modelo Celular</label><input type="text" id="f_modelo_cel"></div>
+            <div class="form-group"><label>IMEI Equipo</label><input type="text" id="f_imei_cel"></div>
+            <div class="form-group"><label>IMEI SIM Card</label><input type="text" id="f_imei_sim"></div>
 
-            <div class="section-tag">4. Logística y Control</div>
-            <div class="form-group"><label>Ubicación / Ciudad</label><input type="text" id="f_ubicacion"></div>
+            <div class="section-header">5. Logística</div>
             <div class="form-group"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div>
-            <div class="form-group"><label>Fecha Devolución</label><input type="date" id="f_fecha_dev"></div>
-            <div class="form-group"><label>Documento Firmado</label><select id="f_doc"><option>No</option><option>Si</option></select></div>
-            <div class="form-group"><label>Entregado por (Informática)</label><input type="text" id="f_ent_ti"></div>
-            <div class="form-group"><label>Recibido por (Colaborador)</label><input type="text" id="f_ent_usu"></div>
-            <div class="form-group" style="grid-column: span 2;"><label>Observaciones</label><textarea id="f_obs" rows="1"></textarea></div>
+            <div class="form-group"><label>Cargador</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
+            <div class="form-group"><label>Doc. Firmado</label><select id="f_doc"><option>No</option><option>Si</option></select></div>
+            <div class="form-group" style="grid-column: span 2;"><label>Observaciones</label><textarea id="f_obs"></textarea></div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
-            <button onclick="cerrarFicha()" style="padding:12px 25px; border:none; border-radius:10px; cursor:pointer;">Cancelar</button>
-            <button id="btnEliminar" class="hidden" onclick="eliminarRegistro()" style="background:var(--danger); color:white; padding:12px 25px; border:none; border-radius:10px; cursor:pointer;">Eliminar</button>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+            <button onclick="cerrarFicha()" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">Cancelar</button>
             <button onclick="guardarFicha()" class="btn-save">Guardar Registro Maestro</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- SUPABASE CONFIG ---
     const URL = "https://ivjwxvhixrskraepqzse.supabase.co/rest/v1";
     const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
     const HEADERS = { "apikey": KEY, "Authorization": `Bearer ${KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" };
 
     let DB_MASTER = [];
-    let charts = {};
-    let isEditing = false;
-    let editOriginalSerie = null;
 
-    // --- LOGIN ---
     function intentarLogin() {
         if(document.getElementById('passInput').value === 'DominoTI2024') {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             cargarDatos();
-        } else { alert("Clave Incorrecta"); }
+        }
     }
 
-    // --- CARGA DE DATOS ---
     async function cargarDatos() {
-        setLoad(true);
+        document.getElementById('loader').style.width = "100%";
         try {
-            const [cResp, aResp] = await Promise.all([
-                fetch(`${URL}/colaboradores?select=*`, { headers: HEADERS }),
-                fetch(`${URL}/activos?select=*`, { headers: HEADERS })
+            const [cR, aR] = await Promise.all([
+                fetch(`${URL}/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json()),
+                fetch(`${URL}/activos?select=*`, { headers: HEADERS }).then(r => r.json())
             ]);
-            
-            const colabs = await cResp.json();
-            const activos = await aResp.json();
-
-            DB_MASTER = activos.map(act => {
-                const c = colabs.find(u => u.rut === act.rut_responsable) || {};
-                return { ...act, persona: c.nombre || '-', correo: c.correo || '-', area_colab: c.area || '-' };
-            });
-
-            actualizarContadores();
+            DB_MASTER = aR.map(a => ({ ...a, p: cR.find(u => u.rut === a.rut_responsable) || {} }));
+            actualizarDash();
             renderMasterTable();
-            renderRecentTable();
-            if(charts.mini) renderCharts();
-        } catch(e) { console.error("Error BD:", e); }
-        setLoad(false);
+        } catch(e) {}
+        document.getElementById('loader').style.width = "0";
     }
 
-    function actualizarContadores() {
+    function actualizarDash() {
         document.getElementById('dash-total').textContent = DB_MASTER.length;
         document.getElementById('dash-ok').textContent = DB_MASTER.filter(x => x.estado === 'Asignado').length;
-        document.getElementById('dash-fix').textContent = DB_MASTER.filter(x => x.estado === 'Mantención').length;
-        document.getElementById('dash-bad').textContent = DB_MASTER.filter(x => x.estado === 'Dañado').length;
     }
 
-    // --- TABLAS ---
     function renderMasterTable() {
         const q = document.getElementById('mainSearch').value.toLowerCase();
         const body = document.getElementById('masterTableBody');
-        const filtered = DB_MASTER.filter(d => (d.rut_responsable + (d.persona||'') + (d.serie||'')).toLowerCase().includes(q));
-
+        const filtered = DB_MASTER.filter(d => (d.rut_responsable + d.p.nombre + d.serie).toLowerCase().includes(q));
+        
         body.innerHTML = filtered.map(d => `
             <tr onclick="editarRegistro('${d.serie}')">
                 <td><b>${d.rut_responsable}</b></td>
-                <td>${d.persona}</td>
-                <td><span style="color:${d.estado === 'Asignado' ? 'green':'orange'}">${d.estado}</span></td>
+                <td>${d.p.nombre || '-'}</td>
+                <td>${d.estado}</td>
                 <td>${d.area || '-'}</td>
-                <td>${d.ubicacion || '-'}</td>
+                <td><span style="color:var(--primary); font-weight:600;">${d.ubicacion || '-'}</span></td>
                 <td>${d.marca || '-'}</td>
                 <td>${d.modelo || '-'}</td>
                 <td><code>${d.serie}</code></td>
@@ -325,177 +277,52 @@
         `).join('');
     }
 
-    function renderRecentTable() {
-        const body = document.getElementById('recentTable');
-        const recent = DB_MASTER.slice(0, 5);
-        body.innerHTML = recent.map(d => `
-            <tr><td>${d.rut_responsable}</td><td>${d.persona}</td><td>${d.marca}</td><td>${d.estado}</td></tr>
-        `).join('');
-    }
-
-    // --- LÓGICA TELEFONÍA ---
-    function toggleTel() {
-        const hasCel = document.getElementById('sw_cel').checked;
-        const hasSim = document.getElementById('sw_sim').checked;
-        document.getElementById('f_marca_cel').disabled = !hasCel;
-        document.getElementById('f_modelo_cel').disabled = !hasCel;
-        document.getElementById('f_imei_cel').disabled = !hasCel;
-        document.getElementById('f_imei_sim').disabled = !hasSim;
-    }
-
-    // --- GUARDADO / EDICIÓN ---
     async function guardarFicha() {
         const d = {
-            rut: document.getElementById('f_rut').value.trim(),
-            nom: document.getElementById('f_persona').value.trim(),
-            cor: document.getElementById('f_correo').value.trim(),
+            rut: document.getElementById('f_rut').value,
+            nom: document.getElementById('f_persona').value,
+            cor: document.getElementById('f_correo').value,
             are: document.getElementById('f_area').value,
-            ser: document.getElementById('f_serie').value.trim(),
-            mar: document.getElementById('f_marca').value.trim(),
-            mod: document.getElementById('f_modelo').value.trim(),
+            ubi: document.getElementById('f_ubicacion').value,
             est: document.getElementById('f_estado').value,
+            ser: document.getElementById('f_serie').value,
+            mar: document.getElementById('f_marca').value,
+            mod: document.getElementById('f_modelo').value,
             moc: document.getElementById('f_mochila').value,
             car: document.getElementById('f_cargador').value,
-            ubi: document.getElementById('f_ubicacion').value.trim(),
-            f_e: document.getElementById('f_fecha_ent').value,
-            f_d: document.getElementById('f_fecha_dev').value || null,
             doc: document.getElementById('f_doc').value,
-            e_t: document.getElementById('f_ent_ti').value.trim(),
-            e_u: document.getElementById('f_ent_usu').value.trim(),
-            obs: document.getElementById('f_obs').value.trim(),
-            m_c: document.getElementById('sw_cel').checked ? document.getElementById('f_marca_cel').value : null,
-            mo_c: document.getElementById('sw_cel').checked ? document.getElementById('f_modelo_cel').value : null,
-            i_c: document.getElementById('sw_cel').checked ? document.getElementById('f_imei_cel').value : null,
-            i_s: document.getElementById('sw_sim').checked ? document.getElementById('f_imei_sim').value : null
+            m_c: document.getElementById('f_marca_cel').value,
+            mo_c: document.getElementById('f_modelo_cel').value,
+            i_c: document.getElementById('f_imei_cel').value,
+            i_s: document.getElementById('f_imei_sim').value,
+            f_e: document.getElementById('f_fecha_ent').value,
+            obs: document.getElementById('f_obs').value
         };
 
-        if(!d.rut || !d.ser || !d.nom) return alert("RUT, Nombre y Serie PC son obligatorios");
+        if(!d.rut || !d.ser) return alert("RUT y Serie son obligatorios");
 
-        setLoad(true);
         try {
-            // 1. Upsert Colaborador
-            await fetch(`${URL}/colaboradores`, {
-                method: 'POST', headers: HEADERS,
-                body: JSON.stringify({ rut: d.rut, nombre: d.nom, correo: d.cor, area: d.are })
-            });
-
-            // 2. Upsert Activo
-            const res = await fetch(`${URL}/activos`, {
-                method: 'POST', headers: HEADERS,
-                body: JSON.stringify({
-                    serie: d.ser, marca: d.mar, modelo: d.mod, estado: d.est,
-                    ubicacion: d.ubi, area: d.are, fecha_entrega: d.f_e,
-                    fecha_devolucion: d.f_d, mochila: d.moc, cargador: d.car,
-                    doc_firmado: d.doc, marca_cel: d.m_c, modelo_cel: d.mo_c,
-                    imei_cel: d.i_c, imei_sim: d.i_s, entrega_informatica: d.e_t,
-                    entrega_usuario: d.e_u, observaciones: d.obs, rut_responsable: d.rut
-                })
-            });
-
-            if(res.ok) {
-                alert("Ficha guardada correctamente");
-                cerrarFicha();
-                cargarDatos();
-            }
-        } catch(e) { alert("Error al sincronizar ficha."); }
-        setLoad(false);
+            await fetch(`${URL}/colaboradores`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ rut: d.rut, nombre: d.nom, correo: d.cor, area: d.are }) });
+            await fetch(`${URL}/activos`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ 
+                serie: d.ser, marca: d.mar, modelo: d.mod, estado: d.est, ubicacion: d.ubi, 
+                mochila: d.moc, cargador: d.car, doc_firmado: d.doc, marca_cel: d.m_c, imei_cel: d.i_c, imei_sim: d.i_s,
+                fecha_entrega: d.f_e, observaciones: d.obs, rut_responsable: d.rut
+            }) });
+            cerrarFicha();
+            cargarDatos();
+        } catch(e) {}
     }
 
-    function editarRegistro(serie) {
-        const d = DB_MASTER.find(x => x.serie === serie);
-        if(!d) return;
-
-        isEditing = true;
-        editOriginalSerie = d.serie;
-
-        document.getElementById('f_rut').value = d.rut_responsable;
-        document.getElementById('f_persona').value = d.persona;
-        document.getElementById('f_correo').value = d.correo;
-        document.getElementById('f_area').value = d.area || 'Operaciones';
-        document.getElementById('f_marca').value = d.marca || '';
-        document.getElementById('f_modelo').value = d.modelo || '';
-        document.getElementById('f_serie').value = d.serie;
-        document.getElementById('f_estado').value = d.estado;
-        document.getElementById('f_mochila').value = d.mochila || 'No';
-        document.getElementById('f_cargador').value = d.cargador || 'No';
-        document.getElementById('f_ubicacion').value = d.ubicacion || '';
-        document.getElementById('f_fecha_ent').value = d.fecha_entrega || '';
-        document.getElementById('f_fecha_dev').value = d.fecha_devolucion || '';
-        document.getElementById('f_doc').value = d.doc_firmado || 'No';
-        document.getElementById('f_ent_ti').value = d.entrega_informatica || '';
-        document.getElementById('f_ent_usu').value = d.entrega_usuario || '';
-        document.getElementById('f_obs').value = d.observaciones || '';
-        
-        // Telefonía
-        document.getElementById('sw_cel').checked = !!d.marca_cel;
-        document.getElementById('sw_sim').checked = !!d.imei_sim;
-        document.getElementById('f_marca_cel').value = d.marca_cel || '';
-        document.getElementById('f_modelo_cel').value = d.modelo_cel || '';
-        document.getElementById('f_imei_cel').value = d.imei_cel || '';
-        document.getElementById('f_imei_sim').value = d.imei_sim || '';
-        
-        toggleTel();
-        document.getElementById('modalTitle').textContent = "Editando Activo: " + serie;
-        document.getElementById('btnEliminar').classList.remove('hidden');
-        document.getElementById('modalFicha').classList.remove('hidden');
-    }
-
-    async function eliminarRegistro() {
-        if(!confirm("¿Eliminar este activo permanentemente?")) return;
-        setLoad(true);
-        await fetch(`${URL}/activos?serie=eq.${editOriginalSerie}`, { method: 'DELETE', headers: HEADERS });
-        cerrarFicha();
-        cargarDatos();
-    }
-
-    // --- CHARTS ---
-    function renderCharts() {
-        const ctxMini = document.getElementById('miniChart').getContext('2d');
-        const labels = ['Asignado', 'Bodega', 'Mantención', 'Dañado'];
-        const data = labels.map(l => DB_MASTER.filter(x => x.estado === l).length);
-
-        if(charts.mini) charts.mini.destroy();
-        charts.mini = new Chart(ctxMini, {
-            type: 'doughnut',
-            data: { labels, datasets: [{ data, backgroundColor: ['#22c55e', '#0066CC', '#f59e0b', '#ef4444'] }] },
-            options: { plugins: { legend: { position: 'bottom' } } }
-        });
-
-        // Chart Analytics
-        const ctxArea = document.getElementById('chartArea').getContext('2d');
-        const areas = [...new Set(DB_MASTER.map(x => x.area || 'Sin Área'))];
-        const dataArea = areas.map(a => DB_MASTER.filter(x => x.area === a).length);
-        
-        if(charts.area) charts.area.destroy();
-        charts.area = new Chart(ctxArea, {
-            type: 'bar',
-            data: { labels: areas, datasets: [{ label: 'Equipos por Área', data: dataArea, backgroundColor: '#0066CC' }] }
-        });
-    }
-
-    // --- UTILS ---
     function showView(v) {
         document.querySelectorAll('[id^="view-"]').forEach(x => x.classList.add('hidden'));
         document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
         document.getElementById('view-' + v).classList.remove('hidden');
         document.getElementById('nav' + v.charAt(0).toUpperCase() + v.slice(1)).classList.add('active');
         document.getElementById('viewTitle').textContent = v === 'dashboard' ? 'Inicio' : v === 'inventory' ? 'Inventario' : 'Analítica';
-        if(v === 'analytics') setTimeout(renderCharts, 100);
     }
 
-    function abrirFicha() {
-        isEditing = false;
-        document.getElementById('modalTitle').textContent = "Nueva Ficha de Asignación";
-        document.getElementById('btnEliminar').classList.add('hidden');
-        document.querySelectorAll('.modal input, .modal textarea').forEach(x => x.value = '');
-        document.getElementById('modalFicha').classList.remove('hidden');
-    }
+    function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
     function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
-    function setLoad(v) { document.getElementById('loader').style.width = v ? '100%' : '0'; }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('passInput').addEventListener('keypress', e => e.key === 'Enter' && intentarLogin());
-    });
 </script>
 </body>
 </html>
