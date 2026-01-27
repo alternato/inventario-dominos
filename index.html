@@ -3,135 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v58.5 - Total Analytics</title>
+    <title>TI Maestro v60.5 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #0066CC; --secondary: #E31837; --success: #22c55e;
-            --warning: #f59e0b; --danger: #ef4444; --bg: #f8fafc; --border: #e2e8f0;
-            --dark: #0f172a; --sidebar-w: 260px;
+            --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+            --bg: #f8fafc; --border: #e2e8f0; --dark: #0f172a;
+            --sidebar-w: 260px; --radius: 12px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
-
-        /* Sidebar */
-        #sidebar { width: var(--sidebar-w); background: var(--primary); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; z-index: 100; }
-        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 12px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 13px; transition: 0.3s; }
-        .nav-btn.active { background: var(--secondary); font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-
-        .main-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-        header { background: white; padding: 15px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .content-area { padding: 30px; overflow-y: auto; flex-grow: 1; }
-
-        /* KPI Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
-        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-
-        /* Table */
-        .table-container { background: white; border-radius: 15px; border: 1px solid var(--border); overflow: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; min-width: 2800px; font-size: 12px; }
-        th { background: #f8fafc; padding: 15px; text-align: left; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 10; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; }
-
-        /* Modal & Logic Switches */
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; padding: 35px; border-radius: 24px; width: 95%; max-width: 1100px; max-height: 92vh; overflow-y: auto; }
-        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .section-tag { grid-column: span 4; font-size: 12px; font-weight: 800; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 15px; text-transform: uppercase; }
         
-        .tel-toggle-box { grid-column: span 2; background: #f0f7ff; padding: 15px; border-radius: 12px; border: 1px solid #d0e4ff; display: flex; align-items: center; justify-content: space-between; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--success); }
-        input:checked + .slider:before { transform: translateX(22px); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); height: 100vh; overflow: hidden; font-size: 14px; }
+        
+        /* Sidebar & Layout */
+        #sidebar { 
+            width: var(--sidebar-w); background: linear-gradient(180deg, var(--primary) 0%, #0052a3 100%);
+            color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; z-index: 100;
+        }
+        .main-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        header { background: white; padding: 18px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .content-area { padding: 25px; overflow-y: auto; flex-grow: 1; }
 
-        input, select, textarea { padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; background-color: #fff; width: 100%; }
-        input:disabled { background: #f1f5f9; cursor: not-allowed; opacity: 0.5; }
+        /* Buttons & Nav */
+        .nav-btn { 
+            background: rgba(255,255,255,0.08); color: white; border: none; padding: 14px 16px; 
+            border-radius: var(--radius); width: 100%; margin-bottom: 8px; text-align: left; 
+            cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.15); transform: translateX(5px); }
+        .nav-btn.active { background: var(--secondary); box-shadow: 0 4px 12px rgba(227, 24, 55, 0.3); }
 
+        /* Cards & Tables */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 22px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; align-items: center; gap: 18px; }
+        .table-container { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: auto; max-height: 600px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { background: #f8fafc; padding: 16px; text-align: left; border-bottom: 2px solid var(--border); position: sticky; top: 0; font-size: 11px; color: #64748b; text-transform: uppercase; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
+        tr:hover { background-color: #f1f5ff; }
+
+        /* Badges */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid currentColor; }
+        .status-asignado { color: #166534; background: #f0fdf4; }
+        .status-disponible { color: #1e40af; background: #eff6ff; }
+        .status-mantencion { color: #92400e; background: #fffbeb; }
+
+        /* Modals & Forms */
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; padding: 35px; border-radius: 24px; width: 95%; max-width: 1000px; max-height: 90vh; overflow-y: auto; }
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .section-tag { grid-column: span 4; border-bottom: 2px solid var(--border); padding: 10px 0; color: var(--primary); font-weight: 800; text-transform: uppercase; font-size: 12px; margin-top: 15px; }
+        
+        input, select, textarea { padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; width: 100%; outline: none; }
+        input:focus { border-color: var(--primary); }
         .hidden { display: none !important; }
-        #loader { position: fixed; top: 0; left: 0; height: 4px; background: var(--secondary); z-index: 2000; width: 0; transition: 0.3s; }
+        
+        /* Highlight para búsqueda */
+        .highlight { background-color: #ffeb3b; padding: 2px; border-radius: 2px; }
     </style>
 </head>
 <body>
 
-<div id="loader"></div>
-
-<div id="loginPage" style="position:fixed; inset:0; background:var(--primary); display:flex; align-items:center; justify-content:center; z-index:9999;">
-    <div style="background:white; padding:50px; border-radius:30px; width:380px; text-align:center;">
-        <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="160" style="margin-bottom:20px;">
-        <h2 style="color:var(--dark); margin-bottom:30px;">TI Maestro v58.5</h2>
-        <input type="password" id="passInput" placeholder="Contraseña Admin" style="text-align:center; margin-bottom:20px; width:100%; padding:12px; border:1px solid #ccc; border-radius:8px;">
-        <button onclick="intentarLogin()" style="width:100%; padding:15px; background:var(--secondary); color:white; border:none; border-radius:12px; font-weight:800; cursor:pointer;">ACCEDER</button>
+<div id="loginPage" class="modal" style="background: var(--primary);">
+    <div class="modal-content" style="max-width: 350px; text-align: center;">
+        <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header.png" width="120" style="margin-bottom: 20px;">
+        <h3>TI Maestro v60.5</h3>
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">Acceso Privado - Domino's Chile</p>
+        <input type="password" id="passInput" placeholder="Contraseña TI" style="text-align: center; margin-bottom: 15px;">
+        <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center;">ACCEDER</button>
     </div>
 </div>
 
-<div id="app" class="hidden" style="width:100%; display:flex;">
+<div id="app" class="hidden" style="display: flex; width: 100%; height: 100vh;">
     <aside id="sidebar">
-        <div style="text-align:center; margin-bottom:40px;">
-            <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header-51dca28d2d30068385e5de64c9ba774b640a59a56a67d19c24eee33a6aa10343.png" width="110">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <img src="https://assets.dominospizza.cl/assets/logos/logo-dominos-header.png" width="100">
         </div>
         <nav>
-            <button id="navDash" class="nav-btn active" onclick="showView('dashboard')"><i class="fas fa-home"></i> Inicio</button>
-            <button id="navStats" class="nav-btn" onclick="showView('analytics')"><i class="fas fa-chart-line"></i> Analítica</button>
-            <button id="navInv" class="nav-btn" onclick="showView('inventory')"><i class="fas fa-database"></i> Inventario</button>
-            <hr style="opacity:0.1; margin:20px 0;">
-            <button class="nav-btn" style="background:var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> Nuevo Registro</button>
+            <button id="navDash" class="nav-btn active" onclick="showView('dashboard')"><i class="fas fa-home"></i> Dashboard</button>
+            <button id="navInv" class="nav-btn" onclick="showView('inventory')"><i class="fas fa-list"></i> Inventario</button>
+            <button id="navStats" class="nav-btn" onclick="showView('analytics')"><i class="fas fa-chart-pie"></i> Reportes</button>
+            <hr style="margin: 20px 0; opacity: 0.2;">
+            <button class="nav-btn" style="background: var(--success);" onclick="abrirFicha()"><i class="fas fa-plus"></i> Nuevo Activo</button>
         </nav>
-        <button onclick="location.reload()" style="margin-top:auto; background:none; border:1px solid white; color:white; padding:10px; border-radius:10px; cursor:pointer;">Cerrar Sesión</button>
+        <div style="margin-top: auto; font-size: 10px; opacity: 0.5; text-align: center;">v60.5 Built for Domino's</div>
     </aside>
 
-    <div class="main-container">
+    <main class="main-container">
         <header>
-            <h2 id="viewTitle">Dashboard Inicial</h2>
-            <span style="font-weight:600; font-size:12px; color:var(--primary);">Domino's Pizza Chile</span>
+            <h2 id="viewTitle">Gestión de Activos</h2>
+            <div id="lastUpdate" style="font-size: 11px; color: #94a3b8;">Actualizando...</div>
         </header>
 
         <div class="content-area">
             <div id="view-dashboard">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:#eff6ff; color:var(--primary);"><i class="fas fa-laptop"></i></div>
-                        <div class="stat-info"><h3 id="stat-total">0</h3><p>Activos</p></div>
+                        <div style="font-size: 24px; color: var(--primary);"><i class="fas fa-laptop"></i></div>
+                        <div><h3 id="stat-total">0</h3><p style="font-size: 11px; color: #64748b;">Total Activos</p></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:#f0fdf4; color:var(--success);"><i class="fas fa-check-circle"></i></div>
-                        <div class="stat-info"><h3 id="stat-ok">0</h3><p>Asignados</p></div>
+                        <div style="font-size: 24px; color: var(--success);"><i class="fas fa-user-check"></i></div>
+                        <div><h3 id="stat-asignados">0</h3><p style="font-size: 11px; color: #64748b;">Asignados</p></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:#fff7ed; color:var(--warning);"><i class="fas fa-warehouse"></i></div>
-                        <div class="stat-info"><h3 id="stat-stock">0</h3><p>En Bodega</p></div>
+                        <div style="font-size: 24px; color: var(--warning);"><i class="fas fa-tools"></i></div>
+                        <div><h3 id="stat-mantencion">0</h3><p style="font-size: 11px; color: #64748b;">En Servicio</p></div>
                     </div>
                 </div>
-            </div>
-
-            <div id="view-analytics" class="hidden">
-                <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap:25px;">
-                    <div style="background:white; padding:25px; border-radius:20px; border:1px solid var(--border);">
-                        <h4>Distribución por Tienda</h4>
-                        <canvas id="chartStores" style="max-height:450px; margin-top:20px;"></canvas>
-                    </div>
-                    <div style="background:white; padding:25px; border-radius:20px; border:1px solid var(--border);">
-                        <h4>Estado General</h4>
-                        <canvas id="chartStatus" style="margin-top:20px;"></canvas>
-                    </div>
+                <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
+                    <h4>Actividad Reciente</h4>
+                    <table style="margin-top: 15px;">
+                        <thead><tr><th>Colaborador</th><th>Equipo</th><th>Fecha</th></tr></thead>
+                        <tbody id="recentTableBody"></tbody>
+                    </table>
                 </div>
             </div>
 
             <div id="view-inventory" class="hidden">
-                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                    <input type="text" id="mainSearch" placeholder="🔍 Buscar..." style="width:400px;" oninput="renderMasterTable()">
+                <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <input type="text" id="mainSearch" placeholder="Buscar por RUT, Nombre o Serie..." oninput="renderMasterTable()">
+                    <button class="nav-btn" style="width: auto; background: var(--primary);" onclick="cargarDatos()"><i class="fas fa-sync"></i></button>
                 </div>
                 <div class="table-container">
-                    <table>
+                    <table id="masterTable">
                         <thead>
                             <tr>
-                                <th>RUT</th><th>Colaborador</th><th>Estado</th><th>Área</th><th>Tienda</th>
-                                <th>Marca PC</th><th>Serie PC</th><th>IMEI Equipo</th><th>SIM</th><th>Acciones</th>
+                                <th>RUT</th>
+                                <th>Responsable</th>
+                                <th>Estado</th>
+                                <th>Marca/Modelo</th>
+                                <th>Serie</th>
+                                <th>Tienda</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="masterTableBody"></tbody>
@@ -139,185 +146,196 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 </div>
 
-<div id="modalFicha" class="hidden modal">
+<div id="modalFicha" class="modal hidden">
     <div class="modal-content">
-        <h2 id="modalTitle" style="color:var(--primary); margin-bottom:25px;">Ficha Integral de Activo</h2>
+        <div class="section-tag">Responsable del Activo</div>
         <div class="form-grid">
-            <div class="section-tag">1. Identificación del Colaborador</div>
-            <div class="form-group"><label>Nombre Persona</label><input type="text" id="f_persona" onblur="sugerirEmail(this.value)"></div>
-            <div class="form-group"><label>Correo</label><input type="text" id="f_correo"></div>
-            <div class="form-group"><label>RUT</label><input type="text" id="f_rut" oninput="formatRUT(this)" maxlength="12"></div>
-            <div class="form-group"><label>Área</label>
+            <div style="grid-column: span 1;">
+                <label style="font-size: 11px;">RUT *</label>
+                <input type="text" id="f_rut" oninput="formatRUT(this)" placeholder="11.222.333-4">
+            </div>
+            <div style="grid-column: span 2;">
+                <label style="font-size: 11px;">Nombre Completo</label>
+                <input type="text" id="f_persona">
+            </div>
+            <div style="grid-column: span 1;">
+                <label style="font-size: 11px;">Área</label>
                 <select id="f_area">
-                    <option>Operaciones</option><option>Administración</option><option>Informática</option>
-                    <option>Marketing</option><option>RRHH</option><option>Logística</option>
+                    <option>Operaciones</option>
+                    <option>Informática</option>
+                    <option>Administración</option>
+                    <option>Marketing</option>
                 </select>
             </div>
-
-            <div class="section-tag">2. Ubicación y Estado</div>
-            <div class="form-group" style="grid-column: span 2;"><label>Tienda</label>
-                <select id="f_ubicacion">
-                    <option value="">-- Seleccionar --</option>
-                    <option>Antofagasta - Estadio Regional</option><option>Arica</option><option>Buin</option><option>Viña del Mar</option><option>Casa Matriz</option>
-                    </select>
-            </div>
-            <div class="form-group" style="grid-column: span 2;"><label>Estado</label>
-                <select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Dañado</option></select>
-            </div>
-
-            <div class="section-tag">3. Hardware PC</div>
-            <div class="form-group"><label>Marca PC</label><input type="text" id="f_marca"></div>
-            <div class="form-group"><label>Nº Serie PC</label><input type="text" id="f_serie"></div>
-            <div class="form-group"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
-            <div class="form-group"><label>Cargador PC</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
-
-            <div class="section-tag">4. Gestión de Telefonía (On/Off)</div>
-            <div class="tel-toggle-box">
-                <span style="font-weight:bold; font-size:12px;">Asignar Equipo Celular</span>
-                <label class="switch"><input type="checkbox" id="sw_equipo" onchange="toggleTelFields()"><span class="slider"></span></label>
-            </div>
-            <div class="tel-toggle-box">
-                <span style="font-weight:bold; font-size:12px;">Asignar Tarjeta SIM</span>
-                <label class="switch"><input type="checkbox" id="sw_sim" onchange="toggleTelFields()"><span class="slider"></span></label>
-            </div>
-            <div class="form-group"><label>Marca Celular</label><input type="text" id="f_marca_cel" disabled></div>
-            <div class="form-group"><label>Modelo Celular</label><input type="text" id="f_modelo_cel" disabled></div>
-            <div class="form-group"><label>IMEI Equipo</label><input type="text" id="f_imei_cel" disabled></div>
-            <div class="form-group"><label>IMEI SIM Card</label><input type="text" id="f_imei_sim" disabled></div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
-            <button onclick="cerrarFicha()" style="padding:15px 30px; border:none; border-radius:12px; cursor:pointer;">Cancelar</button>
-            <button onclick="guardarFicha()" class="btn-save" style="background:var(--success);">GUARDAR CAMBIOS</button>
+        <div class="section-tag">Detalle Hardware</div>
+        <div class="form-grid">
+            <input type="text" id="f_marca" placeholder="Marca (Ej: HP)">
+            <input type="text" id="f_modelo" placeholder="Modelo (Ej: Elitebook)">
+            <input type="text" id="f_serie" placeholder="N° de Serie">
+            <select id="f_estado">
+                <option>Asignado</option>
+                <option>Disponible</option>
+                <option>Mantención</option>
+            </select>
+        </div>
+
+        <div style="margin-top: 30px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button onclick="cerrarFicha()" style="background: #e2e8f0; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancelar</button>
+            <button onclick="guardarFicha()" id="btnGuardar" style="background: var(--primary); color: white; border: none; padding: 10px 30px; border-radius: 8px; cursor: pointer;">
+                <span id="btnText">Guardar Datos</span>
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-    const URL = "https://ivjwxvhixrskraepqzse.supabase.co/rest/v1";
-    const KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o";
-    const HEADERS = { "apikey": KEY, "Authorization": `Bearer ${KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" };
+// CONFIGURACIÓN
+const SUPABASE_CONFIG = {
+    URL: "https://ivjwxvhixrskraepqzse.supabase.co",
+    ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o"
+};
 
-    let DB_MASTER = [];
-    let myCharts = {};
+const HEADERS = {
+    "apikey": SUPABASE_CONFIG.ANON_KEY,
+    "Authorization": `Bearer ${SUPABASE_CONFIG.ANON_KEY}`,
+    "Content-Type": "application/json"
+};
 
-    function intentarLogin() {
-        if(document.getElementById('passInput').value === 'DominoTI2024') {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            cargarDatos();
+let DB_MASTER = [];
+
+// --- MEJORA: FORMATEADOR DE RUT DINÁMICO ---
+function formatRUT(input) {
+    let value = input.value.replace(/[^0-9kK]/g, '').toUpperCase();
+    if (!value) { input.value = ''; return; }
+    let cuerpo = value.slice(0, -1);
+    let dv = value.slice(-1);
+    if (cuerpo.length > 0) {
+        cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    input.value = cuerpo + (value.length > 1 ? '-' + dv : dv);
+}
+
+// --- MEJORA: GUARDADO TRANSACCIONAL VÍA RPC ---
+async function guardarFicha() {
+    const btnText = document.getElementById('btnText');
+    btnText.innerText = "Procesando...";
+    
+    const payload = {
+        p_colaborador: {
+            rut: document.getElementById('f_rut').value,
+            nombre: document.getElementById('f_persona').value,
+            area: document.getElementById('f_area').value
+        },
+        p_activo: {
+            serie: document.getElementById('f_serie').value,
+            rut_responsable: document.getElementById('f_rut').value,
+            marca: document.getElementById('f_marca').value,
+            modelo: document.getElementById('f_modelo').value,
+            estado: document.getElementById('f_estado').value,
+            fecha_entrega: new Date().toISOString().split('T')[0]
         }
-    }
+    };
 
-    async function cargarDatos() {
-        document.getElementById('loader').style.width = "100%";
-        try {
-            const [cR, aR] = await Promise.all([
-                fetch(`${URL}/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json()),
-                fetch(`${URL}/activos?select=*`, { headers: HEADERS }).then(r => r.json())
-            ]);
-            DB_MASTER = aR.map(a => ({ ...a, p: cR.find(u => u.rut === a.rut_responsable) || {} }));
-            
-            document.getElementById('stat-total').textContent = DB_MASTER.length;
-            document.getElementById('stat-ok').textContent = DB_MASTER.filter(x => x.estado === 'Asignado').length;
-            document.getElementById('stat-stock').textContent = DB_MASTER.filter(x => x.estado === 'Disponible').length;
-            
-            renderMasterTable();
-            if(!document.getElementById('view-analytics').classList.contains('hidden')) renderAnalytics();
-        } catch(e) {}
-        document.getElementById('loader').style.width = "0";
-    }
-
-    function toggleTelFields() {
-        const eq = document.getElementById('sw_equipo').checked;
-        const sim = document.getElementById('sw_sim').checked;
-        document.getElementById('f_marca_cel').disabled = !eq;
-        document.getElementById('f_modelo_cel').disabled = !eq;
-        document.getElementById('f_imei_cel').disabled = !eq;
-        document.getElementById('f_imei_sim').disabled = !sim;
-    }
-
-    function renderAnalytics() {
-        const stores = [...new Set(DB_MASTER.map(x => x.ubicacion || 'Sin Tienda'))];
-        const storeData = stores.map(s => DB_MASTER.filter(x => x.ubicacion === s).length);
-
-        if(myCharts.st) myCharts.st.destroy();
-        myCharts.st = new Chart(document.getElementById('chartStores'), {
-            type: 'bar',
-            data: { labels: stores, datasets: [{ label: 'Activos', data: storeData, backgroundColor: '#0066CC' }] },
-            options: { indexAxis: 'y', maintainAspectRatio: false }
+    try {
+        const res = await fetch(`${SUPABASE_CONFIG.URL}/rest/v1/rpc/guardar_ficha_completa`, {
+            method: 'POST',
+            headers: HEADERS,
+            body: JSON.stringify(payload)
         });
 
-        const statusData = [
-            DB_MASTER.filter(x => x.estado === 'Asignado').length,
-            DB_MASTER.filter(x => x.estado === 'Disponible').length,
-            DB_MASTER.filter(x => x.estado === 'Dañado').length
-        ];
-
-        if(myCharts.stat) myCharts.stat.destroy();
-        myCharts.stat = new Chart(document.getElementById('chartStatus'), {
-            type: 'doughnut',
-            data: { labels: ['Asignado', 'Stock', 'Dañado'], datasets: [{ data: statusData, backgroundColor: ['#22c55e', '#3b82f6', '#ef4444'] }] }
-        });
-    }
-
-    function renderMasterTable() {
-        const q = document.getElementById('mainSearch').value.toLowerCase();
-        const body = document.getElementById('masterTableBody');
-        const filtered = DB_MASTER.filter(d => (d.rut_responsable + (d.p.nombre||'') + d.serie).toLowerCase().includes(q));
+        if (!res.ok) throw new Error('Error RPC');
         
-        body.innerHTML = filtered.map(d => `
-            <tr>
-                <td><b>${d.rut_responsable}</b></td>
-                <td>${d.p.nombre || '-'}</td>
-                <td>${d.estado}</td><td>${d.p.area || '-'}</td><td>${d.ubicacion || '-'}</td>
-                <td>${d.marca || '-'}</td><td><code>${d.serie}</code></td>
-                <td>${d.imei_cel || '-'}</td><td>${d.imei_sim || '-'}</td>
-                <td>
-                    <button onclick="editarRegistro('${d.serie}')" style="color:var(--primary); border:none; background:none; cursor:pointer; margin-right:10px;"><i class="fas fa-edit"></i></button>
-                    <button onclick="eliminar('${d.serie}')" style="color:red; border:none; background:none; cursor:pointer;"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-        `).join('');
+        alert("¡Datos guardados correctamente!");
+        cerrarFicha();
+        cargarDatos();
+    } catch (e) {
+        alert("Error al conectar con el servidor.");
+    } finally {
+        btnText.innerText = "Guardar Datos";
     }
+}
 
-    async function guardarFicha() {
-        const d = {
-            rut: document.getElementById('f_rut').value.trim(),
-            nom: document.getElementById('f_persona').value.trim(),
-            ser: document.getElementById('f_serie').value.trim(),
-            ubi: document.getElementById('f_ubicacion').value,
-            est: document.getElementById('f_estado').value,
-            m_c: document.getElementById('sw_equipo').checked ? document.getElementById('f_marca_cel').value : null,
-            i_s: document.getElementById('sw_sim').checked ? document.getElementById('f_imei_sim').value : null
-        };
+// LÓGICA DE NAVEGACIÓN Y CARGA
+async function cargarDatos() {
+    document.getElementById('lastUpdate').innerText = "Sincronizando...";
+    try {
+        const [resA, resC] = await Promise.all([
+            fetch(`${SUPABASE_CONFIG.URL}/rest/v1/activos?select=*`, { headers: HEADERS }).then(r => r.json()),
+            fetch(`${SUPABASE_CONFIG.URL}/rest/v1/colaboradores?select=*`, { headers: HEADERS }).then(r => r.json())
+        ]);
 
-        try {
-            await fetch(`${URL}/colaboradores`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ rut: d.rut, nombre: d.nom }) });
-            await fetch(`${URL}/activos`, { method: 'POST', headers: HEADERS, body: JSON.stringify({
-                serie: d.ser, estado: d.est, ubicacion: d.ubi, imei_sim: d.i_s, marca_cel: d.m_c, rut_responsable: d.rut
-            }) });
-            cerrarFicha();
-            cargarDatos();
-        } catch(e) {}
-    }
+        DB_MASTER = resA.map(a => ({
+            ...a,
+            colab: resC.find(c => c.rut === a.rut_responsable) || { nombre: 'Desconocido' }
+        }));
 
-    function showView(v) {
-        document.querySelectorAll('[id^="view-"]').forEach(x => x.classList.add('hidden'));
-        document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
-        document.getElementById('view-' + v).classList.remove('hidden');
-        document.getElementById('nav' + v.charAt(0).toUpperCase() + v.slice(1)).classList.add('active');
-        if(v === 'analytics') setTimeout(renderAnalytics, 100);
-    }
+        actualizarUI();
+    } catch (e) { console.error(e); }
+}
 
-    function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
-    function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
-    function formatRUT(i) { let v = i.value.replace(/[^0-9kK]/g, ''); if (v.length > 1) i.value = v.slice(0, -1) + '-' + v.slice(-1).toUpperCase(); else i.value = v; }
-    function sugerirEmail(n) { if(!n)return; const p = n.toLowerCase().trim().split(/\s+/); if(p.length>=2) document.getElementById('f_correo').value = `${p[0]}.${p[1]}@dominospizza.cl`; }
-    async function eliminar(s) { if(confirm("¿Eliminar?")) { await fetch(`${URL}/activos?serie=eq.${s}`, { method: 'DELETE', headers: HEADERS }); cargarDatos(); } }
+function actualizarUI() {
+    document.getElementById('stat-total').innerText = DB_MASTER.length;
+    document.getElementById('stat-asignados').innerText = DB_MASTER.filter(x => x.estado === 'Asignado').length;
+    document.getElementById('stat-mantencion').innerText = DB_MASTER.filter(x => x.estado === 'Mantención').length;
+    
+    renderMasterTable();
+    renderRecent();
+    document.getElementById('lastUpdate').innerText = "Última actualización: " + new Date().toLocaleTimeString();
+}
+
+function renderMasterTable() {
+    const search = document.getElementById('mainSearch').value.toLowerCase();
+    const tbody = document.getElementById('masterTableBody');
+    
+    const filtered = DB_MASTER.filter(x => 
+        x.rut_responsable.toLowerCase().includes(search) || 
+        x.colab.nombre.toLowerCase().includes(search) || 
+        x.serie.toLowerCase().includes(search)
+    );
+
+    tbody.innerHTML = filtered.map(x => `
+        <tr>
+            <td>${x.rut_responsable}</td>
+            <td>${x.colab.nombre}</td>
+            <td><span class="status-badge status-${x.estado.toLowerCase()}">${x.estado}</span></td>
+            <td>${x.marca} ${x.modelo}</td>
+            <td><code>${x.serie}</code></td>
+            <td>${x.ubicacion || 'Bodega'}</td>
+            <td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)"></i></td>
+        </tr>
+    `).join('');
+}
+
+function renderRecent() {
+    const tbody = document.getElementById('recentTableBody');
+    const recent = [...DB_MASTER].reverse().slice(0, 5);
+    tbody.innerHTML = recent.map(x => `
+        <tr><td>${x.colab.nombre}</td><td>${x.marca}</td><td>${x.fecha_entrega}</td></tr>
+    `).join('');
+}
+
+function intentarLogin() {
+    if(document.getElementById('passInput').value === "DominoTI2024") {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        cargarDatos();
+    } else { alert("Clave incorrecta"); }
+}
+
+function showView(view) {
+    document.getElementById('view-dashboard').classList.add('hidden');
+    document.getElementById('view-inventory').classList.add('hidden');
+    document.getElementById(`view-${view}`).classList.remove('hidden');
+    document.getElementById('viewTitle').innerText = view === 'dashboard' ? 'Panel Principal' : 'Inventario TI';
+}
+
+function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
+function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 </script>
 </body>
 </html>
