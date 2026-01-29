@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v61.9 - Domino's Pizza Chile</title>
+    <title>TI Maestro v62.0 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -52,6 +52,7 @@
         input:checked + .slider:before { transform: translateX(20px); }
 
         .disabled-field { background-color: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+        .input-error { border-color: var(--secondary) !important; background-color: #fff1f2; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -62,7 +63,7 @@
         <svg class="logo-svg" viewBox="0 0 100 100" style="margin-bottom: 20px; width: 80px; fill: #0066CC; background: white; padding: 10px; border-radius: 10px;">
             <path d="M50 0 L100 50 L50 100 L0 50 Z M35 40 A5 5 0 1 0 35 39.9 Z M65 40 A5 5 0 1 0 65 39.9 Z M50 70 A5 5 0 1 0 50 69.9 Z"></path>
         </svg>
-        <h3 style="margin-bottom: 15px;">TI Maestro v61.9</h3>
+        <h3 style="margin-bottom: 15px;">TI Maestro v62.0</h3>
         <input type="password" id="passInput" placeholder="Clave: DominoTI2026" style="text-align: center; margin-bottom: 20px; width: 100%; padding: 12px;">
         <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center; font-weight: 700;">ACCEDER</button>
     </div>
@@ -120,7 +121,10 @@
         
         <div class="form-grid">
             <div class="section-tag">1. Identificación y Contacto</div>
-            <div class="field"><label>RUT *</label><input type="text" id="f_rut" oninput="formatRUT(this)" placeholder="11.222.333-4"></div>
+            <div class="field">
+                <label>RUT *</label>
+                <input type="text" id="f_rut" oninput="validarYFormatearRUT(this)" placeholder="11.222.333-4">
+            </div>
             <div class="field" style="grid-column: span 2;"><label>Persona (Nombre Completo) *</label><input type="text" id="f_nombre" onblur="sugerirCorreo(this.value)"></div>
             <div class="field"><label>Correo Corporativo</label><input type="email" id="f_correo" placeholder="nombre.apellido@dominospizza.cl"></div>
             
@@ -172,26 +176,52 @@ const CONFIG = {
     KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o"
 };
 
-// LISTA COMPLETA DE TIENDAS
+// LISTA COMPLETA DE 53 TIENDAS DOMINO'S CHILE
 const TIENDAS = [
-    "Casa Matriz (Santiago)", "Antofagasta - Estadio Regional", "Antofagasta - Sector Norte",
-    "Arica - Centro", "Buin - Plaza", "Viña del Mar - 15 Norte", "Concón - Centro",
-    "Copiapó - Prat", "Chillán - Centro", "La Serena - Balmaceda", 
-    "Rancagua - Paseo Independencia", "Temuco - Centro", "Valdivia - Costanera",
-    "Punta Arenas - Centro", "Bodega Central (Almacén)"
+    "Casa Matriz (Santiago)", "Bodega Central (Almacén)", "Antofagasta - Estadio Regional", "Antofagasta - Sector Norte", "Antofagasta - Centro", 
+    "Arica - Centro", "Buin - Plaza", "Calama - Centro", "Chillán - Centro", "Chillán - Open Plaza", "Concepción - Centro", "Concepción - San Pedro", 
+    "Concepción - Talcahuano", "Concón - Centro", "Copiapó - Prat", "Coquimbo - Centro", "Coronel - Centro", "Curicó - Centro", "Iquique - Centro", 
+    "La Calera - Centro", "La Serena - Balmaceda", "La Serena - Ulriksen", "Linares - Centro", "Los Ángeles - Centro", "Melipilla - Centro", 
+    "Osorno - Centro", "Ovalle - Centro", "Puerto Montt - Centro", "Puerto Varas - Centro", "Punta Arenas - Centro", "Quillota - Centro", 
+    "Quilpué - Centro", "Rancagua - Independencia", "Rancagua - Membrillar", "San Antonio - Centro", "San Bernardo - Centro", "San Felipe - Centro", 
+    "San Fernando - Centro", "Santiago - Agustinas", "Santiago - Alameda", "Santiago - Apoquindo", "Santiago - Gran Avenida", "Santiago - Irarrázaval", 
+    "Santiago - Las Condes", "Santiago - Maipú", "Santiago - Providencia", "Santiago - Puente Alto", "Santiago - Quilicura", "Santiago - Vitacura", 
+    "Talca - Centro", "Temuco - Centro", "Valdivia - Costanera", "Valparaíso - Centro", "Viña del Mar - 15 Norte"
 ];
 
 let DB = [];
 let charts = {};
 
-function formatRUT(input) {
-    let v = input.value.replace(/[^0-9kK]/g, '').toUpperCase();
-    let c = v.slice(0, -1); let d = v.slice(-1);
-    if (c.length > 0) c = c.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    input.value = v.length > 1 ? c + '-' + d : v;
+// VALIDACIÓN DE RUT CHILENO (MÓDULO 11)
+function validarYFormatearRUT(input) {
+    let valor = input.value.replace(/[^0-9kK]/g, '').toUpperCase();
+    if (valor.length < 2) { input.value = valor; return; }
+    
+    let cuerpo = valor.slice(0, -1);
+    let dv = valor.slice(-1);
+    
+    // Formatear con puntos
+    cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    input.value = cuerpo + '-' + dv;
+
+    // Validación algorítmica
+    let suma = 0;
+    let mul = 2;
+    let cuerpoLimpio = valor.slice(0, -1);
+    for (let i = cuerpoLimpio.length - 1; i >= 0; i--) {
+        suma += mul * parseInt(cuerpoLimpio.charAt(i));
+        mul = mul === 7 ? 2 : mul + 1;
+    }
+    let dvr = 11 - (suma % 11);
+    let dvEsperado = dvr === 11 ? "0" : dvr === 10 ? "K" : dvr.toString();
+
+    if (dv !== dvEsperado && valor.length > 7) {
+        input.classList.add('input-error');
+    } else {
+        input.classList.remove('input-error');
+    }
 }
 
-// LÓGICA DE SUGERENCIA DE CORREO
 function sugerirCorreo(nombre) {
     if (!nombre || document.getElementById('f_correo').value !== "") return;
     const partes = nombre.toLowerCase().trim().split(/\s+/);
@@ -219,7 +249,6 @@ function intentarLogin() {
     if(document.getElementById('passInput').value === "DominoTI2026") {
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
-        // CARGAR TODAS LAS TIENDAS
         document.getElementById('f_tienda').innerHTML = TIENDAS.map(t => `<option>${t}</option>`).join('');
         cargarDatos();
     } else { alert("Acceso Denegado"); }
@@ -266,10 +295,17 @@ function renderMasterTable() {
 
 async function guardarFichaFinal() {
     const btn = document.getElementById('btnSave');
+    const rutInput = document.getElementById('f_rut');
+    
+    if (rutInput.classList.contains('input-error')) {
+        alert("Por favor, ingresa un RUT válido antes de guardar.");
+        return;
+    }
+
     btn.innerText = "Sincronizando..."; btn.disabled = true;
 
     const data = {
-        rut: document.getElementById('f_rut').value,
+        rut: rutInput.value,
         persona: document.getElementById('f_nombre').value,
         fecha_entrega: document.getElementById('f_fecha_ent').value,
         estado: document.getElementById('f_estado').value,
