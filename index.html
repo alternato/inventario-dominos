@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v64.0 - Domino's Pizza Chile</title>
+    <title>TI Maestro v64.1 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,7 +16,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); height: 100vh; overflow: hidden; font-size: 13px; }
         #sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, var(--primary) 0%, #0052a3 100%); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo-svg { width: 100px; fill: white; margin: 0 auto 30px auto; }
+        .logo-svg { width: 100px; fill: white; margin: 0 auto 30px auto; display: block; }
         .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
         .nav-btn.active { background: var(--secondary); font-weight: 700; }
         .main-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -24,15 +24,15 @@
         .content-area { padding: 25px; overflow-y: auto; flex-grow: 1; }
         .table-container { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 1800px; }
-        th { background: #f1f5f9; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; font-size: 11px; text-transform: uppercase; }
+        th { background: #f1f5f9; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; font-size: 11px; text-transform: uppercase; color: #475569; border-bottom: 2px solid var(--border); }
         td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; }
-        .section-tag { grid-column: span 4; color: var(--primary); font-weight: 800; border-bottom: 2px solid #eee; padding-bottom: 5px; text-transform: uppercase; margin: 15px 0 10px 0; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 95vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .section-tag { grid-column: span 4; color: var(--primary); font-weight: 800; border-bottom: 2px solid #eee; padding-bottom: 5px; text-transform: uppercase; margin: 15px 0 10px 0; font-size: 11px; }
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         .field label { font-size: 11px; font-weight: 700; color: #64748b; }
-        input, select, textarea { padding: 8px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; }
+        input, select, textarea { padding: 8px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 12px; }
         .switch-box { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
         .toggle { position: relative; display: inline-block; width: 40px; height: 20px; }
         .toggle input { opacity: 0; width: 0; height: 0; }
@@ -41,7 +41,6 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(20px); }
         .disabled-field { background-color: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
-        .input-error { border-color: var(--secondary) !important; background-color: #fff1f2; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -49,38 +48,38 @@
 
 <div id="loginPage" class="modal" style="background: var(--primary);">
     <div class="modal-content" style="max-width: 350px; text-align: center;">
-        <svg class="logo-svg" viewBox="0 0 100 100" style="width: 80px; fill: #0066CC; background: white; padding: 10px; border-radius: 10px; margin-bottom: 20px;">
+        <svg class="logo-svg" viewBox="0 0 100 100" style="width: 80px; fill: #0066CC; background: white; padding: 10px; border-radius: 10px; margin: 0 auto 20px auto;">
             <path d="M50 0 L100 50 L50 100 L0 50 Z M35 40 A5 5 0 1 0 35 39.9 Z M65 40 A5 5 0 1 0 65 39.9 Z M50 70 A5 5 0 1 0 50 69.9 Z"></path>
         </svg>
-        <h3>TI Maestro v64.0</h3>
+        <h3>TI Maestro v64.1</h3>
         <input type="password" id="passInput" placeholder="Clave: DominoTI2026" style="text-align: center; margin: 20px 0; width: 100%; padding: 12px;">
-        <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center; font-weight: 700;">ACCEDER</button>
+        <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center; font-weight: 700; width: 100%;">ACCEDER</button>
     </div>
 </div>
 
 <div id="app" class="hidden" style="display: flex; width: 100%; height: 100vh;">
     <aside id="sidebar">
         <svg class="logo-svg" viewBox="0 0 100 100"><path d="M30 0 L100 70 L70 100 L0 30 Z M42 35 A6 6 0 1 1 42 34.9 Z M68 62 A6 6 0 1 1 68 61.9 Z M54 48 A6 6 0 1 1 54 47.9 Z"></path></svg>
-        <button class="nav-btn active" id="btn-inv" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario</button>
+        <button class="nav-btn active" id="btn-inv" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario Maestro</button>
         <button class="nav-btn" id="btn-metrics" onclick="showView('metrics')"><i class="fas fa-chart-line"></i> Reportes</button>
         <hr style="margin: 20px 0; opacity: 0.2;">
-        <button class="nav-btn" style="background: var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> NUEVO ACTIVO</button>
+        <button class="nav-btn" style="background: var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> NUEVO REGISTRO</button>
     </aside>
 
     <main class="main-container">
         <header>
-            <h2 id="viewTitle">Maestro TI Domino's</h2>
-            <div id="sync" style="font-size: 11px; color: #22c55e; font-weight: 700;"><i class="fas fa-database"></i> BASE RELACIONAL CONECTADA</div>
+            <h2 id="viewTitle">Inventario Maestro TI</h2>
+            <div id="sync" style="font-size: 11px; color: #22c55e; font-weight: 700;"><i class="fas fa-database"></i> BASE DE DATOS ACTIVA</div>
         </header>
 
         <div class="content-area">
             <div id="view-inventory">
-                <input type="text" id="mainSearch" placeholder="Buscar por RUT, Nombre o Serie..." style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 8px; border: 1px solid var(--border);" oninput="renderMasterTable()">
+                <input type="text" id="mainSearch" placeholder="Filtro por RUT, Persona o Serie..." style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 8px; border: 1px solid var(--border);" oninput="renderMasterTable()">
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>RUT</th><th>Responsable</th><th>Fecha Entrega</th><th>Estado</th><th>Correo</th><th>Área</th><th>Ubicación</th>
+                                <th>RUT</th><th>Persona</th><th>Fecha Entrega</th><th>Estado</th><th>Correo</th><th>Área</th><th>Ubicación</th>
                                 <th>Marca</th><th>Modelo</th><th>Nº de Serie</th><th>Doc. Firmado</th><th>Mochila</th><th>Cargador</th>
                                 <th>IT Entregó</th><th>Devolución</th><th>Acciones</th>
                             </tr>
@@ -106,37 +105,41 @@
             <div class="section-tag">1. Datos del Colaborador</div>
             <div class="field"><label>RUT *</label><input type="text" id="f_rut" oninput="validarYFormatearRUT(this)" placeholder="11.222.333-4"></div>
             <div class="field" style="grid-column: span 2;"><label>Nombre Completo *</label><input type="text" id="f_nombre" onblur="sugerirCorreo(this.value)"></div>
-            <div class="field"><label>Correo Corporativo</label><input type="email" id="f_correo"></div>
+            <div class="field"><label>Correo Corporativo</label><input type="email" id="f_correo" placeholder="nombre.apellido@dominospizza.cl"></div>
             
-            <div class="field"><label>Área</label><select id="f_area">
-                <option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option>
+            <div class="field"><label>Área / Departamento</label><select id="f_area">
+                <option value="">-- Seleccionar --</option>
+                <option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option>
+                <option>Logística</option><option>Finanzas</option><option>RRHH</option><option>Legal</option><option>Gerencia</option>
             </select></div>
-            <div class="field"><label>Ubicación (Tienda)</label><select id="f_tienda"></select></div>
-            <div class="field"><label>Estado</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Dañado</option></select></div>
-            <div class="field"><label>Doc. Firmado</label><select id="f_doc"><option>No</option><option>Si</option></select></div>
+            <div class="field"><label>Ubicación (Tienda / Local)</label><select id="f_tienda"></select></div>
+            <div class="field"><label>Estado del Activo</label><select id="f_estado">
+                <option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Dañado</option><option>Baja</option>
+            </select></div>
+            <div class="field"><label>Documento Firmado</label><select id="f_doc"><option>No</option><option>Si</option></select></div>
 
-            <div class="section-tag">2. Datos del Equipo</div>
-            <div class="field"><label>Marca</label><input type="text" id="f_marca"></div>
+            <div class="section-tag">2. Datos del Equipo Computacional</div>
+            <div class="field"><label>Marca</label><input type="text" id="f_marca" placeholder="Ej: HP, Dell"></div>
             <div class="field"><label>Modelo</label><input type="text" id="f_modelo"></div>
-            <div class="field"><label>Serie *</label><input type="text" id="f_serie"></div>
-            <div class="field"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
+            <div class="field"><label>Número de Serie *</label><input type="text" id="f_serie"></div>
+            <div class="field" style="display:none"><input type="text" id="f_tipo" value="Laptop"></div><div class="field"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
             <div class="field"><label>Cargador</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
 
             <div class="section-tag">3. Telefonía Móvil</div>
             <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Asignar Celular</span></div>
-            <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Asignar SIM</span></div>
+            <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Asignar SIM Card</span></div>
             <div class="field"><label>Modelo Celular</label><input type="text" id="f_mod_cel" disabled></div>
             <div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" disabled></div>
             <div class="field" style="grid-column: span 2;"><label>IMSI / ICCID Chip</label><input type="text" id="f_imsi" disabled></div>
 
-            <div class="section-tag">4. Control IT</div>
+            <div class="section-tag">4. Fechas y Observaciones</div>
             <div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div>
-            <div class="field"><label>Entrega Informática</label><input type="text" id="f_ent_it"></div>
+            <div class="field"><label>Entrega Informática (Firma IT)</label><input type="text" id="f_ent_it"></div>
             <div class="field"><label>Fecha Devolución</label><input type="date" id="f_fecha_dev"></div>
             <div class="field" style="grid-column: span 4;"><label>Observaciones</label><textarea id="f_obs" rows="2"></textarea></div>
         </div>
         <div style="margin-top: 25px; text-align: right;">
-            <button onclick="cerrarFicha()" style="padding: 10px 20px; border: none; cursor: pointer;">Cancelar</button>
+            <button onclick="cerrarFicha()" style="padding: 10px 20px; border: none; cursor: pointer; border-radius: 8px; background: #f1f5f9;">Cancelar</button>
             <button onclick="guardarSincronizado()" id="btnSave" style="background: var(--primary); color: white; padding: 10px 40px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">GUARDAR REGISTRO</button>
         </div>
     </div>
@@ -148,7 +151,18 @@ const CONFIG = {
     KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o"
 };
 
-const TIENDAS = ["Casa Matriz", "Bodega Central", "Viña 15 Norte", "Antofagasta Regional", "Concepción Alameda"];
+const TIENDAS = [
+    "Casa Matriz (Santiago)", "Bodega Central (Almacén)", "Antofagasta - Estadio Regional", "Antofagasta - Sector Norte", "Antofagasta - Centro", 
+    "Arica - Centro", "Buin - Plaza", "Calama - Centro", "Chillán - Centro", "Chillán - Open Plaza", "Concepción - Centro", "Concepción - San Pedro", 
+    "Concepción - Talcahuano", "Concón - Centro", "Copiapó - Prat", "Coquimbo - Centro", "Coronel - Centro", "Curicó - Centro", "Iquique - Centro", 
+    "La Calera - Centro", "La Serena - Balmaceda", "La Serena - Ulriksen", "Linares - Centro", "Los Ángeles - Centro", "Melipilla - Centro", 
+    "Osorno - Centro", "Ovalle - Centro", "Puerto Montt - Centro", "Puerto Varas - Centro", "Punta Arenas - Centro", "Quillota - Centro", 
+    "Quilpué - Centro", "Rancagua - Independencia", "Rancagua - Membrillar", "San Antonio - Centro", "San Bernardo - Centro", "San Felipe - Centro", 
+    "San Fernando - Centro", "Santiago - Agustinas", "Santiago - Alameda", "Santiago - Apoquindo", "Santiago - Gran Avenida", "Santiago - Irarrázaval", 
+    "Santiago - Las Condes", "Santiago - Maipú", "Santiago - Providencia", "Santiago - Puente Alto", "Santiago - Quilicura", "Santiago - Vitacura", 
+    "Talca - Centro", "Temuco - Centro", "Valdivia - Costanera", "Valparaíso - Centro", "Viña del Mar - 15 Norte"
+];
+
 let DB_ACTIVOS = []; let DB_COLABS = []; let charts = {};
 
 function validarYFormatearRUT(input) {
@@ -160,7 +174,11 @@ function validarYFormatearRUT(input) {
 function sugerirCorreo(n) {
     if (!n || document.getElementById('f_correo').value) return;
     const p = n.toLowerCase().trim().split(/\s+/);
-    if (p.length >= 2) document.getElementById('f_correo').value = `${p[0]}.${p[1]}@dominospizza.cl`;
+    if (p.length >= 2) {
+        const nom = p[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const ape = p[1].normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        document.getElementById('f_correo').value = `${nom}.${ape}@dominospizza.cl`;
+    }
 }
 
 function toggleTelefonia() {
@@ -195,16 +213,14 @@ async function cargarDatosSincronizados() {
 function renderMasterTable() {
     const b = document.getElementById('masterTableBody');
     const s = document.getElementById('mainSearch').value.toLowerCase();
-    
     b.innerHTML = DB_ACTIVOS.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'Sin asignar', correo: '-', area: '-' };
-        if(!c.nombre.toLowerCase().includes(s) && !a.serie.toLowerCase().includes(s)) return '';
-        
+        if(!c.nombre.toLowerCase().includes(s) && !a.serie.toLowerCase().includes(s) && !a.rut_responsable?.toLowerCase().includes(s)) return '';
         return `<tr>
             <td>${a.rut_responsable || '-'}</td>
             <td>${c.nombre}</td>
             <td>${a.fecha_entrega || '-'}</td>
-            <td><span style="background:#e2e8f0; padding:3px 8px; border-radius:10px;">${a.estado}</span></td>
+            <td><span style="background:#e2e8f0; padding:3px 8px; border-radius:10px; font-weight:bold; font-size:10px;">${a.estado}</span></td>
             <td>${c.correo}</td>
             <td>${c.area}</td>
             <td>${a.ubicacion || '-'}</td>
@@ -238,6 +254,7 @@ async function guardarSincronizado() {
         rut_responsable: colabData.rut,
         marca: document.getElementById('f_marca').value,
         modelo: document.getElementById('f_modelo').value,
+        tipo: document.getElementById('f_tipo').value,
         estado: document.getElementById('f_estado').value,
         ubicacion: document.getElementById('f_tienda').value,
         fecha_entrega: document.getElementById('f_fecha_ent').value || null,
@@ -247,7 +264,7 @@ async function guardarSincronizado() {
         entrega_it: document.getElementById('f_ent_it').value,
         observaciones: document.getElementById('f_obs').value,
         fecha_devolucion: document.getElementById('f_fecha_dev').value || null,
-        // Telefonía según tus nombres de columna en Supabase
+        // Telefonía - Mapeo a nombres de tu BD
         marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_marca').value : null,
         modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
         imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
@@ -255,14 +272,12 @@ async function guardarSincronizado() {
     };
 
     try {
-        // 1. Guardar Colaborador (Upsert)
         await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, {
             method: 'POST',
             headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
             body: JSON.stringify(colabData)
         });
 
-        // 2. Guardar Activo (Upsert)
         const resA = await fetch(`${CONFIG.URL}/rest/v1/activos`, {
             method: 'POST',
             headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
@@ -273,8 +288,9 @@ async function guardarSincronizado() {
             alert("¡Registro Exitoso!");
             cerrarFicha(); cargarDatosSincronizados();
         } else {
-            console.error(await resA.text());
-            alert("Error en la tabla Activos. Revisa los nombres de columna.");
+            const errorText = await resA.text();
+            console.error(errorText);
+            alert("Error en la tabla Activos. Revisa la consola (F12).");
         }
     } catch(e) { alert("Error de conexión."); }
     finally { btn.innerText = "GUARDAR REGISTRO"; btn.disabled = false; }
@@ -282,8 +298,12 @@ async function guardarSincronizado() {
 
 function initCharts() {
     if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy();
-    const a = {}, e = {}; DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
-    charts.e = new Chart(document.getElementById('chartEstado'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Activos', data: Object.values(e), backgroundColor: '#0066CC' }] }, options: { maintainAspectRatio: false } });
+    const a = {}, e = {}; 
+    DB_COLABS.forEach(x => a[x.area] = (a[x.area] || 0) + 1);
+    DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
+    
+    charts.a = new Chart(document.getElementById('chartArea'), { type: 'pie', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b','#3b82f6','#64748b'] }] }, options: { plugins: { title: { display:true, text:'Distribución por Área' } }, maintainAspectRatio: false } });
+    charts.e = new Chart(document.getElementById('chartEstado'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Activos', data: Object.values(e), backgroundColor: '#0066CC' }] }, options: { plugins: { title: { display:true, text:'Estado de Flota' } }, maintainAspectRatio: false } });
 }
 
 function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
@@ -291,6 +311,8 @@ function cerrarFicha() { document.getElementById('modalFicha').classList.add('hi
 function showView(v) {
     document.getElementById('view-inventory').classList.toggle('hidden', v !== 'inventory');
     document.getElementById('view-metrics').classList.toggle('hidden', v !== 'metrics');
+    document.getElementById('btn-inv').classList.toggle('active', v === 'inventory');
+    document.getElementById('btn-metrics').classList.toggle('active', v === 'metrics');
 }
 </script>
 </body>
