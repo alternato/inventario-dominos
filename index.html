@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v62.2 - Domino's Pizza Chile</title>
+    <title>TI Maestro v62.3 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -62,7 +62,7 @@
         <svg class="logo-svg" viewBox="0 0 100 100" style="margin-bottom: 20px; width: 80px; fill: #0066CC; background: white; padding: 10px; border-radius: 10px;">
             <path d="M50 0 L100 50 L50 100 L0 50 Z M35 40 A5 5 0 1 0 35 39.9 Z M65 40 A5 5 0 1 0 65 39.9 Z M50 70 A5 5 0 1 0 50 69.9 Z"></path>
         </svg>
-        <h3 style="margin-bottom: 15px;">TI Maestro v62.2</h3>
+        <h3 style="margin-bottom: 15px;">TI Maestro v62.3</h3>
         <input type="password" id="passInput" placeholder="Clave: DominoTI2026" style="text-align: center; margin-bottom: 20px; width: 100%; padding: 12px;">
         <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center; font-weight: 700;">ACCEDER</button>
     </div>
@@ -186,14 +186,12 @@ const TIENDAS = [
 
 let DB = [];
 
-// FUNCIÓN DE VALIDACIÓN DE RUT
 function validarYFormatearRUT(input) {
     let valor = input.value.replace(/[^0-9kK]/g, '').toUpperCase();
     let cuerpo = valor.slice(0, -1); let dv = valor.slice(-1);
     cuerpo = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     input.value = valor.length > 1 ? cuerpo + '-' + dv : valor;
     
-    // Algoritmo Mod 11
     let suma = 0; let mul = 2;
     for (let i = cuerpo.replace(/\./g, '').length - 1; i >= 0; i--) {
         suma += mul * parseInt(cuerpo.replace(/\./g, '').charAt(i));
@@ -233,7 +231,8 @@ function intentarLogin() {
 
 async function cargarDatos() {
     try {
-        const res = await fetch(`${CONFIG.URL}/rest/v1/activos_v2?select=*`, {
+        // CORRECCIÓN: Apuntar a la tabla 'activos'
+        const res = await fetch(`${CONFIG.URL}/rest/v1/activos?select=*`, {
             headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}` }
         });
         DB = await res.json();
@@ -270,13 +269,15 @@ async function guardarFichaFinal() {
         entrega_user: document.getElementById('f_ent_user').value,
         observaciones: document.getElementById('f_obs').value,
         fecha_devolucion: document.getElementById('f_fecha_dev').value || null,
+        // Telefonía
         mod_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
         imei: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
         imsi: document.getElementById('sw_sim').checked ? document.getElementById('f_imsi').value : null
     };
 
     try {
-        const res = await fetch(`${CONFIG.URL}/rest/v1/activos_v2`, {
+        // CORRECCIÓN: Apuntar a la tabla 'activos'
+        const res = await fetch(`${CONFIG.URL}/rest/v1/activos`, {
             method: 'POST',
             headers: { 
                 "apikey": CONFIG.KEY, 
@@ -303,8 +304,4 @@ function abrirFicha() { document.getElementById('modalFicha').classList.remove('
 function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 function showView(v) {
     document.getElementById('view-inventory').classList.toggle('hidden', v !== 'inventory');
-    document.getElementById('view-metrics').classList.toggle('hidden', v !== 'metrics');
-}
-</script>
-</body>
-</html>
+    document.getElementById('view-metrics').
