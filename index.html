@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v65.9 - Domino's Pizza Chile</title>
+    <title>TI Maestro v66.0 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -60,13 +60,13 @@
         <button class="nav-btn active" id="btn-inv" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario Maestro</button>
         <button class="nav-btn" id="btn-metrics" onclick="showView('metrics')"><i class="fas fa-chart-line"></i> Reportes</button>
         <hr style="margin: 20px 0; opacity: 0.2;">
-        <button class="nav-btn" style="background: var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> NUEVO ACTIVO</button>
+        <button class="nav-btn" style="background: var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> NUEVO REGISTRO</button>
     </aside>
 
     <main class="main-container">
         <header>
             <h2 id="viewTitle">Gestión TI Domino's Chile</h2>
-            <div id="sync" style="font-size: 11px; color: #22c55e; font-weight: 700;"><i class="fas fa-check-double"></i> SISTEMA ONLINE</div>
+            <div id="sync" style="font-size: 11px; color: #22c55e; font-weight: 700;"><i class="fas fa-check-double"></i> MODO EDICIÓN ACTIVO</div>
         </header>
         <div class="content-area">
             <div id="view-inventory">
@@ -126,7 +126,7 @@
         </div>
         <div style="margin-top: 25px; text-align: right;">
             <button onclick="cerrarFicha()" style="padding: 10px 20px; border: none; cursor: pointer; background: #f1f5f9; border-radius: 8px;">Cancelar</button>
-            <button onclick="guardarTodoSincronizado()" id="btnSave" style="background: var(--primary); color: white; padding: 10px 40px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">GUARDAR CAMBIOS</button>
+            <button onclick="guardarTodoSincronizado()" id="btnSave" style="background: var(--primary); color: white; padding: 10px 40px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">GUARDAR REGISTRO</button>
         </div>
     </div>
 </div>
@@ -137,7 +137,7 @@ const CONFIG = {
     KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o"
 };
 
-const TIENDAS = ["Casa Matriz", "Bodega Central (Almacén)", "Santiago Alameda", "Viña 15 Norte", "Antofagasta Regional", "Concepción Alameda", "La Serena Centro", "Temuco Centro", "Puerto Montt"];
+const TIENDAS = ["Casa Matriz", "Bodega Central", "Santiago Alameda", "Viña 15 Norte", "Antofagasta Regional", "Concepción", "La Serena", "Puerto Montt"];
 
 let DB_ACTIVOS = []; let DB_COLABS = []; let charts = {};
 
@@ -156,7 +156,6 @@ function editarActivo(serie) {
     const activo = DB_ACTIVOS.find(a => a.serie === serie);
     const colab = DB_COLABS.find(c => c.rut === activo.rut_responsable) || {};
     
-    // Carga de campos
     document.getElementById('f_rut').value = activo.rut_responsable || '';
     document.getElementById('f_nombre').value = colab.nombre || '';
     document.getElementById('f_correo').value = colab.correo || '';
@@ -191,14 +190,14 @@ async function cargarTodo() {
         DB_ACTIVOS = resA; DB_COLABS = resC;
         renderMasterTable();
         initCharts();
-    } catch (e) { console.error("Error al cargar datos"); }
+    } catch (e) { console.error(e); }
 }
 
 function renderMasterTable() {
     const b = document.getElementById('masterTableBody');
     const s = document.getElementById('mainSearch').value.toLowerCase();
     b.innerHTML = DB_ACTIVOS.map(a => {
-        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'Sin asignar', area: '-' };
+        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', area: '-' };
         if(!c.nombre.toLowerCase().includes(s) && !a.serie.toLowerCase().includes(s) && !a.rut_responsable?.toLowerCase().includes(s)) return '';
         return `<tr>
             <td>${a.rut_responsable || '-'}</td><td>${c.nombre}</td><td>${a.estado}</td><td>${c.area}</td><td>${a.ubicacion || '-'}</td><td>${a.marca} ${a.modelo}</td><td><code>${a.serie}</code></td><td>${a.entrega_it || '-'}</td>
@@ -209,8 +208,7 @@ function renderMasterTable() {
 
 async function guardarTodoSincronizado() {
     const btn = document.getElementById('btnSave');
-    const originalText = btn.innerText;
-    btn.innerText = "PROCESANDO..."; btn.disabled = true;
+    btn.innerText = "ACTUALIZANDO..."; btn.disabled = true;
 
     const colab = { 
         rut: document.getElementById('f_rut').value, 
@@ -236,30 +234,39 @@ async function guardarTodoSincronizado() {
     };
 
     try {
-        const resC = await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, {
+        // UPSERT Colaboradores
+        await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, {
             method: 'POST',
-            headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+            headers: { 
+                "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, 
+                "Content-Type": "application/json", 
+                "Prefer": "resolution=merge-duplicates" 
+            },
             body: JSON.stringify(colab)
         });
 
+        // UPSERT Activos (Esta es la clave para evitar el error de llave duplicada)
         const resA = await fetch(`${CONFIG.URL}/rest/v1/activos`, {
             method: 'POST',
-            headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+            headers: { 
+                "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, 
+                "Content-Type": "application/json", 
+                "Prefer": "resolution=merge-duplicates" 
+            },
             body: JSON.stringify(activo)
         });
 
-        if (resC.ok && resA.ok) {
-            alert("¡ÉXITO! Datos guardados en Colaboradores y Activos correctamente.");
+        if (resA.ok) {
+            alert("¡Sincronización Exitosa! El registro se ha creado o actualizado correctamente.");
             cerrarFicha();
             cargarTodo();
         } else {
-            const errA = await resA.text();
-            alert("ERROR AL GUARDAR: " + errA);
+            alert("Error en Supabase: " + await resA.text());
         }
     } catch(e) {
-        alert("ERROR DE RED: No se pudo conectar con Supabase.");
+        alert("Error de red.");
     } finally {
-        btn.innerText = originalText; btn.disabled = false;
+        btn.innerText = "GUARDAR CAMBIOS"; btn.disabled = false;
     }
 }
 
@@ -269,7 +276,7 @@ function intentarLogin() {
         document.getElementById('app').classList.remove('hidden');
         document.getElementById('f_tienda').innerHTML = TIENDAS.map(t => `<option>${t}</option>`).join('');
         cargarTodo();
-    } else { alert("Clave Incorrecta"); }
+    } else { alert("Acceso denegado"); }
 }
 
 function showView(v) {
@@ -282,21 +289,12 @@ function showView(v) {
 function initCharts() {
     if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy();
     const a = {}, e = {}; DB_COLABS.forEach(x => a[x.area] = (a[x.area] || 0) + 1); DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
-    charts.a = new Chart(document.getElementById('chartArea'), { type: 'doughnut', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b','#3b82f6'] }] }, options: { plugins: { title: { display:true, text:'Dotación por Área' } }, maintainAspectRatio: false } });
-    charts.e = new Chart(document.getElementById('chartEstado'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Activos', data: Object.values(e), backgroundColor: '#E31837' }] }, options: { plugins: { title: { display:true, text:'Estado de Equipos' } }, maintainAspectRatio: false } });
+    charts.a = new Chart(document.getElementById('chartArea').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b','#3b82f6'] }] }, options: { maintainAspectRatio: false } });
+    charts.e = new Chart(document.getElementById('chartEstado').getContext('2d'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Equipos', data: Object.values(e), backgroundColor: '#E31837' }] }, options: { maintainAspectRatio: false } });
 }
 
 function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
-function cerrarFicha() { 
-    document.getElementById('modalFicha').classList.add('hidden'); 
-    // Limpiar campos para que no queden datos de una edición previa si se va a crear uno nuevo
-    const inputs = document.querySelectorAll('#modalFicha input, #modalFicha textarea');
-    inputs.forEach(i => i.value = "");
-    document.querySelectorAll('#modalFicha select').forEach(s => s.selectedIndex = 0);
-    document.getElementById('sw_equipo').checked = false;
-    document.getElementById('sw_sim').checked = false;
-    toggleTelefonia();
-}
+function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 </script>
 </body>
 </html>
