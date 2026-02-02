@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v65.2 - Domino's Pizza Chile</title>
+    <title>TI Maestro v65.3 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -51,7 +51,7 @@
 <div id="loginPage" class="modal" style="background: var(--primary);">
     <div class="modal-content" style="max-width: 380px; text-align: center;">
         <img src="https://logos-world.net/wp-content/uploads/2021/08/Dominos-Logo.png" class="logo-img" alt="Domino's Logo" style="margin-bottom: 20px;">
-        <h3>TI Maestro v65.2</h3>
+        <h3>TI Maestro v65.3</h3>
         <input type="password" id="passInput" placeholder="Clave de acceso" style="text-align: center; margin: 20px 0; width: 100%;">
         <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center; font-weight: 700; width: 100%;">ACCEDER</button>
     </div>
@@ -89,7 +89,6 @@
                     </table>
                 </div>
             </div>
-
             <div id="view-metrics" class="hidden">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="chart-card"><canvas id="chartArea"></canvas></div>
@@ -108,33 +107,25 @@
             <div class="field"><label>RUT *</label><input type="text" id="f_rut" placeholder="11.222.333-4"></div>
             <div class="field" style="grid-column: span 2;"><label>Persona (Nombre Completo) *</label><input type="text" id="f_nombre" onblur="sugerirCorreo(this.value)"></div>
             <div class="field"><label>Correo Corporativo</label><input type="email" id="f_correo"></div>
-            
-            <div class="field"><label>Área</label><select id="f_area">
-                <option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option><option>Legal</option>
-            </select></div>
+            <div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option><option>Legal</option></select></div>
             <div class="field"><label>Ubicación (Tienda)</label><select id="f_tienda"></select></div>
             <div class="field"><label>Estado</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Dañado</option></select></div>
             <div class="field"><label>Documento Firmado</label><select id="f_doc"><option>No</option><option>Si</option></select></div>
 
-            <div class="section-tag">2. Hardware Computacional</div>
-            <div class="field"><label>Marca</label><input type="text" id="f_marca"></div>
-            <div class="field"><label>Modelo</label><input type="text" id="f_modelo"></div>
+            <div class="section-tag">2. Hardware Computacional (Laptop/Desktop)</div>
+            <div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div>
+            <div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div>
             <div class="field"><label>Nº de Serie *</label><input type="text" id="f_serie"></div>
             <div class="field"><label>Mochila</label><select id="f_mochila"><option>No</option><option>Si</option></select></div>
             <div class="field"><label>Cargador</label><select id="f_cargador"><option>No</option><option>Si</option></select></div>
 
             <div class="section-tag">3. Telefonía Móvil</div>
-            <div class="switch-box">
-                <label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label>
-                <span>Asignar Equipo Celular</span>
-            </div>
-            <div class="switch-box">
-                <label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label>
-                <span>Asignar SIM Card</span>
-            </div>
+            <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Asignar Equipo Celular</span></div>
+            <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Asignar SIM Card</span></div>
+            <div class="field"><label>Marca Celular</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div>
             <div class="field"><label>Modelo Celular</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div>
             <div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled></div>
-            <div class="field" style="grid-column: span 2;"><label>IMSI / ICCID Chip</label><input type="text" id="f_imsi" class="disabled-field" disabled></div>
+            <div class="field" style="grid-column: span 1;"><label>IMSI / ICCID Chip</label><input type="text" id="f_imsi" class="disabled-field" disabled></div>
 
             <div class="section-tag">4. Control IT</div>
             <div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div>
@@ -163,14 +154,19 @@ function toggleTelefonia() {
     const eq = document.getElementById('sw_equipo').checked;
     const sim = document.getElementById('sw_sim').checked;
     
-    const fieldsEq = ['f_mod_cel', 'f_imei'];
-    fieldsEq.forEach(id => {
+    ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => {
         document.getElementById(id).disabled = !eq;
         document.getElementById(id).classList.toggle('disabled-field', !eq);
     });
 
     document.getElementById('f_imsi').disabled = !sim;
     document.getElementById('f_imsi').classList.toggle('disabled-field', !sim);
+}
+
+function sugerirCorreo(n) {
+    if (!n || document.getElementById('f_correo').value) return;
+    const p = n.toLowerCase().trim().split(/\s+/);
+    if (p.length >= 2) document.getElementById('f_correo').value = `${p[0]}.${p[1]}@dominospizza.cl`;
 }
 
 async function editarActivo(serie) {
@@ -181,7 +177,7 @@ async function editarActivo(serie) {
     document.getElementById('f_nombre').value = colab.nombre || '';
     document.getElementById('f_correo').value = colab.correo || '';
     document.getElementById('f_area').value = colab.area || 'Operaciones';
-    document.getElementById('f_tienda').value = activo.ubicacion || 'Casa Matriz (Santiago)';
+    document.getElementById('f_tienda').value = activo.ubicacion || TIENDAS[0];
     document.getElementById('f_estado').value = activo.estado || 'Asignado';
     document.getElementById('f_marca').value = activo.marca || '';
     document.getElementById('f_modelo').value = activo.modelo || '';
@@ -194,11 +190,11 @@ async function editarActivo(serie) {
     document.getElementById('f_fecha_dev').value = activo.fecha_devolucion || '';
     document.getElementById('f_obs').value = activo.observaciones || '';
 
-    // Telefonía
+    // Telefonía - Carga de datos específicos
     document.getElementById('sw_equipo').checked = !!activo.marca_cel;
+    document.getElementById('f_mar_cel').value = activo.marca_cel || '';
     document.getElementById('f_mod_cel').value = activo.modelo_cel || '';
     document.getElementById('f_imei').value = activo.imei_cel || '';
-    
     document.getElementById('sw_sim').checked = !!activo.imei_sim;
     document.getElementById('f_imsi').value = activo.imei_sim || '';
 
@@ -210,15 +206,14 @@ function renderMasterTable() {
     const b = document.getElementById('masterTableBody');
     const s = document.getElementById('mainSearch').value.toLowerCase();
     b.innerHTML = DB_ACTIVOS.map(a => {
-        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', correo: '-' };
-        if(!c.nombre.toLowerCase().includes(s) && !a.serie.toLowerCase().includes(s)) return '';
+        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', correo: '-', area: '-' };
+        if(!c.nombre.toLowerCase().includes(s) && !a.serie.toLowerCase().includes(s) && !a.rut_responsable?.toLowerCase().includes(s)) return '';
         return `<tr>
             <td>${a.rut_responsable || '-'}</td><td>${c.nombre}</td><td>${a.fecha_entrega || '-'}</td>
             <td><span style="background:#e2e8f0; padding:3px 8px; border-radius:10px;">${a.estado}</span></td>
             <td>${c.correo}</td><td>${c.area || '-'}</td><td>${a.ubicacion || '-'}</td>
             <td>${a.marca}</td><td>${a.modelo}</td><td><code>${a.serie}</code></td><td>${a.doc_firmado}</td>
-            <td>${a.mochila}</td><td>${a.cargador}</td><td>${a.entrega_it || '-'}</td>
-            <td>${a.fecha_devolucion || '-'}</td>
+            <td>${a.mochila}</td><td>${a.cargador}</td><td>${a.entrega_it || '-'}</td><td>${a.fecha_devolucion || '-'}</td>
             <td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)" onclick="editarActivo('${a.serie}')"></i></td>
         </tr>`;
     }).join('');
@@ -259,21 +254,48 @@ function initCharts() {
     charts.e = new Chart(document.getElementById('chartEstado'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Activos', data: Object.values(e), backgroundColor: '#E31837' }] }, options: { plugins: { title: { display:true, text:'Estado de Equipos' } }, maintainAspectRatio: false } });
 }
 
-function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
-function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
-
 async function guardarTodoSincronizado() {
     const btn = document.getElementById('btnSave');
     btn.innerText = "Sincronizando..."; btn.disabled = true;
-    const colab = { rut: document.getElementById('f_rut').value, nombre: document.getElementById('f_nombre').value, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value };
-    const activo = { serie: document.getElementById('f_serie').value, rut_responsable: colab.rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value || null, doc_firmado: document.getElementById('f_doc').value, mochila: document.getElementById('f_mochila').value, cargador: document.getElementById('f_cargador').value, entrega_it: document.getElementById('f_ent_it').value, observaciones: document.getElementById('f_obs').value, fecha_devolucion: document.getElementById('f_fecha_dev').value || null, marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_marca').value : null, modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null, imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null, imei_sim: document.getElementById('sw_sim').checked ? document.getElementById('f_imsi').value : null };
+
+    const colab = { 
+        rut: document.getElementById('f_rut').value, 
+        nombre: document.getElementById('f_nombre').value, 
+        correo: document.getElementById('f_correo').value, 
+        area: document.getElementById('f_area').value 
+    };
+
+    const activo = { 
+        serie: document.getElementById('f_serie').value, 
+        rut_responsable: colab.rut, 
+        marca: document.getElementById('f_marca').value, 
+        modelo: document.getElementById('f_modelo').value, 
+        estado: document.getElementById('f_estado').value, 
+        ubicacion: document.getElementById('f_tienda').value, 
+        fecha_entrega: document.getElementById('f_fecha_ent').value || null, 
+        doc_firmado: document.getElementById('f_doc').value, 
+        mochila: document.getElementById('f_mochila').value, 
+        cargador: document.getElementById('f_cargador').value, 
+        entrega_it: document.getElementById('f_ent_it').value, 
+        observaciones: document.getElementById('f_obs').value, 
+        fecha_devolucion: document.getElementById('f_fecha_dev').value || null,
+        // Telefonía Reparada
+        marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null,
+        modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
+        imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
+        imei_sim: document.getElementById('sw_sim').checked ? document.getElementById('f_imsi').value : null
+    };
+
     try {
         await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, { method: 'POST', headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(colab) });
         const resA = await fetch(`${CONFIG.URL}/rest/v1/activos`, { method: 'POST', headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(activo) });
-        if(resA.ok) { alert("¡Guardado y Sincronizado!"); cerrarFicha(); cargarTodo(); }
-    } catch(e) { alert("Error"); }
+        if(resA.ok) { alert("¡Guardado Exitoso!"); cerrarFicha(); cargarTodo(); }
+    } catch(e) { alert("Error de red"); }
     finally { btn.innerText = "GUARDAR CAMBIOS"; btn.disabled = false; }
 }
+
+function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
+function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 </script>
 </body>
 </html>
