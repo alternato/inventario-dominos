@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v64.7 - Domino's Pizza Chile</title>
+    <title>TI Maestro v64.8 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,30 +15,36 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); height: 100vh; overflow: hidden; font-size: 13px; }
+        
+        /* Sidebar con Logo */
         #sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, var(--primary) 0%, #0052a3 100%); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
         
-        /* LOGO DOMINÓ CORREGIDO */
         .logo-container { margin-bottom: 30px; text-align: center; }
-        .domino-svg { width: 60px; height: 60px; transform: rotate(-45deg); filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2)); }
+        .domino-svg { width: 80px; height: 80px; transform: rotate(-45deg); }
         .domino-svg rect { fill: white; }
         .domino-svg circle { fill: #E31837; }
 
-        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px 15px; border-radius: 8px; width: 100%; margin-bottom: 8px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
         .nav-btn.active { background: var(--secondary); font-weight: 700; }
+
         .main-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
         header { background: white; padding: 18px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .content-area { padding: 25px; overflow-y: auto; flex-grow: 1; }
+
         .table-container { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 1800px; }
         th { background: #f1f5f9; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; font-size: 11px; text-transform: uppercase; }
         td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; }
-        .section-tag { grid-column: span 4; color: var(--primary); font-weight: 800; border-bottom: 2px solid #eee; padding-bottom: 5px; text-transform: uppercase; margin: 15px 0 10px 0; }
+        
+        .section-tag { grid-column: span 4; color: var(--primary); font-weight: 800; border-bottom: 2px solid #eee; padding-bottom: 5px; text-transform: uppercase; margin: 15px 0 10px 0; font-size: 11px; }
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         .field label { font-size: 11px; font-weight: 700; color: #64748b; }
         input, select, textarea { padding: 8px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 12px; }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -48,15 +54,15 @@
     <div class="modal-content" style="max-width: 350px; text-align: center;">
         <div class="logo-container">
             <svg class="domino-svg" viewBox="0 0 100 100">
-                <rect x="10" y="10" width="80" height="80" rx="8" />
-                <line x1="10" y1="50" x2="90" y2="50" stroke="#0066CC" stroke-width="4" />
-                <circle cx="30" cy="30" r="6" />
-                <circle cx="70" cy="30" r="6" />
-                <circle cx="50" cy="75" r="6" />
+                <rect x="5" y="5" width="90" height="45" rx="4" fill="white" />
+                <rect x="5" y="50" width="90" height="45" rx="4" fill="white" />
+                <circle cx="27.5" cy="27.5" r="7" fill="#E31837" />
+                <circle cx="72.5" cy="27.5" r="7" fill="#E31837" />
+                <circle cx="50" cy="72.5" r="7" fill="#0066CC" />
             </svg>
         </div>
-        <h3 style="margin-bottom: 20px;">TI Maestro v64.7</h3>
-        <input type="password" id="passInput" placeholder="Clave: DominoTI2026" style="text-align: center; margin-bottom: 20px; width: 100%;">
+        <h3 style="margin-bottom: 20px;">TI Maestro v64.8</h3>
+        <input type="password" id="passInput" placeholder="Clave: DominoTI2026" style="text-align: center; margin-bottom: 20px; width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
         <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center; font-weight: 700;">ACCEDER</button>
     </div>
 </div>
@@ -65,27 +71,27 @@
     <aside id="sidebar">
         <div class="logo-container">
             <svg class="domino-svg" viewBox="0 0 100 100">
-                <rect x="10" y="10" width="80" height="80" rx="8" />
-                <line x1="10" y1="50" x2="90" y2="50" stroke="#0066CC" stroke-width="4" />
-                <circle cx="30" cy="30" r="6" />
-                <circle cx="70" cy="30" r="6" />
-                <circle cx="50" cy="75" r="6" />
+                <rect x="5" y="5" width="90" height="45" rx="4" fill="white" />
+                <rect x="5" y="50" width="90" height="45" rx="4" fill="white" />
+                <circle cx="27.5" cy="27.5" r="7" fill="#0066CC" />
+                <circle cx="72.5" cy="27.5" r="7" fill="#0066CC" />
+                <circle cx="50" cy="72.5" r="7" fill="#0066CC" />
             </svg>
         </div>
-        <button class="nav-btn active" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario</button>
+        <button class="nav-btn active" id="btn-inv" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario Maestro</button>
         <button class="nav-btn" onclick="showView('metrics')"><i class="fas fa-chart-line"></i> Reportes</button>
         <hr style="margin: 20px 0; opacity: 0.2;">
-        <button class="nav-btn" style="background: var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> NUEVO ACTIVO</button>
+        <button class="nav-btn" style="background: var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> NUEVO REGISTRO</button>
     </aside>
 
     <main class="main-container">
         <header>
-            <h2 id="viewTitle">Inventario Maestro TI</h2>
-            <div style="font-size: 11px; color: #22c55e; font-weight: 700;"><i class="fas fa-database"></i> BASE SINCRONIZADA</div>
+            <h2 id="viewTitle">Gestión de Activos TI</h2>
+            <div id="sync" style="font-size: 11px; color: #22c55e; font-weight: 700;"><i class="fas fa-database"></i> BASE DE DATOS ACTIVA</div>
         </header>
         <div class="content-area">
             <div id="view-inventory">
-                <input type="text" id="mainSearch" placeholder="Buscar..." style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 8px; border: 1px solid var(--border);" oninput="renderMasterTable()">
+                <input type="text" id="mainSearch" placeholder="Buscar por RUT, Nombre o Serie..." style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 8px; border: 1px solid var(--border);" oninput="renderMasterTable()">
                 <div class="table-container">
                     <table>
                         <thead>
@@ -105,7 +111,7 @@
 
 <div id="modalFicha" class="modal hidden">
     <div class="modal-content">
-        <h2 style="margin-bottom: 15px; color: var(--primary);">Ficha Técnica Relacional</h2>
+        <h2 style="margin-bottom: 15px; color: var(--primary); font-size: 18px;"><i class="fas fa-file-signature"></i> Ficha Técnica Relacional</h2>
         <div class="form-grid">
             <div class="section-tag">1. Colaborador</div>
             <div class="field"><label>RUT *</label><input type="text" id="f_rut" placeholder="11.222.333-4"></div>
@@ -135,7 +141,7 @@ const CONFIG = {
     KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o"
 };
 
-const TIENDAS = ["Casa Matriz", "Bodega Central", "Viña 15 Norte", "Antofagasta", "Concepción"];
+const TIENDAS = ["Casa Matriz", "Bodega Central", "Viña 15 Norte", "Antofagasta", "Concepción", "Temuco", "Puerto Montt"];
 let DB_ACTIVOS = []; let DB_COLABS = [];
 
 function intentarLogin() {
@@ -144,7 +150,7 @@ function intentarLogin() {
         document.getElementById('app').classList.remove('hidden');
         document.getElementById('f_tienda').innerHTML = TIENDAS.map(t => `<option>${t}</option>`).join('');
         cargarDatosSincronizados();
-    } else { alert("Clave Incorrecta"); }
+    } else { alert("Acceso Incorrecto"); }
 }
 
 async function cargarDatosSincronizados() {
@@ -155,22 +161,16 @@ async function cargarDatosSincronizados() {
         ]);
         DB_ACTIVOS = resA; DB_COLABS = resC;
         renderMasterTable();
-    } catch (e) { console.error("Error cargando datos"); }
+    } catch (e) { console.error("Error en conexión"); }
 }
 
 function renderMasterTable() {
     const b = document.getElementById('masterTableBody');
     const s = document.getElementById('mainSearch').value.toLowerCase();
     b.innerHTML = DB_ACTIVOS.map(a => {
-        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'Sin asignar', correo: '-' };
+        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', correo: '-' };
         if(!c.nombre.toLowerCase().includes(s) && !a.serie.toLowerCase().includes(s)) return '';
-        return `<tr>
-            <td>${a.rut_responsable || '-'}</td><td>${c.nombre}</td><td>${a.fecha_entrega || '-'}</td>
-            <td>${a.estado}</td><td>${c.correo}</td><td>${c.area || '-'}</td><td>${a.ubicacion || '-'}</td>
-            <td>${a.marca}</td><td>${a.modelo}</td><td>${a.serie}</td><td>${a.doc_firmado}</td>
-            <td>${a.mochila}</td><td>${a.cargador}</td><td>${a.entrega_it || '-'}</td>
-            <td>${a.fecha_devolucion || '-'}</td><td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)"></i></td>
-        </tr>`;
+        return `<tr><td>${a.rut_responsable || '-'}</td><td>${c.nombre}</td><td>${a.fecha_entrega || '-'}</td><td>${a.estado}</td><td>${c.correo}</td><td>${c.area || '-'}</td><td>${a.ubicacion || '-'}</td><td>${a.marca}</td><td>${a.modelo}</td><td>${a.serie}</td><td>${a.doc_firmado}</td><td>${a.mochila}</td><td>${a.cargador}</td><td>${a.entrega_it || '-'}</td><td>${a.fecha_devolucion || '-'}</td><td><i class="fas fa-edit"></i></td></tr>`;
     }).join('');
 }
 
@@ -178,23 +178,8 @@ async function guardarSincronizado() {
     const btn = document.getElementById('btnSave');
     btn.innerText = "Sincronizando..."; btn.disabled = true;
 
-    const colabData = {
-        rut: document.getElementById('f_rut').value,
-        nombre: document.getElementById('f_nombre').value,
-        correo: document.getElementById('f_correo').value
-    };
-
-    const activoData = {
-        serie: document.getElementById('f_serie').value,
-        rut_responsable: colabData.rut,
-        marca: document.getElementById('f_marca').value,
-        modelo: document.getElementById('f_modelo').value,
-        estado: document.getElementById('f_estado').value,
-        ubicacion: document.getElementById('f_tienda').value,
-        doc_firmado: document.getElementById('f_doc').value,
-        mochila: document.getElementById('f_mochila').value,
-        cargador: document.getElementById('f_cargador').value
-    };
+    const colabData = { rut: document.getElementById('f_rut').value, nombre: document.getElementById('f_nombre').value, correo: document.getElementById('f_correo').value };
+    const activoData = { serie: document.getElementById('f_serie').value, rut_responsable: colabData.rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, doc_firmado: document.getElementById('f_doc').value, mochila: document.getElementById('f_mochila').value, cargador: document.getElementById('f_cargador').value };
 
     try {
         await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, {
@@ -202,21 +187,18 @@ async function guardarSincronizado() {
             headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
             body: JSON.stringify(colabData)
         });
-
         const resA = await fetch(`${CONFIG.URL}/rest/v1/activos`, {
             method: 'POST',
             headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
             body: JSON.stringify(activoData)
         });
-
-        if(resA.ok) { alert("¡Guardado!"); cerrarFicha(); cargarDatosSincronizados(); }
-    } catch(e) { alert("Error de conexión"); }
+        if(resA.ok) { alert("Registro guardado con éxito."); cerrarFicha(); cargarDatosSincronizados(); }
+    } catch(e) { alert("Error al conectar con la base de datos."); }
     finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
 }
 
 function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
 function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
-function showView(v) { /* Lógica visual simple */ }
 </script>
 </body>
 </html>
