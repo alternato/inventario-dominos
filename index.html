@@ -73,7 +73,7 @@
             <div id="view-inventory">
                 <div class="csv-panel">
                     <div>
-                        <label style="display:block; font-size:10px; font-weight:800; color:var(--primary); margin-bottom:5px;">IMPORTAR MAESTRO CSV (17 COLUMNAS)</label>
+                        <label style="display:block; font-size:10px; font-weight:800; color:var(--primary); margin-bottom:5px;">IMPORTAR MAESTRO CSV</label>
                         <input type="file" id="csvFile" accept=".csv">
                     </div>
                     <button onclick="procesarCSV()" class="nav-btn" style="width:auto; background:var(--dark); margin:0;">
@@ -87,7 +87,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>RUT</th><th>Responsable</th><th>Estado</th><th>Área</th><th>Tienda</th><th>Marca/Modelo</th><th>Serie PC</th><th>Entrega IT</th><th>Acciones</th>
+                                <th>RUT</th><th>Responsable</th><th>Estado</th><th>Contrato</th><th>Área</th><th>Tienda</th><th>Marca/Modelo</th><th>Serie PC</th><th>Entrega IT</th><th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="masterTableBody"></tbody>
@@ -120,12 +120,16 @@
                 <option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option>
             </select></div>
             <div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div>
+            <div class="field"><label>Estado Contractual</label><select id="f_contractual">
+                <option value="Vigente">Vigente</option>
+                <option value="Cesado">Cesado</option>
+            </select></div>
 
             <div class="section-tag">2. Hardware PC</div>
             <div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div>
             <div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div>
             <div class="field"><label>Nº de Serie PC *</label><input type="text" id="f_serie"></div>
-            <div class="field"><label>Estado</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option></select></div>
+            <div class="field"><label>Estado Equipo</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option></select></div>
 
             <div class="section-tag">3. Telefonía</div>
             <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div>
@@ -156,7 +160,6 @@ const CONFIG = {
 const TIENDAS = ["Casa Matriz", "Bodega Central", "Santiago Alameda", "Viña 15 Norte", "Antofagasta Regional", "Concepción", "La Serena", "Puerto Montt"];
 let DB_ACTIVOS = []; let DB_COLABS = []; let charts = {};
 
-// --- LÓGICA DE RUT Y SUGERENCIAS ---
 function formatearRut(rut) {
     let valor = rut.replace(/\./g, '').replace(/-/g, '').toLowerCase();
     if (valor.length < 2) return valor;
@@ -177,18 +180,19 @@ function setupListeners() {
             inputNombre.value = c.nombre;
             inputCorreo.value = c.correo;
             document.getElementById('f_area').value = c.area || 'Operaciones';
+            document.getElementById('f_contractual').value = c.estado_contractual || 'Vigente';
         }
     });
 
     inputNombre.addEventListener('input', () => {
-        // Autocompletado desde Datalist (nombre -> rut)
         const c = DB_COLABS.find(x => x.nombre === inputNombre.value);
         if(c) {
             inputRut.value = c.rut;
             inputCorreo.value = c.correo;
+            document.getElementById('f_area').value = c.area || 'Operaciones';
+            document.getElementById('f_contractual').value = c.estado_contractual || 'Vigente';
         }
 
-        // Sugerencia de correo Domino's
         if (inputCorreo.value === "" || inputCorreo.value.includes('@dominos.cl')) {
             const parts = inputNombre.value.toLowerCase().trim().split(" ");
             if (parts.length >= 2) {
@@ -198,7 +202,19 @@ function setupListeners() {
     });
 }
 
-// --- CARGA CSV (17 COLUMNAS) ---
+function toggleTelefonia() {
+    const eq = document.getElementById('sw_equipo').checked;
+    const sim = document.getElementById('sw_sim').checked;
+    
+    ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { 
+        document.getElementById(id).disabled = !eq; 
+        document.getElementById(id).classList.toggle('disabled-field', !eq);
+    });
+    
+    document.getElementById('f_imsi').disabled = !sim;
+    document.getElementById('f_imsi').classList.toggle('disabled-field', !sim);
+}
+
 async function procesarCSV() {
     const fileInput = document.getElementById('csvFile');
     if (!fileInput.files[0]) return alert("Selecciona un CSV");
@@ -212,7 +228,14 @@ async function procesarCSV() {
             const col = lines[i].split(',').map(v => v.replace(/^"|"$/g, '').trim());
             if (col.length < 10) continue;
 
-            const colab = { rut: formatearRut(col[0]), nombre: col[1], correo: col[4], area: col[5] };
+            const colab = { 
+                rut: formatearRut(col[0]), 
+                nombre: col[1], 
+                correo: col[4], 
+                area: col[5],
+                estado_contractual: col[16] || 'Vigente' 
+            };
+            
             const activo = {
                 serie: col[9], rut_responsable: colab.rut, ubicacion: col[6], marca: col[7], modelo: col[8],
                 estado: col[3], fecha_entrega: formatearFechaCSV(col[2]), entrega_it: col[13], observaciones: col[15]
@@ -239,16 +262,28 @@ function formatearFechaCSV(str) {
     return (p.length === 3 && p[2].length === 4) ? `${p[2]}-${p[1]}-${p[0]}` : str;
 }
 
-// --- RESTO DE FUNCIONES ---
 async function guardarTodoSincronizado() {
     const btn = document.getElementById('btnSave');
     btn.innerText = "PROCESANDO..."; btn.disabled = true;
 
-    const colab = { rut: document.getElementById('f_rut').value, nombre: document.getElementById('f_nombre').value, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value };
+    const colab = { 
+        rut: document.getElementById('f_rut').value, 
+        nombre: document.getElementById('f_nombre').value, 
+        correo: document.getElementById('f_correo').value, 
+        area: document.getElementById('f_area').value,
+        estado_contractual: document.getElementById('f_contractual').value
+    };
+
     const activo = { 
-        serie: document.getElementById('f_serie').value, rut_responsable: colab.rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, 
-        estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value || null, 
-        entrega_it: document.getElementById('f_ent_it').value, observaciones: document.getElementById('f_obs').value,
+        serie: document.getElementById('f_serie').value, 
+        rut_responsable: colab.rut, 
+        marca: document.getElementById('f_marca').value, 
+        modelo: document.getElementById('f_modelo').value, 
+        estado: document.getElementById('f_estado').value, 
+        ubicacion: document.getElementById('f_tienda').value, 
+        fecha_entrega: document.getElementById('f_fecha_ent').value || null, 
+        entrega_it: document.getElementById('f_ent_it').value, 
+        observaciones: document.getElementById('f_obs').value,
         marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null,
         modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
         imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
@@ -285,10 +320,23 @@ function renderMasterTable() {
     const b = document.getElementById('masterTableBody');
     const s = document.getElementById('mainSearch').value.toLowerCase();
     b.innerHTML = DB_ACTIVOS.map(a => {
-        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', area: '-' };
+        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', area: '-', estado_contractual: 'Vigente' };
         if(!c.nombre.toLowerCase().includes(s) && !a.serie.toLowerCase().includes(s) && !a.rut_responsable?.toLowerCase().includes(s)) return '';
-        return `<tr><td>${a.rut_responsable || '-'}</td><td>${c.nombre}</td><td>${a.estado}</td><td>${c.area}</td><td>${a.ubicacion || '-'}</td><td>${a.marca} ${a.modelo}</td><td><code>${a.serie}</code></td><td>${a.entrega_it || '-'}</td>
-            <td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)" onclick="editarActivo('${a.serie}')"></i></td></tr>`;
+        
+        const styleContrato = c.estado_contractual === 'Cesado' ? 'color: var(--secondary); font-weight: bold;' : '';
+        
+        return `<tr>
+            <td>${a.rut_responsable || '-'}</td>
+            <td>${c.nombre}</td>
+            <td>${a.estado}</td>
+            <td style="${styleContrato}">${c.estado_contractual || 'Vigente'}</td>
+            <td>${c.area}</td>
+            <td>${a.ubicacion || '-'}</td>
+            <td>${a.marca} ${a.modelo}</td>
+            <td><code>${a.serie}</code></td>
+            <td>${a.entrega_it || '-'}</td>
+            <td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)" onclick="editarActivo('${a.serie}')"></i></td>
+        </tr>`;
     }).join('');
 }
 
@@ -300,6 +348,7 @@ function editarActivo(serie) {
     document.getElementById('f_correo').value = c.correo || '';
     document.getElementById('f_area').value = c.area || 'Operaciones';
     document.getElementById('f_tienda').value = a.ubicacion;
+    document.getElementById('f_contractual').value = c.estado_contractual || 'Vigente';
     document.getElementById('f_marca').value = a.marca;
     document.getElementById('f_modelo').value = a.modelo;
     document.getElementById('f_serie').value = a.serie;
@@ -307,6 +356,15 @@ function editarActivo(serie) {
     document.getElementById('f_fecha_ent').value = a.fecha_entrega;
     document.getElementById('f_ent_it').value = a.entrega_it;
     document.getElementById('f_obs').value = a.observaciones;
+
+    document.getElementById('sw_equipo').checked = !!a.marca_cel;
+    document.getElementById('f_mar_cel').value = a.marca_cel || '';
+    document.getElementById('f_mod_cel').value = a.modelo_cel || '';
+    document.getElementById('f_imei').value = a.imei_cel || '';
+    document.getElementById('sw_sim').checked = !!a.imei_sim;
+    document.getElementById('f_imsi').value = a.imei_sim || '';
+
+    toggleTelefonia();
     abrirFicha();
 }
 
@@ -322,18 +380,17 @@ function intentarLogin() {
 function showView(v) {
     document.getElementById('view-inventory').classList.toggle('hidden', v !== 'inventory');
     document.getElementById('view-metrics').classList.toggle('hidden', v !== 'metrics');
+    document.getElementById('btn-inv').classList.toggle('active', v === 'inventory');
+    document.getElementById('btn-metrics').classList.toggle('active', v === 'metrics');
 }
 
 function initCharts() {
     if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy();
-    const a = {}, e = {}; DB_COLABS.forEach(x => a[x.area] = (a[x.area] || 0) + 1); DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
+    const a = {}, e = {}; 
+    DB_COLABS.forEach(x => a[x.area] = (a[x.area] || 0) + 1); 
+    DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
     charts.a = new Chart(document.getElementById('chartArea').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b','#3b82f6'] }] }, options: { maintainAspectRatio: false } });
     charts.e = new Chart(document.getElementById('chartEstado').getContext('2d'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Equipos', data: Object.values(e), backgroundColor: '#E31837' }] }, options: { maintainAspectRatio: false } });
-}
-
-function toggleTelefonia() {
-    const eq = document.getElementById('sw_equipo').checked;
-    ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { document.getElementById(id).disabled = !eq; });
 }
 
 function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); setupListeners(); }
