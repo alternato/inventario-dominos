@@ -42,6 +42,9 @@
         input:checked + .slider:before { transform: translateX(20px); }
         .disabled-field { background-color: #f1f5f9 !important; color: #94a3b8 !important; cursor: not-allowed !important; }
         .hidden { display: none !important; }
+        
+        /* Estilo para el área de carga CSV */
+        .csv-panel { background: white; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 15px; display: flex; align-items: center; gap: 20px; }
     </style>
 </head>
 <body>
@@ -70,7 +73,19 @@
         </header>
         <div class="content-area">
             <div id="view-inventory">
+                
+                <div class="csv-panel">
+                    <div>
+                        <label style="font-weight: 800; color: var(--primary); font-size: 11px; display: block; margin-bottom: 5px;">IMPORTAR MAESTRO (.CSV)</label>
+                        <input type="file" id="csvFile" accept=".csv">
+                    </div>
+                    <button onclick="procesarCSV()" class="nav-btn" style="width: auto; background: var(--dark); margin: 0;">
+                        <i class="fas fa-file-import"></i> PROCESAR CARGA
+                    </button>
+                </div>
+
                 <input type="text" id="mainSearch" placeholder="Filtro rápido (RUT, Persona, Serie...)" style="width: 100%; margin-bottom: 15px; padding: 10px; border-radius: 8px; border: 1px solid var(--border);" oninput="renderMasterTable()">
+                
                 <div class="table-container">
                     <table>
                         <thead>
@@ -82,6 +97,7 @@
                     </table>
                 </div>
             </div>
+
             <div id="view-metrics" class="hidden">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div style="background:white; padding:20px; border-radius:12px; height: 400px;"><canvas id="chartArea"></canvas></div>
@@ -141,6 +157,89 @@ const TIENDAS = ["Casa Matriz", "Bodega Central", "Santiago Alameda", "Viña 15 
 
 let DB_ACTIVOS = []; let DB_COLABS = []; let charts = {};
 
+// --- FUNCIONES DE CARGA CSV ---
+
+async function procesarCSV() {
+    const fileInput = document.getElementById('csvFile');
+    if (!fileInput.files[0]) return alert("Selecciona un archivo CSV");
+
+    const reader = new FileReader();
+    reader.readAsText(fileInput.files[0], 'UTF-8');
+    
+    reader.onload = async function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/);
+        
+        let successCount = 0;
+        let errorCount = 0;
+
+        // Empezamos en 1 para saltar cabecera
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+
+            // Split considerando que los campos pueden venir entre comillas
+            const col = lines[i].split(',').map(item => item.replace(/^"|"$/g, '').trim());
+
+            if (col.length < 10) continue;
+
+            // Mapeo según tus campos: 0:Rut, 1:Persona, 2:Fecha, 3:Estado, 4:Correo, 5:Area, 6:Ubicación, 7:Marca, 8:Modelo, 9:Serie...
+            const payloadColab = {
+                rut: col[0],
+                nombre: col[1],
+                correo: col[4],
+                area: col[5]
+            };
+
+            const payloadActivo = {
+                serie: col[9],
+                rut_responsable: col[0],
+                fecha_entrega: formatearFecha(col[2]),
+                estado: col[3] || 'Asignado',
+                ubicacion: col[6],
+                marca: col[7],
+                modelo: col[8],
+                entrega_it: col[13],
+                observaciones: col[15]
+            };
+
+            try {
+                // Upsert Colab
+                await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, {
+                    method: 'POST',
+                    headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify(payloadColab)
+                });
+
+                // Upsert Activo
+                const resA = await fetch(`${CONFIG.URL}/rest/v1/activos`, {
+                    method: 'POST',
+                    headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+                    body: JSON.stringify(payloadActivo)
+                });
+
+                if (resA.ok) successCount++; else errorCount++;
+            } catch (err) {
+                errorCount++;
+            }
+        }
+
+        alert(`Carga Masiva Finalizada\n✅ Éxitos: ${successCount}\n❌ Errores: ${errorCount}`);
+        cargarTodo();
+    };
+}
+
+function formatearFecha(str) {
+    if(!str) return null;
+    // Intenta convertir DD/MM/YYYY o DD-MM-YYYY a YYYY-MM-DD
+    const parts = str.split(/[\/-]/);
+    if(parts.length === 3) {
+        if(parts[2].length === 4) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return str;
+}
+
+// --- LOGICA DE LA APP ---
+
 function toggleTelefonia() {
     const eq = document.getElementById('sw_equipo').checked;
     const sim = document.getElementById('sw_sim').checked;
@@ -169,7 +268,6 @@ function editarActivo(serie) {
     document.getElementById('f_ent_it').value = activo.entrega_it || '';
     document.getElementById('f_obs').value = activo.observaciones || '';
 
-    // Telefonía
     document.getElementById('sw_equipo').checked = !!activo.marca_cel;
     document.getElementById('f_mar_cel').value = activo.marca_cel || '';
     document.getElementById('f_mod_cel').value = activo.modelo_cel || '';
@@ -234,40 +332,27 @@ async function guardarTodoSincronizado() {
     };
 
     try {
-        // UPSERT Colaboradores
         await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, {
             method: 'POST',
-            headers: { 
-                "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, 
-                "Content-Type": "application/json", 
-                "Prefer": "resolution=merge-duplicates" 
-            },
+            headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
             body: JSON.stringify(colab)
         });
 
-        // UPSERT Activos (Esta es la clave para evitar el error de llave duplicada)
         const resA = await fetch(`${CONFIG.URL}/rest/v1/activos`, {
             method: 'POST',
-            headers: { 
-                "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, 
-                "Content-Type": "application/json", 
-                "Prefer": "resolution=merge-duplicates" 
-            },
+            headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
             body: JSON.stringify(activo)
         });
 
         if (resA.ok) {
-            alert("¡Sincronización Exitosa! El registro se ha creado o actualizado correctamente.");
+            alert("¡Sincronización Exitosa!");
             cerrarFicha();
             cargarTodo();
         } else {
             alert("Error en Supabase: " + await resA.text());
         }
-    } catch(e) {
-        alert("Error de red.");
-    } finally {
-        btn.innerText = "GUARDAR CAMBIOS"; btn.disabled = false;
-    }
+    } catch(e) { alert("Error de red."); } 
+    finally { btn.innerText = "GUARDAR REGISTRO"; btn.disabled = false; }
 }
 
 function intentarLogin() {
@@ -288,7 +373,10 @@ function showView(v) {
 
 function initCharts() {
     if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy();
-    const a = {}, e = {}; DB_COLABS.forEach(x => a[x.area] = (a[x.area] || 0) + 1); DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
+    const a = {}, e = {}; 
+    DB_COLABS.forEach(x => a[x.area] = (a[x.area] || 0) + 1); 
+    DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
+    
     charts.a = new Chart(document.getElementById('chartArea').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b','#3b82f6'] }] }, options: { maintainAspectRatio: false } });
     charts.e = new Chart(document.getElementById('chartEstado').getContext('2d'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Equipos', data: Object.values(e), backgroundColor: '#E31837' }] }, options: { maintainAspectRatio: false } });
 }
