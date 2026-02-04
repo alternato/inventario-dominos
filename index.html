@@ -42,9 +42,7 @@
         input:checked + .slider:before { transform: translateX(20px); }
         .disabled-field { background-color: #f1f5f9 !important; color: #94a3b8 !important; cursor: not-allowed !important; }
         .hidden { display: none !important; }
-        
-        /* Estilo para el área de carga CSV */
-        .csv-panel { background: white; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 15px; display: flex; align-items: center; gap: 20px; }
+        .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
     </style>
 </head>
 <body>
@@ -73,14 +71,13 @@
         </header>
         <div class="content-area">
             <div id="view-inventory">
-                
                 <div class="csv-panel">
                     <div>
-                        <label style="font-weight: 800; color: var(--primary); font-size: 11px; display: block; margin-bottom: 5px;">IMPORTAR MAESTRO (.CSV)</label>
+                        <label style="display:block; font-size:10px; font-weight:800; color:var(--primary); margin-bottom:5px;">IMPORTAR MAESTRO CSV (17 COLUMNAS)</label>
                         <input type="file" id="csvFile" accept=".csv">
                     </div>
-                    <button onclick="procesarCSV()" class="nav-btn" style="width: auto; background: var(--dark); margin: 0;">
-                        <i class="fas fa-file-import"></i> PROCESAR CARGA
+                    <button onclick="procesarCSV()" class="nav-btn" style="width:auto; background:var(--dark); margin:0;">
+                        <i class="fas fa-upload"></i> CARGAR DATOS
                     </button>
                 </div>
 
@@ -97,7 +94,6 @@
                     </table>
                 </div>
             </div>
-
             <div id="view-metrics" class="hidden">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div style="background:white; padding:20px; border-radius:12px; height: 400px;"><canvas id="chartArea"></canvas></div>
@@ -114,7 +110,11 @@
         <div class="form-grid">
             <div class="section-tag">1. Colaborador</div>
             <div class="field"><label>RUT *</label><input type="text" id="f_rut" placeholder="11.222.333-k"></div>
-            <div class="field" style="grid-column: span 2;"><label>Nombre Completo *</label><input type="text" id="f_nombre"></div>
+            <div class="field" style="grid-column: span 2;">
+                <label>Nombre Completo *</label>
+                <input type="text" id="f_nombre" list="listaNombres">
+                <datalist id="listaNombres"></datalist>
+            </div>
             <div class="field"><label>Correo</label><input type="email" id="f_correo"></div>
             <div class="field"><label>Área</label><select id="f_area">
                 <option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option>
@@ -142,7 +142,7 @@
         </div>
         <div style="margin-top: 25px; text-align: right;">
             <button onclick="cerrarFicha()" style="padding: 10px 20px; border: none; cursor: pointer; background: #f1f5f9; border-radius: 8px;">Cancelar</button>
-            <button onclick="guardarTodoSincronizado()" id="btnSave" style="background: var(--primary); color: white; padding: 10px 40px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">GUARDAR REGISTRO</button>
+            <button onclick="guardarTodoSincronizado()" id="btnSave" style="background: var(--primary); color: white; padding: 10px 40px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">GUARDAR CAMBIOS</button>
         </div>
     </div>
 </div>
@@ -154,141 +154,131 @@ const CONFIG = {
 };
 
 const TIENDAS = ["Casa Matriz", "Bodega Central", "Santiago Alameda", "Viña 15 Norte", "Antofagasta Regional", "Concepción", "La Serena", "Puerto Montt"];
-
 let DB_ACTIVOS = []; let DB_COLABS = []; let charts = {};
 
-// --- FUNCIONES DE CARGA CSV ---
+// --- LÓGICA DE RUT Y SUGERENCIAS ---
+function formatearRut(rut) {
+    let valor = rut.replace(/\./g, '').replace(/-/g, '').toLowerCase();
+    if (valor.length < 2) return valor;
+    let cuerpo = valor.slice(0, -1);
+    let dv = valor.slice(-1);
+    return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "-" + dv;
+}
 
-async function procesarCSV() {
-    const fileInput = document.getElementById('csvFile');
-    if (!fileInput.files[0]) return alert("Selecciona un archivo CSV");
+function setupListeners() {
+    const inputRut = document.getElementById('f_rut');
+    const inputNombre = document.getElementById('f_nombre');
+    const inputCorreo = document.getElementById('f_correo');
 
-    const reader = new FileReader();
-    reader.readAsText(fileInput.files[0], 'UTF-8');
-    
-    reader.onload = async function(e) {
-        const text = e.target.result;
-        const lines = text.split(/\r?\n/);
-        
-        let successCount = 0;
-        let errorCount = 0;
+    inputRut.addEventListener('blur', () => {
+        inputRut.value = formatearRut(inputRut.value);
+        const c = DB_COLABS.find(x => x.rut === inputRut.value);
+        if(c) {
+            inputNombre.value = c.nombre;
+            inputCorreo.value = c.correo;
+            document.getElementById('f_area').value = c.area || 'Operaciones';
+        }
+    });
 
-        // Empezamos en 1 para saltar cabecera
-        for (let i = 1; i < lines.length; i++) {
-            if (!lines[i].trim()) continue;
-
-            // Split considerando que los campos pueden venir entre comillas
-            const col = lines[i].split(',').map(item => item.replace(/^"|"$/g, '').trim());
-
-            if (col.length < 10) continue;
-
-            // Mapeo según tus campos: 0:Rut, 1:Persona, 2:Fecha, 3:Estado, 4:Correo, 5:Area, 6:Ubicación, 7:Marca, 8:Modelo, 9:Serie...
-            const payloadColab = {
-                rut: col[0],
-                nombre: col[1],
-                correo: col[4],
-                area: col[5]
-            };
-
-            const payloadActivo = {
-                serie: col[9],
-                rut_responsable: col[0],
-                fecha_entrega: formatearFecha(col[2]),
-                estado: col[3] || 'Asignado',
-                ubicacion: col[6],
-                marca: col[7],
-                modelo: col[8],
-                entrega_it: col[13],
-                observaciones: col[15]
-            };
-
-            try {
-                // Upsert Colab
-                await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, {
-                    method: 'POST',
-                    headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
-                    body: JSON.stringify(payloadColab)
-                });
-
-                // Upsert Activo
-                const resA = await fetch(`${CONFIG.URL}/rest/v1/activos`, {
-                    method: 'POST',
-                    headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
-                    body: JSON.stringify(payloadActivo)
-                });
-
-                if (resA.ok) successCount++; else errorCount++;
-            } catch (err) {
-                errorCount++;
-            }
+    inputNombre.addEventListener('input', () => {
+        // Autocompletado desde Datalist (nombre -> rut)
+        const c = DB_COLABS.find(x => x.nombre === inputNombre.value);
+        if(c) {
+            inputRut.value = c.rut;
+            inputCorreo.value = c.correo;
         }
 
-        alert(`Carga Masiva Finalizada\n✅ Éxitos: ${successCount}\n❌ Errores: ${errorCount}`);
+        // Sugerencia de correo Domino's
+        if (inputCorreo.value === "" || inputCorreo.value.includes('@dominos.cl')) {
+            const parts = inputNombre.value.toLowerCase().trim().split(" ");
+            if (parts.length >= 2) {
+                inputCorreo.value = `${parts[0][0]}${parts[1]}@dominos.cl`.replace(/\s/g, '');
+            }
+        }
+    });
+}
+
+// --- CARGA CSV (17 COLUMNAS) ---
+async function procesarCSV() {
+    const fileInput = document.getElementById('csvFile');
+    if (!fileInput.files[0]) return alert("Selecciona un CSV");
+    const reader = new FileReader();
+    reader.readAsText(fileInput.files[0], 'UTF-8');
+    reader.onload = async function(e) {
+        const lines = e.target.result.split(/\r?\n/);
+        let count = 0;
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const col = lines[i].split(',').map(v => v.replace(/^"|"$/g, '').trim());
+            if (col.length < 10) continue;
+
+            const colab = { rut: formatearRut(col[0]), nombre: col[1], correo: col[4], area: col[5] };
+            const activo = {
+                serie: col[9], rut_responsable: colab.rut, ubicacion: col[6], marca: col[7], modelo: col[8],
+                estado: col[3], fecha_entrega: formatearFechaCSV(col[2]), entrega_it: col[13], observaciones: col[15]
+            };
+
+            await fetch(`${CONFIG.URL}/rest/v1/colaboradores?on_conflict=rut`, {
+                method: 'POST', headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify(colab)
+            });
+            await fetch(`${CONFIG.URL}/rest/v1/activos?on_conflict=serie`, {
+                method: 'POST', headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+                body: JSON.stringify(activo)
+            });
+            count++;
+        }
+        alert("Carga de " + count + " registros completa.");
         cargarTodo();
     };
 }
 
-function formatearFecha(str) {
+function formatearFechaCSV(str) {
     if(!str) return null;
-    // Intenta convertir DD/MM/YYYY o DD-MM-YYYY a YYYY-MM-DD
-    const parts = str.split(/[\/-]/);
-    if(parts.length === 3) {
-        if(parts[2].length === 4) return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
-    return str;
+    const p = str.split(/[\/-]/);
+    return (p.length === 3 && p[2].length === 4) ? `${p[2]}-${p[1]}-${p[0]}` : str;
 }
 
-// --- LOGICA DE LA APP ---
+// --- RESTO DE FUNCIONES ---
+async function guardarTodoSincronizado() {
+    const btn = document.getElementById('btnSave');
+    btn.innerText = "PROCESANDO..."; btn.disabled = true;
 
-function toggleTelefonia() {
-    const eq = document.getElementById('sw_equipo').checked;
-    const sim = document.getElementById('sw_sim').checked;
-    ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => {
-        document.getElementById(id).disabled = !eq;
-        document.getElementById(id).classList.toggle('disabled-field', !eq);
-    });
-    document.getElementById('f_imsi').disabled = !sim;
-    document.getElementById('f_imsi').classList.toggle('disabled-field', !sim);
-}
+    const colab = { rut: document.getElementById('f_rut').value, nombre: document.getElementById('f_nombre').value, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value };
+    const activo = { 
+        serie: document.getElementById('f_serie').value, rut_responsable: colab.rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, 
+        estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value || null, 
+        entrega_it: document.getElementById('f_ent_it').value, observaciones: document.getElementById('f_obs').value,
+        marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null,
+        modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
+        imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
+        imei_sim: document.getElementById('sw_sim').checked ? document.getElementById('f_imsi').value : null
+    };
 
-function editarActivo(serie) {
-    const activo = DB_ACTIVOS.find(a => a.serie === serie);
-    const colab = DB_COLABS.find(c => c.rut === activo.rut_responsable) || {};
-    
-    document.getElementById('f_rut').value = activo.rut_responsable || '';
-    document.getElementById('f_nombre').value = colab.nombre || '';
-    document.getElementById('f_correo').value = colab.correo || '';
-    document.getElementById('f_area').value = colab.area || 'Operaciones';
-    document.getElementById('f_tienda').value = activo.ubicacion || TIENDAS[0];
-    document.getElementById('f_marca').value = activo.marca || '';
-    document.getElementById('f_modelo').value = activo.modelo || '';
-    document.getElementById('f_serie').value = activo.serie || '';
-    document.getElementById('f_estado').value = activo.estado || 'Asignado';
-    document.getElementById('f_fecha_ent').value = activo.fecha_entrega || '';
-    document.getElementById('f_ent_it').value = activo.entrega_it || '';
-    document.getElementById('f_obs').value = activo.observaciones || '';
+    try {
+        await fetch(`${CONFIG.URL}/rest/v1/colaboradores?on_conflict=rut`, {
+            method: 'POST', headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+            body: JSON.stringify(colab)
+        });
+        const resA = await fetch(`${CONFIG.URL}/rest/v1/activos?on_conflict=serie`, {
+            method: 'POST', headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
+            body: JSON.stringify(activo)
+        });
 
-    document.getElementById('sw_equipo').checked = !!activo.marca_cel;
-    document.getElementById('f_mar_cel').value = activo.marca_cel || '';
-    document.getElementById('f_mod_cel').value = activo.modelo_cel || '';
-    document.getElementById('f_imei').value = activo.imei_cel || '';
-    document.getElementById('sw_sim').checked = !!activo.imei_sim;
-    document.getElementById('f_imsi').value = activo.imei_sim || '';
-
-    toggleTelefonia();
-    abrirFicha();
+        if (resA.ok) { alert("¡Sincronizado!"); cerrarFicha(); cargarTodo(); }
+        else { alert("Error: " + await resA.text()); }
+    } catch(e) { alert("Error de red"); }
+    finally { btn.innerText = "GUARDAR CAMBIOS"; btn.disabled = false; }
 }
 
 async function cargarTodo() {
-    try {
-        const [resA, resC] = await Promise.all([
-            fetch(`${CONFIG.URL}/rest/v1/activos?select=*`, { headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}` } }).then(r => r.json()),
-            fetch(`${CONFIG.URL}/rest/v1/colaboradores?select=*`, { headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}` } }).then(r => r.json())
-        ]);
-        DB_ACTIVOS = resA; DB_COLABS = resC;
-        renderMasterTable();
-        initCharts();
-    } catch (e) { console.error(e); }
+    const [resA, resC] = await Promise.all([
+        fetch(`${CONFIG.URL}/rest/v1/activos?select=*`, { headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}` } }).then(r => r.json()),
+        fetch(`${CONFIG.URL}/rest/v1/colaboradores?select=*`, { headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}` } }).then(r => r.json())
+    ]);
+    DB_ACTIVOS = resA; DB_COLABS = resC;
+    document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c => `<option value="${c.nombre}">`).join('');
+    renderMasterTable(); initCharts();
 }
 
 function renderMasterTable() {
@@ -297,62 +287,27 @@ function renderMasterTable() {
     b.innerHTML = DB_ACTIVOS.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', area: '-' };
         if(!c.nombre.toLowerCase().includes(s) && !a.serie.toLowerCase().includes(s) && !a.rut_responsable?.toLowerCase().includes(s)) return '';
-        return `<tr>
-            <td>${a.rut_responsable || '-'}</td><td>${c.nombre}</td><td>${a.estado}</td><td>${c.area}</td><td>${a.ubicacion || '-'}</td><td>${a.marca} ${a.modelo}</td><td><code>${a.serie}</code></td><td>${a.entrega_it || '-'}</td>
-            <td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)" onclick="editarActivo('${a.serie}')"></i></td>
-        </tr>`;
+        return `<tr><td>${a.rut_responsable || '-'}</td><td>${c.nombre}</td><td>${a.estado}</td><td>${c.area}</td><td>${a.ubicacion || '-'}</td><td>${a.marca} ${a.modelo}</td><td><code>${a.serie}</code></td><td>${a.entrega_it || '-'}</td>
+            <td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)" onclick="editarActivo('${a.serie}')"></i></td></tr>`;
     }).join('');
 }
 
-async function guardarTodoSincronizado() {
-    const btn = document.getElementById('btnSave');
-    btn.innerText = "ACTUALIZANDO..."; btn.disabled = true;
-
-    const colab = { 
-        rut: document.getElementById('f_rut').value, 
-        nombre: document.getElementById('f_nombre').value, 
-        correo: document.getElementById('f_correo').value, 
-        area: document.getElementById('f_area').value 
-    };
-
-    const activo = { 
-        serie: document.getElementById('f_serie').value, 
-        rut_responsable: colab.rut, 
-        marca: document.getElementById('f_marca').value, 
-        modelo: document.getElementById('f_modelo').value, 
-        estado: document.getElementById('f_estado').value, 
-        ubicacion: document.getElementById('f_tienda').value, 
-        fecha_entrega: document.getElementById('f_fecha_ent').value || null, 
-        entrega_it: document.getElementById('f_ent_it').value, 
-        observaciones: document.getElementById('f_obs').value,
-        marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null,
-        modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
-        imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
-        imei_sim: document.getElementById('sw_sim').checked ? document.getElementById('f_imsi').value : null
-    };
-
-    try {
-        await fetch(`${CONFIG.URL}/rest/v1/colaboradores`, {
-            method: 'POST',
-            headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
-            body: JSON.stringify(colab)
-        });
-
-        const resA = await fetch(`${CONFIG.URL}/rest/v1/activos`, {
-            method: 'POST',
-            headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" },
-            body: JSON.stringify(activo)
-        });
-
-        if (resA.ok) {
-            alert("¡Sincronización Exitosa!");
-            cerrarFicha();
-            cargarTodo();
-        } else {
-            alert("Error en Supabase: " + await resA.text());
-        }
-    } catch(e) { alert("Error de red."); } 
-    finally { btn.innerText = "GUARDAR REGISTRO"; btn.disabled = false; }
+function editarActivo(serie) {
+    const a = DB_ACTIVOS.find(x => x.serie === serie);
+    const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || {};
+    document.getElementById('f_rut').value = a.rut_responsable;
+    document.getElementById('f_nombre').value = c.nombre || '';
+    document.getElementById('f_correo').value = c.correo || '';
+    document.getElementById('f_area').value = c.area || 'Operaciones';
+    document.getElementById('f_tienda').value = a.ubicacion;
+    document.getElementById('f_marca').value = a.marca;
+    document.getElementById('f_modelo').value = a.modelo;
+    document.getElementById('f_serie').value = a.serie;
+    document.getElementById('f_estado').value = a.estado;
+    document.getElementById('f_fecha_ent').value = a.fecha_entrega;
+    document.getElementById('f_ent_it').value = a.entrega_it;
+    document.getElementById('f_obs').value = a.observaciones;
+    abrirFicha();
 }
 
 function intentarLogin() {
@@ -361,27 +316,27 @@ function intentarLogin() {
         document.getElementById('app').classList.remove('hidden');
         document.getElementById('f_tienda').innerHTML = TIENDAS.map(t => `<option>${t}</option>`).join('');
         cargarTodo();
-    } else { alert("Acceso denegado"); }
+    } else { alert("Denegado"); }
 }
 
 function showView(v) {
     document.getElementById('view-inventory').classList.toggle('hidden', v !== 'inventory');
     document.getElementById('view-metrics').classList.toggle('hidden', v !== 'metrics');
-    document.getElementById('btn-inv').classList.toggle('active', v === 'inventory');
-    document.getElementById('btn-metrics').classList.toggle('active', v === 'metrics');
 }
 
 function initCharts() {
     if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy();
-    const a = {}, e = {}; 
-    DB_COLABS.forEach(x => a[x.area] = (a[x.area] || 0) + 1); 
-    DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
-    
+    const a = {}, e = {}; DB_COLABS.forEach(x => a[x.area] = (a[x.area] || 0) + 1); DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado] || 0) + 1);
     charts.a = new Chart(document.getElementById('chartArea').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b','#3b82f6'] }] }, options: { maintainAspectRatio: false } });
     charts.e = new Chart(document.getElementById('chartEstado').getContext('2d'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Equipos', data: Object.values(e), backgroundColor: '#E31837' }] }, options: { maintainAspectRatio: false } });
 }
 
-function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
+function toggleTelefonia() {
+    const eq = document.getElementById('sw_equipo').checked;
+    ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { document.getElementById(id).disabled = !eq; });
+}
+
+function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); setupListeners(); }
 function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 </script>
 </body>
