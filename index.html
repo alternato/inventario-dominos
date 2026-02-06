@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v67.4 - Domino's Pizza Chile</title>
+    <title>TI Maestro v67.5 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -81,8 +82,19 @@
 <div id="loginPage" class="modal" style="background: var(--primary);">
     <div class="modal-content" style="max-width: 380px; text-align: center;">
         <img src="https://logos-world.net/wp-content/uploads/2021/08/Dominos-Logo.png" class="logo-img">
-        <input type="password" id="passInput" placeholder="Clave TI" style="text-align: center; margin-bottom: 20px; width: 100%;">
-        <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center; font-weight: 700;">ACCEDER</button>
+        
+        <button onclick="signInWithMicrosoft()" class="nav-btn" style="background: #2f2f2f; color: white; justify-content: center; font-weight: 700; margin-bottom: 20px; border: 1px solid #444;">
+            <i class="fab fa-microsoft"></i> Ingresar con Domino's
+        </button>
+
+        <div style="display: flex; align-items: center; margin: 15px 0; opacity: 0.5;">
+            <hr style="flex-grow: 1; border: 0; border-top: 1px solid #000;">
+            <span style="padding: 0 10px; font-size: 10px;">O ACCESO ADMINISTRATIVO</span>
+            <hr style="flex-grow: 1; border: 0; border-top: 1px solid #000;">
+        </div>
+
+        <input type="password" id="passInput" placeholder="Clave de Respaldo" style="text-align: center; margin-bottom: 10px; width: 100%;">
+        <button onclick="intentarLogin()" class="nav-btn" style="background: var(--secondary); justify-content: center; font-weight: 700;">ACCEDER MANUALMENTE</button>
     </div>
 </div>
 
@@ -94,12 +106,16 @@
         <button class="nav-btn" id="btn-metrics" onclick="showView('metrics')"><i class="fas fa-chart-pie"></i> Reportes TI</button>
         <hr style="margin: 20px 0; opacity: 0.2;">
         <button class="nav-btn" style="background: var(--success);" onclick="abrirFicha()"><i class="fas fa-plus-circle"></i> NUEVO REGISTRO</button>
+        <button class="nav-btn" style="background: rgba(0,0,0,0.3); margin-top: auto;" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
     </aside>
 
     <main class="main-container">
         <header>
             <h2 id="viewTitle">Dashboard General</h2>
-            <div id="sync" style="font-size: 11px; color: #22c55e; font-weight: 700;"><i class="fas fa-wifi"></i> CONECTADO A SUPABASE</div>
+            <div id="sync" style="font-size: 11px; color: #22c55e; font-weight: 700;">
+                <span id="userEmail" style="margin-right: 10px; color: #64748b;">Invitado</span>
+                <i class="fas fa-wifi"></i> ONLINE
+            </div>
         </header>
         <div class="content-area">
             
@@ -243,16 +259,55 @@
 </div>
 
 <script>
-// PLUGIN CHARTS
+// INIT PLUGINS
 Chart.register(ChartDataLabels);
 
+// CONFIG & CLIENT
 const CONFIG = {
     URL: "https://ivjwxvhixrskraepqzse.supabase.co",
     KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o"
 };
+const supabase = supabase.createClient(CONFIG.URL, CONFIG.KEY);
 
 const TIENDAS = ["Casa Matriz", "Bodega Central", "Santiago Alameda", "Viña 15 Norte", "Antofagasta Regional", "Concepción", "La Serena", "Puerto Montt"];
 let DB_ACTIVOS = []; let DB_COLABS = []; let charts = {};
+
+// --- AUTH LOGIC ---
+async function signInWithMicrosoft() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'azure',
+        options: {
+            scopes: 'email',
+            queryParams: { prompt: 'select_account' },
+        },
+    });
+}
+
+function cerrarSesion() {
+    supabase.auth.signOut();
+    document.getElementById('app').classList.add('hidden');
+    document.getElementById('loginPage').classList.remove('hidden');
+}
+
+// CHECK AUTH STATE
+supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('userEmail').innerText = session.user.email;
+        document.getElementById('f_tienda').innerHTML = TIENDAS.map(t=>`<option>${t}</option>`).join('');
+        cargarTodo();
+    }
+});
+
+function intentarLogin() {
+    if(document.getElementById('passInput').value==="DominoTI2026") {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('f_tienda').innerHTML = TIENDAS.map(t=>`<option>${t}</option>`).join('');
+        cargarTodo();
+    } else alert("Clave incorrecta");
+}
 
 // --- UTILS ---
 function formatearRut(rut) {
@@ -265,7 +320,7 @@ function formatearRut(rut) {
 }
 function setSelect(id, val) { const el = document.getElementById(id); if(el) el.value = val; }
 
-// --- UI LOGIC ---
+// --- UI LISTENERS ---
 function setupListeners() {
     const inputRut = document.getElementById('f_rut');
     const inputNombre = document.getElementById('f_nombre');
@@ -306,7 +361,7 @@ function toggleTelefonia() {
     const simEl = document.getElementById('f_imsi'); simEl.disabled = !sim; simEl.classList.toggle('disabled-field', !sim); if(!sim) simEl.value = "";
 }
 
-// --- CORE ---
+// --- DATA ---
 async function cargarTodo() {
     try {
         const [resA, resC] = await Promise.all([
@@ -322,12 +377,10 @@ async function cargarTodo() {
     } catch(e) { console.error(e); }
 }
 
-// --- NUEVA FUNCION: VER USUARIO ---
+// --- MODAL USUARIO ---
 function verUsuario(rut) {
     const colab = DB_COLABS.find(c => c.rut === rut);
-    if (!colab) return alert("Usuario no encontrado en base de datos de colaboradores");
-
-    // Filtrar todos los activos de este usuario
+    if (!colab) return;
     const activos = DB_ACTIVOS.filter(a => a.rut_responsable === rut);
 
     const html = `
@@ -348,7 +401,7 @@ function verUsuario(rut) {
                     <div>
                         <div style="font-weight:700; color:var(--dark)">${a.marca} ${a.modelo}</div>
                         <div style="font-size:11px; color:#64748b">Serie: <code style="color:var(--primary)">${a.serie}</code></div>
-                        ${a.marca_cel ? `<div style="font-size:10px; color:#64748b; margin-top:2px;"><i class="fas fa-mobile-alt"></i> ${a.marca_cel} ${a.modelo_cel} (IMEI: ${a.imei_cel})</div>` : ''}
+                        ${a.marca_cel ? `<div style="font-size:10px; color:#64748b; margin-top:2px;"><i class="fas fa-mobile-alt"></i> ${a.marca_cel} (IMEI: ${a.imei_cel})</div>` : ''}
                     </div>
                     <div style="text-align:right;">
                         <span style="font-size:10px; background:#f1f5f9; padding:3px 6px; border-radius:4px;">${a.estado}</span>
@@ -358,11 +411,11 @@ function verUsuario(rut) {
             `).join('') : '<p style="color:#64748b; font-style:italic;">No tiene equipos asignados actualmente.</p>'}
         </ul>
     `;
-
     document.getElementById('userProfileContent').innerHTML = html;
     document.getElementById('modalVerUsuario').classList.remove('hidden');
 }
 
+// --- DASHBOARD ---
 function actualizarKPIs() {
     const total = DB_ACTIVOS.length;
     const disponibles = DB_ACTIVOS.filter(a => a.estado === 'Disponible').length;
@@ -435,7 +488,7 @@ async function procesarCSV() {
 }
 function formatearFechaCSV(str) { if(!str) return null; const p = str.split(/[\/-]/); return (p.length === 3 && p[2].length === 4) ? `${p[2]}-${p[1]}-${p[0]}` : str; }
 
-// --- NAV & RENDER ---
+// --- RENDER TABLE ---
 function editarActivo(serie) {
     const a = DB_ACTIVOS.find(x => x.serie === serie); if(!a) return;
     const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || {};
@@ -464,7 +517,6 @@ function renderMasterTable() {
         const tdClass = isSame ? 'dim-text' : '';
         const contractStyle = c.estado_contractual==='Cesado' ? 'color:#b91c1c; font-weight:800;' : 'color:#15803d; font-weight:700;';
 
-        // AQUÍ AÑADÍ EL CLIC AL NOMBRE
         return `<tr class="${trClass}">
             <td class="${tdClass}" style="color:#64748b">${a.rut_responsable}</td>
             <td class="${tdClass} click-name" onclick="verUsuario('${a.rut_responsable}')">${c.nombre}</td>
@@ -479,7 +531,6 @@ function renderMasterTable() {
     }).join('');
 }
 
-function intentarLogin() { if(document.getElementById('passInput').value==="DominoTI2026") { document.getElementById('loginPage').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); document.getElementById('f_tienda').innerHTML = TIENDAS.map(t=>`<option>${t}</option>`).join(''); cargarTodo(); } else alert("Error"); }
 function showView(v) { document.getElementById('view-home').classList.toggle('hidden', v!=='home'); document.getElementById('view-inventory').classList.toggle('hidden', v!=='inventory'); document.getElementById('view-metrics').classList.toggle('hidden', v!=='metrics'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); }
 function initCharts() {
     if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy();
