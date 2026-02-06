@@ -4,128 +4,211 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario Domino's Pizza - Acceso</title>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* Estilos básicos con identidad visual de Domino's */
+        /* --- VARIABLES DE COLOR --- */
+        :root {
+            --dominos-red: #E31837;
+            --dominos-blue: #006491;
+            --bg-gradient-start: #f8f9fa;
+            --bg-gradient-end: #e9ecef;
+        }
+
+        /* --- ESTILOS GENERALES --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            margin: 0;
+            /* Degradado sutil en el fondo en lugar de color plano */
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            overflow: hidden; /* Evita scrollbars por los elementos flotantes */
+            position: relative; /* Necesario para posicionar los elementos absolutos */
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-            margin: 0;
         }
+
+        /* --- CONTENEDOR DE LOS ELEMENTOS FLOTANTES --- */
+        .background-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Para que queden detrás de la tarjeta de login */
+            overflow: hidden;
+        }
+
+        /* --- DISEÑO DE LA FICHA DE DOMINÓ (CSS PURO) --- */
+        .floating-domino {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            background-color: var(--dominos-red);
+            border-radius: 4px;
+            opacity: 0.15; /* Muy sutiles para no distraer */
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+            /* Animación base */
+            animation: floaty 8s ease-in-out infinite alternate;
+        }
+        .floating-domino.blue {
+            background-color: var(--dominos-blue);
+        }
+        /* Variante de tamaño más pequeño para dar profundidad */
+        .floating-domino.small {
+            width: 40px;
+            height: 20px;
+            opacity: 0.1;
+        }
+
+        /* --- ANIMACIÓN DE FLOTACIÓN --- */
+        @keyframes floaty {
+            0% {
+                transform: translateY(0px) rotate(45deg);
+            }
+            100% {
+                 /* Se mueven 30px hacia arriba y rotan un poco más */
+                transform: translateY(-30px) rotate(55deg);
+            }
+        }
+
+        /* --- POSICIONES "ALEATORIAS" MANUALES --- 
+           Diferentes ubicaciones (top/left), duraciones y retrasos de animación 
+           para simular aleatoriedad */
+        .d1 { top: 10%; left: 10%; animation-duration: 7s; }
+        .d2 { top: 20%; right: 15%; animation-delay: 1s; animation-duration: 9s; }
+        .d3 { bottom: 15%; left: 20%; animation-delay: 2s; }
+        .d4 { bottom: 30%; right: 10%; animation-duration: 11s; }
+        .d5 { top: 50%; left: 5%; animation-delay: 0.5s; }
+        .d6 { top: 60%; right: 30%; animation-duration: 8s; }
+        .d7 { top: -5%; left: 50%; animation-delay: 3s; }
+        .d8 { bottom: -5%; right: 40%; animation-duration: 10s; }
+
+
+        /* --- TARJETA DE LOGIN (ESTILO ANTERIOR MEJORADO) --- */
+        .login-container-wrapper {
+            z-index: 10; /* Asegura que esté por encima del fondo */
+            padding: 20px;
+        }
+
         .login-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.95); /* Un poco transparente */
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
             text-align: center;
             max-width: 400px;
             width: 100%;
-            border-top: 5px solid #E31837; /* Rojo Domino's */
+            border-top: 6px solid var(--dominos-red);
+            backdrop-filter: blur(5px); /* Efecto de vidrio esmerilado moderno */
         }
         h1 {
-            color: #006491; /* Azul Domino's */
-            margin-bottom: 1.5rem;
+            color: var(--dominos-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
         }
-        p {
+        .subtitle {
             color: #666;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
         .btn-microsoft {
-            background-color: #2F2F2F; /* Oscuro neutro para Microsoft */
+            background-color: #2F2F2F;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 24px;
             font-size: 16px;
-            border-radius: 5px;
+            font-weight: 600;
+            border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .btn-microsoft:hover {
             background-color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-        .logo-icon {
-            font-weight: bold;
-            font-style: italic;
+        .btn-microsoft:active {
+            transform: translateY(0px);
         }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <h1>Gestión de Inventario</h1>
-        <p>Acceso exclusivo para colaboradores de Domino's Pizza Chile.</p>
-        
-        <button onclick="signInWithMicrosoft()" class="btn-microsoft">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M0 0h11.377v11.372H0zM12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zM12.623 12.623H24V24H12.623z"/></svg>
-            Iniciar Sesión con Corporate
-        </button>
-        
-        <p id="status-msg" style="margin-top: 15px; font-size: 0.9em;"></p>
+    <div class="background-shapes">
+        <div class="floating-domino d1"></div>
+        <div class="floating-domino small d3"></div>
+        <div class="floating-domino d5"></div>
+        <div class="floating-domino small d7"></div>
+        <div class="floating-domino blue d2"></div>
+        <div class="floating-domino blue small d4"></div>
+        <div class="floating-domino blue d6"></div>
+        <div class="floating-domino blue small d8"></div>
+    </div>
+
+    <div class="login-container-wrapper">
+        <div class="login-card">
+            <h1>Gestión de Inventario</h1>
+            <p class="subtitle">Acceso seguro exclusivo para colaboradores de Domino's Pizza Chile.</p>
+            
+            <button onclick="signInWithMicrosoft()" class="btn-microsoft">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M0 0h11.377v11.372H0zM12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zM12.623 12.623H24V24H12.623z"/></svg>
+                Iniciar Sesión Corporativa
+            </button>
+            
+            <p id="status-msg" style="margin-top: 20px; font-size: 0.85em; color: #888; min-height: 20px;"></p>
+        </div>
     </div>
 
     <script>
-        // ---------------------------------------------------------------
-        // 1. CONFIGURACIÓN DE SUPABASE
-        // ---------------------------------------------------------------
-        // Reemplaza estos valores con los de tu proyecto en Supabase
-        // (Están en Project Settings > API)
-        const SUPABASE_URL = 'AQUI_TU_URL_DE_SUPABASE'; 
-        const SUPABASE_ANON_KEY = 'AQUI_TU_KEY_ANON_PUBLIC';
+        // =============================================
+        //  TUS CREDENCIALES DE SUPABASE AQUI
+        // =============================================
+        const SUPABASE_URL = 'https://ivjwxvhixrskraepqzse.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o';
+        // =============================================
 
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ---------------------------------------------------------------
-        // 2. FUNCIÓN DE LOGIN (LA MEJORA)
-        // ---------------------------------------------------------------
         async function signInWithMicrosoft() {
             const statusMsg = document.getElementById('status-msg');
-            statusMsg.innerText = "Conectando con Microsoft...";
+            statusMsg.innerText = "Conectando con Microsoft seguro...";
+            statusMsg.style.color = "#006491";
 
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'azure',
                 options: {
                     scopes: 'email',
-                    queryParams: {
-                        prompt: 'select_account', // Fuerza a elegir cuenta
-                    },
-                    // *** AQUÍ ESTÁ LA MEJORA CLAVE ***
-                    // Esto evita el error de localhost y el bloqueo de palabras
+                    queryParams: { prompt: 'select_account' },
                     redirectTo: 'https://alternato.github.io/inventario-dominos/'
                 },
             });
 
             if (error) {
                 console.error("Error:", error);
-                statusMsg.innerText = "Error al conectar: " + error.message;
+                statusMsg.innerText = "Error: " + error.message;
+                statusMsg.style.color = "#E31837";
             }
         }
 
-        // ---------------------------------------------------------------
-        // 3. VERIFICAR SI YA VOLVIÓ DEL LOGIN
-        // ---------------------------------------------------------------
-        // Este código se ejecuta cuando la página carga.
-        // Revisa si en la URL hay un "access_token" (señal de que ya entró).
-        
         window.onload = async function() {
             const { data: { session } } = await supabase.auth.getSession();
-
             if (session) {
-                // Si ya hay sesión, mostramos el usuario o redirigimos al dashboard
+                // Usuario ya logueado
                 document.querySelector('.login-card').innerHTML = `
-                    <h2 style="color: #006491;">¡Bienvenido!</h2>
-                    <p>Has iniciado sesión como:<br><strong>${session.user.email}</strong></p>
-                    <button onclick="signOut()" class="btn-microsoft" style="background:#E31837;">Cerrar Sesión</button>
+                    <h2 style="color: #006491; margin-bottom: 10px;">¡Hola de nuevo!</h2>
+                    <p style="color: #555; margin-bottom: 25px;">Sesión activa como:<br><strong>${session.user.email}</strong></p>
+                    <button onclick="signOut()" class="btn-microsoft" style="background-color: #E31837;">
+                        Cerrar Sesión
+                    </button>
                 `;
             }
         };
