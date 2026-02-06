@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v67.3 - Domino's Pizza Chile</title>
+    <title>TI Maestro v67.4 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -60,9 +60,20 @@
         .hidden { display: none !important; }
 
         /* ESTILOS PARA AGRUPACIÓN VISUAL EN TABLA */
-        .group-start td { border-top: 2px solid #cbd5e1; } /* Línea divisoria entre personas */
+        .group-start td { border-top: 2px solid #cbd5e1; }
         .group-continue td { border-top: none; padding-top: 4px; padding-bottom: 4px; }
-        .dim-text { opacity: 0; pointer-events: none; } /* Oculta texto repetido pero mantiene estructura */
+        .dim-text { opacity: 0; pointer-events: none; }
+        
+        /* ESTILO LINK NOMBRE */
+        .click-name { cursor: pointer; color: var(--primary); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px; transition: 0.2s; }
+        .click-name:hover { color: var(--secondary); }
+
+        /* MODAL USUARIO */
+        .user-header { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; }
+        .user-avatar { width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; }
+        .asset-list { list-style: none; }
+        .asset-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; border-radius: 8px; transition:0.2s; }
+        .asset-item:hover { background: #f8fafc; border-color: var(--primary); }
     </style>
 </head>
 <body>
@@ -222,8 +233,17 @@
     </div>
 </div>
 
+<div id="modalVerUsuario" class="modal hidden" style="z-index: 1100;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div id="userProfileContent"></div>
+        <div style="text-align: right; margin-top: 20px;">
+            <button onclick="document.getElementById('modalVerUsuario').classList.add('hidden')" style="background: var(--dark); color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: 700;">Cerrar Ficha</button>
+        </div>
+    </div>
+</div>
+
 <script>
-// REGISTRAR PLUGIN DE ETIQUETAS
+// PLUGIN CHARTS
 Chart.register(ChartDataLabels);
 
 const CONFIG = {
@@ -245,7 +265,7 @@ function formatearRut(rut) {
 }
 function setSelect(id, val) { const el = document.getElementById(id); if(el) el.value = val; }
 
-// --- LOGICA UI ---
+// --- UI LOGIC ---
 function setupListeners() {
     const inputRut = document.getElementById('f_rut');
     const inputNombre = document.getElementById('f_nombre');
@@ -302,11 +322,51 @@ async function cargarTodo() {
     } catch(e) { console.error(e); }
 }
 
+// --- NUEVA FUNCION: VER USUARIO ---
+function verUsuario(rut) {
+    const colab = DB_COLABS.find(c => c.rut === rut);
+    if (!colab) return alert("Usuario no encontrado en base de datos de colaboradores");
+
+    // Filtrar todos los activos de este usuario
+    const activos = DB_ACTIVOS.filter(a => a.rut_responsable === rut);
+
+    const html = `
+        <div class="user-header">
+            <div class="user-avatar">${colab.nombre.charAt(0)}</div>
+            <div>
+                <h3 style="margin:0; font-size: 20px; color:var(--dark)">${colab.nombre}</h3>
+                <p style="margin:5px 0; color:#64748b; font-size:12px;">${colab.rut} | ${colab.area}</p>
+                <span style="background:${colab.estado_contractual==='Cesado'?'#fee2e2':'#dcfce7'}; color:${colab.estado_contractual==='Cesado'?'#b91c1c':'#166534'}; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">
+                    ${colab.estado_contractual || 'Vigente'}
+                </span>
+            </div>
+        </div>
+        <h4 style="color:var(--primary); margin-bottom:15px; border-left: 4px solid var(--secondary); padding-left: 10px;">Equipos Asignados (${activos.length})</h4>
+        <ul class="asset-list">
+            ${activos.length > 0 ? activos.map(a => `
+                <li class="asset-item">
+                    <div>
+                        <div style="font-weight:700; color:var(--dark)">${a.marca} ${a.modelo}</div>
+                        <div style="font-size:11px; color:#64748b">Serie: <code style="color:var(--primary)">${a.serie}</code></div>
+                        ${a.marca_cel ? `<div style="font-size:10px; color:#64748b; margin-top:2px;"><i class="fas fa-mobile-alt"></i> ${a.marca_cel} ${a.modelo_cel} (IMEI: ${a.imei_cel})</div>` : ''}
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="font-size:10px; background:#f1f5f9; padding:3px 6px; border-radius:4px;">${a.estado}</span>
+                        <div style="margin-top:5px;"><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)" onclick="document.getElementById('modalVerUsuario').classList.add('hidden'); editarActivo('${a.serie}')"></i></div>
+                    </div>
+                </li>
+            `).join('') : '<p style="color:#64748b; font-style:italic;">No tiene equipos asignados actualmente.</p>'}
+        </ul>
+    `;
+
+    document.getElementById('userProfileContent').innerHTML = html;
+    document.getElementById('modalVerUsuario').classList.remove('hidden');
+}
+
 function actualizarKPIs() {
     const total = DB_ACTIVOS.length;
     const disponibles = DB_ACTIVOS.filter(a => a.estado === 'Disponible').length;
     const mantencion = DB_ACTIVOS.filter(a => a.estado === 'Mantención').length;
-    
     let cesados = 0;
     DB_ACTIVOS.forEach(a => {
         if(a.estado === 'Asignado') {
@@ -320,41 +380,13 @@ function actualizarKPIs() {
     document.getElementById('kpi-mant').innerText = mantencion;
     document.getElementById('kpi-cesados').innerText = cesados;
 
-    // Renderizar tabla inicial (Top 5)
     renderHomeTable(DB_ACTIVOS.slice(0, 5), "Últimos Movimientos");
 
-    // Mini Gráfico con Plugin de Etiquetas
     if(charts.mini) charts.mini.destroy();
     charts.mini = new Chart(document.getElementById('chartMini').getContext('2d'), { 
         type: 'doughnut', 
-        data: { 
-            labels: ['Disponible', 'Asignado', 'Mantención'], 
-            datasets: [{ 
-                data: [disponibles, (total - disponibles - mantencion), mantencion], 
-                backgroundColor: ['#22c55e','#0066CC','#f59e0b'] 
-            }] 
-        },
-        options: { 
-            maintainAspectRatio: false,
-            plugins: { 
-                legend: { display: false }, // Ocultar leyenda lateral
-                datalabels: { // Configurar etiquetas en el gráfico
-                    color: 'white',
-                    font: { weight: 'bold', size: 11 },
-                    formatter: (val, ctx) => {
-                        return val > 0 ? ctx.chart.data.labels[ctx.dataIndex] + '\n' + val : '';
-                    }
-                }
-            },
-            onClick: (e, elements) => { // EVENTO CLICK INTERACTIVO
-                if(elements.length > 0) {
-                    const index = elements[0].index;
-                    const label = charts.mini.data.labels[index]; // Disponible, Asignado, etc.
-                    const filtrados = DB_ACTIVOS.filter(a => a.estado === label);
-                    renderHomeTable(filtrados, `Detalle: ${label} (${filtrados.length})`);
-                }
-            }
-        }
+        data: { labels: ['Disponible', 'Asignado', 'Mantención'], datasets: [{ data: [disponibles, (total - disponibles - mantencion), mantencion], backgroundColor: ['#22c55e','#0066CC','#f59e0b'] }] },
+        options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: 'white', font: { weight: 'bold', size: 11 }, formatter: (val, ctx) => val > 0 ? ctx.chart.data.labels[ctx.dataIndex] + '\n' + val : '' } }, onClick: (e, elements) => { if(elements.length > 0) { const label = charts.mini.data.labels[elements[0].index]; renderHomeTable(DB_ACTIVOS.filter(a => a.estado === label), `Detalle: ${label}`); } } }
     });
 }
 
@@ -362,32 +394,21 @@ function renderHomeTable(data, title) {
     document.getElementById('homeTableTitle').innerText = title;
     const tbody = document.getElementById('lastMovesTable');
     if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">Sin resultados</td></tr>'; return; }
-    
     tbody.innerHTML = data.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
-        return `<tr>
-            <td><div style="font-weight:700; color:var(--primary)">${a.serie}</div><div style="font-size:10px; color:#64748b">${a.rut_responsable}</div></td>
-            <td><div style="font-weight:600;">${c.nombre}</div><div style="font-size:10px;">${a.ubicacion || '-'}</div></td>
-            <td><span style="font-size:11px; padding:2px 6px; border-radius:4px; background:${a.estado==='Disponible'?'#dcfce7':'#f1f5f9'}; color:${a.estado==='Disponible'?'#166534':'#334155'}">${a.estado}</span></td>
-        </tr>`;
+        return `<tr><td><div style="font-weight:700; color:var(--primary)">${a.serie}</div><div style="font-size:10px; color:#64748b">${a.rut_responsable}</div></td><td><div style="font-weight:600;">${c.nombre}</div><div style="font-size:10px;">${a.ubicacion || '-'}</div></td><td><span style="font-size:11px; padding:2px 6px; border-radius:4px; background:${a.estado==='Disponible'?'#dcfce7':'#f1f5f9'}; color:${a.estado==='Disponible'?'#166534':'#334155'}">${a.estado}</span></td></tr>`;
     }).join('');
 }
-
-function resetHomeTable() {
-    renderHomeTable(DB_ACTIVOS.slice(0, 5), "Últimos Movimientos");
-}
+function resetHomeTable() { renderHomeTable(DB_ACTIVOS.slice(0, 5), "Últimos Movimientos"); }
 
 // --- CRUD ---
 async function guardarTodoSincronizado() {
     const btn = document.getElementById('btnSave'); btn.innerText = "GUARDANDO..."; btn.disabled = true;
     const rut = document.getElementById('f_rut').value.trim();
     const serie = document.getElementById('f_serie').value.trim();
-
     if(!rut || !serie) { alert("Datos faltantes"); btn.disabled = false; return; }
-
     const colab = { rut, nombre: document.getElementById('f_nombre').value.trim(), correo: document.getElementById('f_correo').value.trim(), area: document.getElementById('f_area').value, estado_contractual: document.getElementById('f_contractual').value };
     const activo = { serie, rut_responsable: rut, marca: document.getElementById('f_marca').value.trim(), modelo: document.getElementById('f_modelo').value.trim(), estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value || null, entrega_it: document.getElementById('f_ent_it').value.trim(), observaciones: document.getElementById('f_obs').value.trim(), marca_cel: document.getElementById('sw_equipo').checked?document.getElementById('f_mar_cel').value:null, modelo_cel: document.getElementById('sw_equipo').checked?document.getElementById('f_mod_cel').value:null, imei_cel: document.getElementById('sw_equipo').checked?document.getElementById('f_imei').value:null, imei_sim: document.getElementById('sw_sim').checked?document.getElementById('f_imsi').value:null };
-
     try {
         await fetch(`${CONFIG.URL}/rest/v1/colaboradores?on_conflict=rut`, { method: 'POST', headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(colab) });
         await fetch(`${CONFIG.URL}/rest/v1/activos?on_conflict=serie`, { method: 'POST', headers: { "apikey": CONFIG.KEY, "Authorization": `Bearer ${CONFIG.KEY}`, "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates" }, body: JSON.stringify(activo) });
@@ -396,10 +417,8 @@ async function guardarTodoSincronizado() {
 }
 
 async function procesarCSV() {
-    const file = document.getElementById('csvFile').files[0];
-    if (!file) return alert("Selecciona CSV");
-    const reader = new FileReader();
-    reader.readAsText(file, 'UTF-8');
+    const file = document.getElementById('csvFile').files[0]; if (!file) return alert("Selecciona CSV");
+    const reader = new FileReader(); reader.readAsText(file, 'UTF-8');
     reader.onload = async function(e) {
         const lines = e.target.result.split(/\r?\n/);
         for (let i = 1; i < lines.length; i++) {
@@ -416,7 +435,7 @@ async function procesarCSV() {
 }
 function formatearFechaCSV(str) { if(!str) return null; const p = str.split(/[\/-]/); return (p.length === 3 && p[2].length === 4) ? `${p[2]}-${p[1]}-${p[0]}` : str; }
 
-// --- NAV & CHART ---
+// --- NAV & RENDER ---
 function editarActivo(serie) {
     const a = DB_ACTIVOS.find(x => x.serie === serie); if(!a) return;
     const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || {};
@@ -430,31 +449,25 @@ function editarActivo(serie) {
 }
 
 function renderMasterTable() {
-    const b = document.getElementById('masterTableBody'); 
-    const s = document.getElementById('mainSearch').value.toLowerCase();
+    const b = document.getElementById('masterTableBody'); const s = document.getElementById('mainSearch').value.toLowerCase();
     let lastRut = null;
-
-    // 1. Filtrar y Ordenar (CRÍTICO PARA AGRUPACIÓN)
     const filtered = DB_ACTIVOS.filter(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
         return `${a.serie} ${c.nombre} ${a.rut_responsable} ${a.ubicacion}`.toLowerCase().includes(s);
     }).sort((a, b) => (a.rut_responsable || '').localeCompare(b.rut_responsable || ''));
 
-    // 2. Renderizar con Agrupación
     b.innerHTML = filtered.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', estado_contractual: 'Vigente' };
-        
         const isSame = lastRut === a.rut_responsable;
         lastRut = a.rut_responsable;
-
-        // Clases CSS para ocultar/mostrar bordes y texto
         const trClass = isSame ? 'group-continue' : 'group-start';
         const tdClass = isSame ? 'dim-text' : '';
         const contractStyle = c.estado_contractual==='Cesado' ? 'color:#b91c1c; font-weight:800;' : 'color:#15803d; font-weight:700;';
 
+        // AQUÍ AÑADÍ EL CLIC AL NOMBRE
         return `<tr class="${trClass}">
             <td class="${tdClass}" style="color:#64748b">${a.rut_responsable}</td>
-            <td class="${tdClass}" style="font-weight:600">${c.nombre}</td>
+            <td class="${tdClass} click-name" onclick="verUsuario('${a.rut_responsable}')">${c.nombre}</td>
             <td>${a.estado}</td>
             <td class="${tdClass}" style="${contractStyle}">${c.estado_contractual||'Vigente'}</td>
             <td class="${tdClass}">${c.area}</td>
