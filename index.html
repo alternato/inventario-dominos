@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v67.2 - Domino's Pizza Chile</title>
+    <title>TI Maestro v67.3 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -58,6 +58,11 @@
         input:checked + .slider:before { transform: translateX(20px); }
         .disabled-field { background-color: #f1f5f9 !important; color: #94a3b8 !important; cursor: not-allowed !important; }
         .hidden { display: none !important; }
+
+        /* ESTILOS PARA AGRUPACIÓN VISUAL EN TABLA */
+        .group-start td { border-top: 2px solid #cbd5e1; } /* Línea divisoria entre personas */
+        .group-continue td { border-top: none; padding-top: 4px; padding-bottom: 4px; }
+        .dim-text { opacity: 0; pointer-events: none; } /* Oculta texto repetido pero mantiene estructura */
     </style>
 </head>
 <body>
@@ -115,7 +120,7 @@
                         </div>
                         <div style="overflow-y: auto; flex-grow: 1;">
                             <table style="min-width: 100%;">
-                                <thead style="position: sticky; top: 0; z-index: 5;">
+                                <thead style="position: sticky; top: 0; z-index: 5; background: white;">
                                     <tr><th>RUT/Serie</th><th>Responsable/Ubicación</th><th>Estado</th></tr>
                                 </thead>
                                 <tbody id="lastMovesTable"></tbody>
@@ -425,11 +430,39 @@ function editarActivo(serie) {
 }
 
 function renderMasterTable() {
-    const b = document.getElementById('masterTableBody'); const s = document.getElementById('mainSearch').value.toLowerCase();
-    b.innerHTML = DB_ACTIVOS.map(a => {
+    const b = document.getElementById('masterTableBody'); 
+    const s = document.getElementById('mainSearch').value.toLowerCase();
+    let lastRut = null;
+
+    // 1. Filtrar y Ordenar (CRÍTICO PARA AGRUPACIÓN)
+    const filtered = DB_ACTIVOS.filter(a => {
+        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
+        return `${a.serie} ${c.nombre} ${a.rut_responsable} ${a.ubicacion}`.toLowerCase().includes(s);
+    }).sort((a, b) => (a.rut_responsable || '').localeCompare(b.rut_responsable || ''));
+
+    // 2. Renderizar con Agrupación
+    b.innerHTML = filtered.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', estado_contractual: 'Vigente' };
-        if(!`${a.serie} ${c.nombre} ${a.rut_responsable} ${a.ubicacion}`.toLowerCase().includes(s)) return '';
-        return `<tr><td style="color:#64748b">${a.rut_responsable}</td><td style="font-weight:600">${c.nombre}</td><td>${a.estado}</td><td style="color:${c.estado_contractual==='Cesado'?'red':'green'}">${c.estado_contractual||'Vigente'}</td><td>${c.area}</td><td>${a.ubicacion}</td><td>${a.marca}</td><td><code>${a.serie}</code></td><td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)" onclick="editarActivo('${a.serie}')"></i></td></tr>`;
+        
+        const isSame = lastRut === a.rut_responsable;
+        lastRut = a.rut_responsable;
+
+        // Clases CSS para ocultar/mostrar bordes y texto
+        const trClass = isSame ? 'group-continue' : 'group-start';
+        const tdClass = isSame ? 'dim-text' : '';
+        const contractStyle = c.estado_contractual==='Cesado' ? 'color:#b91c1c; font-weight:800;' : 'color:#15803d; font-weight:700;';
+
+        return `<tr class="${trClass}">
+            <td class="${tdClass}" style="color:#64748b">${a.rut_responsable}</td>
+            <td class="${tdClass}" style="font-weight:600">${c.nombre}</td>
+            <td>${a.estado}</td>
+            <td class="${tdClass}" style="${contractStyle}">${c.estado_contractual||'Vigente'}</td>
+            <td class="${tdClass}">${c.area}</td>
+            <td class="${tdClass}">${a.ubicacion}</td>
+            <td>${a.marca} ${a.modelo}</td>
+            <td><code style="color:var(--primary);">${a.serie}</code></td>
+            <td><i class="fas fa-edit" style="cursor:pointer; color:var(--primary)" onclick="editarActivo('${a.serie}')"></i></td>
+        </tr>`;
     }).join('');
 }
 
