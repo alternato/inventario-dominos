@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v67.0 - Domino's Pizza Chile</title>
+    <title>TI Maestro v67.1 - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -121,7 +121,9 @@
                     </div>
                     <div style="background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border);">
                         <h4 style="color: var(--primary); margin-bottom: 15px;">Distribución Rápida</h4>
-                        <canvas id="chartMini"></canvas>
+                        <div style="height: 250px; position: relative;">
+                            <canvas id="chartMini"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -300,12 +302,10 @@ async function cargarTodo() {
 }
 
 function actualizarKPIs() {
-    // 1. Calcular Totales
     const total = DB_ACTIVOS.length;
     const disponibles = DB_ACTIVOS.filter(a => a.estado === 'Disponible').length;
     const mantencion = DB_ACTIVOS.filter(a => a.estado === 'Mantención').length;
     
-    // Contar equipos en manos de cesados (Cruce de datos)
     let equiposEnCesados = 0;
     DB_ACTIVOS.forEach(a => {
         if(a.estado === 'Asignado') {
@@ -314,13 +314,11 @@ function actualizarKPIs() {
         }
     });
 
-    // 2. Renderizar KPIs
     document.getElementById('kpi-total').innerText = total;
     document.getElementById('kpi-dispo').innerText = disponibles;
     document.getElementById('kpi-mant').innerText = mantencion;
     document.getElementById('kpi-cesados').innerText = equiposEnCesados;
 
-    // 3. Tabla Resumida (Top 5 últimos)
     const tablaResumen = document.getElementById('lastMovesTable');
     tablaResumen.innerHTML = DB_ACTIVOS.slice(0, 5).map(a => `
         <tr>
@@ -331,7 +329,6 @@ function actualizarKPIs() {
         </tr>
     `).join('');
 
-    // 4. Mini Gráfico Home
     if(charts.mini) charts.mini.destroy();
     charts.mini = new Chart(document.getElementById('chartMini').getContext('2d'), { 
         type: 'doughnut', 
@@ -340,7 +337,7 @@ function actualizarKPIs() {
     });
 }
 
-// --- CRUD ---
+// --- CRUD & CSV ---
 async function guardarTodoSincronizado() {
     const btn = document.getElementById('btnSave');
     btn.innerText = "GUARDANDO..."; btn.disabled = true;
