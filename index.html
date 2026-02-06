@@ -20,125 +20,88 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             height: 100vh;
             margin: 0;
-            /* Degradado sutil en el fondo en lugar de color plano */
             background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-            overflow: hidden; /* Evita scrollbars por los elementos flotantes */
-            position: relative; /* Necesario para posicionar los elementos absolutos */
+            overflow: hidden;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* --- CONTENEDOR DE LOS ELEMENTOS FLOTANTES --- */
+        /* --- ELEMENTOS FLOTANTES (FONDOS) --- */
         .background-shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Para que queden detrás de la tarjeta de login */
-            overflow: hidden;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
         }
-
-        /* --- DISEÑO DE LA FICHA DE DOMINÓ (CSS PURO) --- */
         .floating-domino {
-            position: absolute;
-            width: 60px;
-            height: 30px;
-            background-color: var(--dominos-red);
-            border-radius: 4px;
-            opacity: 0.15; /* Muy sutiles para no distraer */
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
-            /* Animación base */
+            position: absolute; width: 60px; height: 30px; background-color: var(--dominos-red);
+            border-radius: 4px; opacity: 0.15; box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
             animation: floaty 8s ease-in-out infinite alternate;
         }
-        .floating-domino.blue {
-            background-color: var(--dominos-blue);
-        }
-        /* Variante de tamaño más pequeño para dar profundidad */
-        .floating-domino.small {
-            width: 40px;
-            height: 20px;
-            opacity: 0.1;
-        }
-
-        /* --- ANIMACIÓN DE FLOTACIÓN --- */
+        .floating-domino.blue { background-color: var(--dominos-blue); }
+        .floating-domino.small { width: 40px; height: 20px; opacity: 0.1; }
         @keyframes floaty {
-            0% {
-                transform: translateY(0px) rotate(45deg);
-            }
-            100% {
-                 /* Se mueven 30px hacia arriba y rotan un poco más */
-                transform: translateY(-30px) rotate(55deg);
-            }
+            0% { transform: translateY(0px) rotate(45deg); }
+            100% { transform: translateY(-30px) rotate(55deg); }
         }
-
-        /* --- POSICIONES "ALEATORIAS" MANUALES --- 
-           Diferentes ubicaciones (top/left), duraciones y retrasos de animación 
-           para simular aleatoriedad */
+        /* Posiciones manuales */
         .d1 { top: 10%; left: 10%; animation-duration: 7s; }
         .d2 { top: 20%; right: 15%; animation-delay: 1s; animation-duration: 9s; }
         .d3 { bottom: 15%; left: 20%; animation-delay: 2s; }
         .d4 { bottom: 30%; right: 10%; animation-duration: 11s; }
         .d5 { top: 50%; left: 5%; animation-delay: 0.5s; }
         .d6 { top: 60%; right: 30%; animation-duration: 8s; }
-        .d7 { top: -5%; left: 50%; animation-delay: 3s; }
-        .d8 { bottom: -5%; right: 40%; animation-duration: 10s; }
 
-
-        /* --- TARJETA DE LOGIN (ESTILO ANTERIOR MEJORADO) --- */
-        .login-container-wrapper {
-            z-index: 10; /* Asegura que esté por encima del fondo */
-            padding: 20px;
-        }
-
+        /* --- TARJETA DE LOGIN --- */
+        .login-container-wrapper { z-index: 10; padding: 20px; }
         .login-card {
-            background: rgba(255, 255, 255, 0.95); /* Un poco transparente */
+            background: rgba(255, 255, 255, 0.95);
             padding: 2.5rem;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.08);
             text-align: center;
-            max-width: 400px;
+            max-width: 380px; /* Un poco más ancho para el form */
             width: 100%;
             border-top: 6px solid var(--dominos-red);
-            backdrop-filter: blur(5px); /* Efecto de vidrio esmerilado moderno */
+            backdrop-filter: blur(5px);
         }
-        h1 {
-            color: var(--dominos-blue);
-            margin-bottom: 1rem;
-            font-weight: 700;
+        h1 { color: var(--dominos-blue); margin-bottom: 0.5rem; font-weight: 700; }
+        .subtitle { color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
+
+        /* --- FORMULARIO LOCAL --- */
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; color: #555; font-size: 0.85rem; margin-bottom: 5px; font-weight: 600;}
+        .input-group input {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px; box-sizing: border-box; transition: border 0.3s;
         }
-        .subtitle {
-            color: #666;
-            margin-bottom: 2.5rem;
-            font-size: 0.95rem;
-            line-height: 1.5;
+        .input-group input:focus { border-color: var(--dominos-blue); outline: none; }
+        
+        .btn-primary {
+            background-color: var(--dominos-blue); color: white; border: none;
+            padding: 12px; width: 100%; border-radius: 6px; font-weight: 600; cursor: pointer;
+            transition: background 0.3s;
         }
+        .btn-primary:hover { background-color: #004c6e; }
+
+        /* --- SEPARADOR --- */
+        .divider {
+            display: flex; align-items: center; margin: 20px 0; color: #999; font-size: 0.8rem;
+        }
+        .divider::before, .divider::after {
+            content: ""; flex: 1; height: 1px; background: #ddd;
+        }
+        .divider span { padding: 0 10px; }
+
+        /* --- BOTÓN MICROSOFT --- */
         .btn-microsoft {
-            background-color: #2F2F2F;
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: #2F2F2F; color: white; border: none; padding: 12px;
+            width: 100%; border-radius: 6px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: background 0.3s;
         }
-        .btn-microsoft:hover {
-            background-color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-        .btn-microsoft:active {
-            transform: translateY(0px);
-        }
+        .btn-microsoft:hover { background-color: #000; }
+
+        #status-msg { margin-top: 15px; font-size: 0.85em; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -147,43 +110,55 @@
         <div class="floating-domino d1"></div>
         <div class="floating-domino small d3"></div>
         <div class="floating-domino d5"></div>
-        <div class="floating-domino small d7"></div>
         <div class="floating-domino blue d2"></div>
         <div class="floating-domino blue small d4"></div>
         <div class="floating-domino blue d6"></div>
-        <div class="floating-domino blue small d8"></div>
     </div>
 
     <div class="login-container-wrapper">
         <div class="login-card">
             <h1>Gestión de Inventario</h1>
-            <p class="subtitle">Acceso seguro exclusivo para colaboradores de Domino's Pizza Chile.</p>
+            <p class="subtitle">Acceso autorizado Domino's Pizza</p>
             
+            <div id="login-form">
+                <div class="input-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="email" placeholder="nombre@ejemplo.com">
+                </div>
+                <div class="input-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+                <button onclick="signInWithEmail()" class="btn-primary">Ingresar</button>
+            </div>
+
+            <div class="divider"><span>O ingresa con</span></div>
+
             <button onclick="signInWithMicrosoft()" class="btn-microsoft">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M0 0h11.377v11.372H0zM12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zM12.623 12.623H24V24H12.623z"/></svg>
-                Iniciar Sesión Corporativa
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M0 0h11.377v11.372H0zM12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zM12.623 12.623H24V24H12.623z"/></svg>
+                Cuenta Corporativa
             </button>
             
-            <p id="status-msg" style="margin-top: 20px; font-size: 0.85em; color: #888; min-height: 20px;"></p>
+            <p id="status-msg"></p>
         </div>
     </div>
 
     <script>
         // =============================================
-        //  TUS CREDENCIALES DE SUPABASE AQUI
+        //  TUS CREDENCIALES (Reemplaza esto)
         // =============================================
         const SUPABASE_URL = 'https://ivjwxvhixrskraepqzse.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o';
-        // =============================================
+        
+        // CORRECCIÓN IMPORTANTE: Cambiamos el nombre de la variable a 'supabaseClient'
+        // para evitar conflictos con la librería global 'supabase'.
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+        // --- LÓGICA LOGIN MICROSOFT ---
         async function signInWithMicrosoft() {
-            const statusMsg = document.getElementById('status-msg');
-            statusMsg.innerText = "Conectando con Microsoft seguro...";
-            statusMsg.style.color = "#006491";
-
-            const { data, error } = await supabase.auth.signInWithOAuth({
+            updateStatus("Conectando con Microsoft...", "blue");
+            
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'azure',
                 options: {
                     scopes: 'email',
@@ -192,20 +167,51 @@
                 },
             });
 
+            if (error) updateStatus("Error SSO: " + error.message, "red");
+        }
+
+        // --- LÓGICA LOGIN CORREO/CLAVE ---
+        async function signInWithEmail() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                updateStatus("Por favor completa ambos campos", "red");
+                return;
+            }
+
+            updateStatus("Verificando credenciales...", "blue");
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
             if (error) {
-                console.error("Error:", error);
-                statusMsg.innerText = "Error: " + error.message;
-                statusMsg.style.color = "#E31837";
+                updateStatus("Error: " + error.message, "red");
+            } else {
+                updateStatus("¡Ingreso exitoso!", "green");
+                // Recargar para mostrar la vista de "Logueado"
+                window.location.reload();
             }
         }
 
+        // --- UTILIDAD PARA MENSAJES ---
+        function updateStatus(msg, color) {
+            const el = document.getElementById('status-msg');
+            el.innerText = msg;
+            el.style.color = color === "red" ? "#E31837" : (color === "green" ? "green" : "#006491");
+        }
+
+        // --- VERIFICAR SESIÓN ACTIVA AL CARGAR ---
         window.onload = async function() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
-                // Usuario ya logueado
                 document.querySelector('.login-card').innerHTML = `
-                    <h2 style="color: #006491; margin-bottom: 10px;">¡Hola de nuevo!</h2>
-                    <p style="color: #555; margin-bottom: 25px;">Sesión activa como:<br><strong>${session.user.email}</strong></p>
+                    <h2 style="color: #006491; margin-bottom: 10px;">¡Hola!</h2>
+                    <p style="color: #555; margin-bottom: 25px;">
+                        Sesión iniciada como:<br><strong>${session.user.email}</strong>
+                    </p>
                     <button onclick="signOut()" class="btn-microsoft" style="background-color: #E31837;">
                         Cerrar Sesión
                     </button>
@@ -214,7 +220,7 @@
         };
 
         async function signOut() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             window.location.reload();
         }
     </script>
