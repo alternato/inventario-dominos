@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Inventario</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --red: #E31837; --blue: #006491; }
+        body {
+            font-family: 'Segoe UI', sans-serif; margin: 0; min-height: 100vh;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        /* --- Fondo Animado (Igual al index) --- */
+        .bg-shapes { position: fixed; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .domino {
+            position: absolute; width: 60px; height: 30px; background: var(--red);
+            opacity: 0.1; border-radius: 4px; animation: float 10s ease-in-out infinite alternate;
+        }
+        .domino.blue { background: var(--blue); }
+        @keyframes float { to { transform: translateY(-40px) rotate(10deg); } }
+        
+        /* --- Navegación --- */
+        .navbar {
+            background: var(--blue); color: white; padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 4px solid var(--red); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .nav-brand { font-weight: bold; font-style: italic; font-size: 1.2rem; }
+        .btn-logout {
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            padding: 8px 15px; border-radius: 4px; cursor: pointer;
+        }
+        .btn-logout:hover { background: var(--red); }
+
+        /* --- Contenido Principal --- */
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        
+        .panel {
+            background: rgba(255,255,255,0.9); padding: 20px; border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+        .btn-add {
+            background: var(--blue); color: white; border: none; padding: 10px 20px;
+            border-radius: 6px; cursor: pointer; float: right;
+        }
+
+        /* --- Tabla --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid #ddd; color: #555; }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f1f1f1; }
+        .badge { padding: 4px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+        .ok { background: #d4edda; color: #155724; }
+        .low { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shapes">
+        <div class="domino d1" style="top:10%; left:5%"></div>
+        <div class="domino blue d2" style="top:40%; right:10%"></div>
+        <div class="domino d3" style="bottom:20%; left:20%"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-brand"><i class="fa-solid fa-pizza-slice"></i> INVENTARIO DOMINO'S</div>
+        <div>
+            <span id="user-email" style="margin-right: 15px; font-size: 0.9em;">Cargando...</span>
+            <button onclick="logout()" class="btn-logout">Salir</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="panel">
+            <button class="btn-add"><i class="fa-solid fa-plus"></i> Nuevo Producto</button>
+            <h2 style="color: var(--blue); margin: 0;">Stock Actual</h2>
+            
+            <table>
+                <thead>
+                    <tr><th>Producto</th><th>Categoría</th><th>Cantidad</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Queso Mozzarella</td><td>Insumos</td><td>45 Cajas</td><td><span class="badge ok">OK</span></td></tr>
+                    <tr><td>Salsa de Tomate</td><td>Insumos</td><td>12 Bolsas</td><td><span class="badge low">Bajo</span></td></tr>
+                    <tr><td>Cajas Medianas</td><td>Empaque</td><td>500 Unid.</td><td><span class="badge ok">OK</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // --- PEGA TUS LLAVES AQUÍ (LAS MISMAS DEL INDEX) ---
+        const SB_URL = 'https://ivjwxvhixrskraepqzse.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o';
+        
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        // 1. SEGURIDAD: Si no hay usuario, patea afuera
+        async function checkUser() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) {
+                window.location.href = 'index.html'; // Fuera de aquí
+            } else {
+                document.getElementById('user-email').innerText = session.user.email;
+            }
+        }
+        checkUser();
+
+        // 2. Cerrar Sesión
+        async function logout() {
+            await sb.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
