@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TI Maestro v67.9 - Domino's Pizza Chile</title>
+    <title>TI Maestro v67.7 FINAL - Domino's Pizza Chile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -32,13 +32,15 @@
         header { background: white; padding: 18px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .content-area { padding: 25px; overflow-y: auto; flex-grow: 1; }
         
-        /* DASHBOARD LAYOUT */
+        /* DASHBOARD LAYOUT (Rediseñado) */
         .dashboard-top { display: grid; grid-template-columns: 3fr 1fr; gap: 20px; margin-bottom: 25px; }
+        
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         .kpi-card { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .kpi-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
         .kpi-info h3 { font-size: 24px; font-weight: 800; color: var(--dark); margin: 0; }
         .kpi-info p { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; margin: 0; }
+
         .graph-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; justify-content: center; }
 
         /* TABLAS Y PANELES */
@@ -70,7 +72,7 @@
         .disabled-field { background-color: #f1f5f9 !important; color: #94a3b8 !important; cursor: not-allowed !important; }
         .hidden { display: none !important; }
 
-        /* ESTILOS DE AGRUPACIÓN (LIMPIEZA VISUAL) */
+        /* AGRUPACIÓN VISUAL */
         .group-start td { border-top: 2px solid #cbd5e1; }
         .group-continue td { border-top: none; padding-top: 4px; padding-bottom: 4px; }
         .dim-text { opacity: 0; pointer-events: none; }
@@ -79,12 +81,11 @@
         .click-name { cursor: pointer; color: var(--primary); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px; transition: 0.2s; }
         .click-name:hover { color: var(--secondary); }
 
-        /* ESTILOS PERMISOS (RBAC) */
+        /* PERMISOS */
         .admin-only { display: none !important; }
         body.role-admin .admin-only { display: inline-flex !important; }
         body.role-admin div.admin-only { display: flex !important; }
         
-        /* BADGE DE ROL */
         .role-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 800; margin-left: 5px; }
         .badge-viewer { background: #e2e8f0; color: #64748b; }
         .badge-admin { background: #fee2e2; color: #b91c1c; }
@@ -144,8 +145,9 @@
                         <div class="kpi-card"><div class="kpi-icon" style="background: #f59e0b;"><i class="fas fa-tools"></i></div><div class="kpi-info"><h3 id="kpi-mant">0</h3><p>En Mantención</p></div></div>
                         <div class="kpi-card"><div class="kpi-icon" style="background: var(--secondary);"><i class="fas fa-user-slash"></i></div><div class="kpi-info"><h3 id="kpi-cesados">0</h3><p>Equipos en Cesados</p></div></div>
                     </div>
+                    
                     <div class="graph-card">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 5px;">Distribución (Click para filtrar)</div>
+                        <div style="font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 5px;">Distribución (Click)</div>
                         <div style="height: 100px; position: relative;">
                             <canvas id="chartMini"></canvas>
                         </div>
@@ -292,7 +294,7 @@ async function signInWithMicrosoft() {
         options: { 
             scopes: 'email', 
             queryParams: { prompt: 'select_account' },
-            // REDIRECCIÓN A PRODUCCIÓN
+            // REDIRECCIÓN A PRODUCCIÓN (GITHUB PAGES)
             redirectTo: 'https://alternato.github.io/inventario-dominos/' 
         }
     });
@@ -403,7 +405,9 @@ function renderHomeTable(data, title) {
     
     b.innerHTML = data.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
-        // Columnas: Nombre/RUT | Estado | Ubicación/Serie
+        // COLUMNA 1: Nombre (negrita) + RUT
+        // COLUMNA 2: Estado (Badge)
+        // COLUMNA 3: Ubicación (negrita) + Serie
         return `<tr>
             <td>
                 <div style="font-weight:700; color:var(--dark)">${c.nombre}</div>
