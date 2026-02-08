@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v68.0</title>
+    <title>Dashboard - TI Maestro v68.1</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -37,13 +37,36 @@
         .kpi-info p { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; margin: 0; }
         .graph-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        /* TABLAS */
+        /* TABLAS (MEJORADA PARA AJUSTE AUTOMÁTICO) */
         .table-wrapper { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
         .table-scroll { overflow: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: #f1f5f9; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
-        td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
         
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            /* Quitamos min-width fijo para permitir que se encoja si es necesario */
+            table-layout: auto; /* Permite que la tabla respire según el contenido */
+        }
+        
+        th { 
+            background: #f1f5f9; 
+            padding: 12px; 
+            text-align: left; 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap; /* Evita que los títulos se rompan feo */
+        }
+        
+        td { 
+            padding: 10px 12px; 
+            border-bottom: 1px solid #f1f5f9; 
+            vertical-align: middle;
+        }
+
         /* MODAL */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; }
