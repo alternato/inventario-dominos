@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v69.0</title>
+    <title>Dashboard - TI Maestro v70.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -37,29 +37,29 @@
         .kpi-info p { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; margin: 0; }
         .graph-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        /* TABLAS INTELIGENTES */
+        /* TABLAS */
         .table-wrapper { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
         .table-scroll { overflow: auto; width: 100%; }
         table { width: 100%; border-collapse: collapse; table-layout: auto; }
         th { background: #f1f5f9; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); white-space: nowrap; color: #64748b; font-weight: 700; }
         td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
-        tr:hover td { background-color: #f8fafc; } /* Efecto Hover */
+        tr:hover td { background-color: #f8fafc; }
 
         /* CSV PANEL */
         .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; align-items: center; gap: 20px; }
 
-        /* TOAST NOTIFICATION */
+        /* TOAST */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-left: 5px solid; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease-out; font-weight: 600; }
         .toast.success { border-color: var(--success); } .toast.error { border-color: var(--secondary); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* PERMISOS & UTILS */
+        /* UTILS */
         .hidden { display: none !important; }
         .admin-only { display: none !important; }
         body.role-admin .admin-only { display: flex !important; }
         
-        .role-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; font-weight: 800; margin-left: 10px; letter-spacing: 0.5px; }
+        .role-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; font-weight: 800; margin-left: 10px; }
         .badge-viewer { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
         .badge-admin { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
@@ -72,8 +72,7 @@
         input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; transition: 0.2s; }
         input:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
         .error-input { border-color: var(--secondary) !important; background-color: #fff1f2; }
-
-        .section-tag { grid-column: span 4; color: var(--primary); font-weight: 800; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; margin: 20px 0 10px 0; font-size: 12px; letter-spacing: 0.5px; }
+        .section-tag { grid-column: span 4; color: var(--primary); font-weight: 800; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; margin: 20px 0 10px 0; font-size: 12px; }
         
         /* SWITCHES */
         .switch-box { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
@@ -85,13 +84,16 @@
         input:checked + .slider:before { transform: translateX(16px); }
         .disabled-field { background-color: #f1f5f9 !important; color: #94a3b8 !important; cursor: not-allowed !important; }
 
-        /* USER PROFILE */
+        /* USER PROFILE DETAILED */
         .click-name { cursor: pointer; color: var(--primary); font-weight: 700; text-decoration: none; border-bottom: 1px dotted var(--primary); }
         .click-name:hover { color: #004488; border-bottom-style: solid; }
         .user-header { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; }
-        .user-avatar { width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; }
+        .user-avatar { width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; }
         .asset-list { list-style: none; padding: 0; }
-        .asset-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border: 1px solid #e2e8f0; margin-bottom: 8px; border-radius: 8px; background: #fff; }
+        .asset-item { border: 1px solid #e2e8f0; margin-bottom: 10px; border-radius: 8px; background: #fff; padding: 15px; }
+        .asset-detail-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .asset-icon { width: 24px; text-align: center; display: inline-block; margin-right: 8px; color: var(--primary); }
+        .separator { border-top: 1px dashed #e2e8f0; margin: 8px 0; }
     </style>
 </head>
 <body>
@@ -180,17 +182,19 @@
                 <div class="field"><label>RUT *</label><input type="text" id="f_rut" placeholder="Ej: 11.222.333-k"></div>
                 <div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div>
                 <div class="field"><label>Correo</label><input type="email" id="f_correo"></div>
-                <div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>RRHH</option><option>Marketing</option><option>Finanzas</option></select></div>
-                <div class="field"><label>Tienda</label><select id="f_tienda"></select></div>
+                <div class="field"><label>Área</label><select id="f_area">
+                    <option>Operaciones</option><option>Informática</option><option>Administración</option><option>RRHH</option><option>Marketing</option><option>Finanzas</option><option>Logística</option><option>Gerencia</option><option>Desarrollo</option>
+                </select></div>
+                <div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div>
                 <div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div>
 
-                <div class="section-tag">2. Equipo</div>
-                <div class="field"><label>Marca</label><input type="text" id="f_marca"></div>
-                <div class="field"><label>Modelo</label><input type="text" id="f_modelo"></div>
-                <div class="field"><label>Serie *</label><input type="text" id="f_serie"></div>
-                <div class="field"><label>Estado</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option></select></div>
+                <div class="section-tag">2. Equipo PC</div>
+                <div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div>
+                <div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div>
+                <div class="field"><label>Serie PC *</label><input type="text" id="f_serie"></div>
+                <div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option></select></div>
                 
-                <div class="section-tag">3. Telefonía (Opcional)</div>
+                <div class="section-tag">3. Telefonía Móvil</div>
                 <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div>
                 <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div>
                 <div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div>
@@ -198,9 +202,10 @@
                 <div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled></div>
                 <div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled></div>
 
-                <div class="section-tag">4. Control</div>
+                <div class="section-tag">4. Control & Auditoría</div>
                 <div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div>
-                <div class="field" style="grid-column: span 3;"><label>Observaciones</label><input type="text" id="f_obs"></div>
+                <div class="field"><label>Entregado Por (IT)</label><input type="text" id="f_ent_it"></div>
+                <div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div>
             </div>
             <div style="margin-top: 25px; text-align: right; border-top: 1px solid #f1f5f9; padding-top: 20px;">
                 <button onclick="cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; color:#64748b; cursor:pointer; border-radius:6px; margin-right: 10px; font-weight:600;">Cancelar</button>
@@ -221,7 +226,7 @@ if(typeof ChartDataLabels!=='undefined') Chart.register(ChartDataLabels);
 const CONFIG = { URL: "https://ivjwxvhixrskraepqzse.supabase.co", KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o" };
 let sb; try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY); } catch(e) { console.error(e); }
 
-const TIENDAS = ["Casa Matriz", "Bodega Central", "Santiago Alameda", "Viña 15 Norte", "Antofagasta Regional", "Concepción", "La Serena", "Puerto Montt"];
+const TIENDAS = ["Casa Matriz", "Bodega Central", "Santiago Alameda", "Viña 15 Norte", "Antofagasta Regional", "Concepción", "La Serena", "Puerto Montt", "Temuco", "Valdivia", "Rancagua", "Talca", "Chillán", "Los Ángeles", "Osorno"];
 let DB_ACTIVOS = [], DB_COLABS = [], charts = {}, currentUserRole = 'viewer';
 
 function showToast(msg, type='success') {
@@ -295,7 +300,6 @@ function renderTablaHome(data, title) {
     const b = document.getElementById('lastMovesTable');
     b.innerHTML = data.length ? data.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
-        const date = a.created_at ? new Date(a.created_at).toLocaleDateString() : '-';
         return `<tr>
             <td><div style="font-weight:700; color:var(--dark)">${c.nombre}</div><div style="font-size:10px; color:#64748b">${a.rut_responsable}</div></td>
             <td><span style="font-size:10px; padding:2px 6px; border-radius:4px; font-weight:600; background:${a.estado==='Disponible'?'#dcfce7':(a.estado==='Mantención'?'#ffedd5':'#f1f5f9')}; color:${a.estado==='Disponible'?'#166534':(a.estado==='Mantención'?'#9a3412':'#334155')}">${a.estado}</span></td>
@@ -339,16 +343,13 @@ function renderTablaMaestra() {
     }).join('') : '<tr><td colspan="9" style="text-align:center; padding:20px; font-style:italic; color:#64748b;">No se encontraron resultados</td></tr>';
 }
 
-// --- FUNCIONALIDAD CRUD ---
+// --- CRUD ---
 function nuevoRegistro() {
-    // 1. LIMPIAR TODOS LOS CAMPOS
     document.querySelectorAll('#modalFicha input').forEach(i => { i.value = ''; i.classList.remove('error-input'); });
     document.querySelectorAll('#modalFicha select').forEach(s => s.selectedIndex = 0);
-    // 2. RESET SWITCHES
     document.getElementById('sw_equipo').checked = false;
     document.getElementById('sw_sim').checked = false;
     toggleTelefonia(); 
-    // 3. ABRIR
     document.getElementById('modalFicha').classList.remove('hidden');
 }
 
@@ -358,11 +359,15 @@ function editar(serie) {
     document.getElementById('f_rut').value = a.rut_responsable;
     document.getElementById('f_nombre').value = c.nombre||'';
     document.getElementById('f_correo').value = c.correo||'';
+    setSelect('f_area', c.area); setSelect('f_tienda', a.ubicacion); 
+    setSelect('f_contractual', c.estado_contractual); setSelect('f_estado', a.estado);
     document.getElementById('f_marca').value = a.marca;
     document.getElementById('f_modelo').value = a.modelo;
     document.getElementById('f_serie').value = a.serie;
-    document.getElementById('f_estado').value = a.estado;
-    // Cargar switches telefonía
+    document.getElementById('f_fecha_ent').value = a.fecha_entrega;
+    document.getElementById('f_ent_it').value = a.entrega_it || '';
+    document.getElementById('f_obs').value = a.observaciones || '';
+    
     document.getElementById('sw_equipo').checked = !!a.marca_cel;
     document.getElementById('sw_sim').checked = !!a.imei_sim;
     document.getElementById('f_mar_cel').value = a.marca_cel || '';
@@ -373,11 +378,38 @@ function editar(serie) {
     document.getElementById('modalFicha').classList.remove('hidden');
 }
 
+// --- MODAL USUARIO MEJORADO ---
 function verUser(rut) {
     const c = DB_COLABS.find(x => x.rut === rut); if(!c) return;
     const activos = DB_ACTIVOS.filter(x => x.rut_responsable === rut);
-    const html = `<div class="user-header"><div class="user-avatar">${c.nombre[0]}</div><div><h3 style="margin:0; font-size:20px;">${c.nombre}</h3><p style="color:#64748b;">${c.rut} | ${c.area}</p></div></div>
-    <h4 style="color:var(--primary); margin-bottom:10px;">Activos Asignados (${activos.length})</h4><ul class="asset-list">${activos.map(a=>`<li class="asset-item"><div><div style="font-weight:700;">${a.marca} ${a.modelo}</div><small style="color:#64748b;">Serie: ${a.serie}</small></div><span class="role-badge badge-viewer">${a.estado}</span></li>`).join('')}</ul>`;
+    
+    const html = `
+        <div class="user-header">
+            <div class="user-avatar">${c.nombre.charAt(0)}</div>
+            <div><h3 style="margin:0; font-size:20px;">${c.nombre}</h3><p style="color:#64748b;">${c.rut} | ${c.area}</p></div>
+        </div>
+        <h4 style="color:var(--primary); margin-bottom:15px;">Equipos Asignados (${activos.length})</h4>
+        <ul class="asset-list">
+            ${activos.map(a => `
+                <li class="asset-item">
+                    <div class="asset-detail-row">
+                        <div><span class="asset-icon"><i class="fas fa-laptop"></i></span> <strong>PC:</strong> ${a.marca} ${a.modelo}</div>
+                        <code style="color:var(--primary)">${a.serie}</code>
+                    </div>
+                    ${a.marca_cel ? `
+                    <div class="separator"></div>
+                    <div class="asset-detail-row">
+                        <div><span class="asset-icon"><i class="fas fa-mobile-alt"></i></span> <strong>Cel:</strong> ${a.marca_cel} ${a.modelo_cel}</div>
+                        <small>IMEI: ${a.imei_cel}</small>
+                    </div>` : ''}
+                    ${a.imei_sim ? `
+                    <div class="asset-detail-row">
+                        <div><span class="asset-icon"><i class="fas fa-sim-card"></i></span> <strong>SIM:</strong> ${a.imei_sim}</div>
+                    </div>` : ''}
+                    <div style="text-align:right; margin-top:5px;"><span class="role-badge badge-viewer">${a.estado}</span></div>
+                </li>
+            `).join('')}
+        </ul>`;
     document.getElementById('userProfileContent').innerHTML = html;
     document.getElementById('modalVerUsuario').classList.remove('hidden');
 }
@@ -386,12 +418,10 @@ async function guardarTodoSincronizado() {
     const btn = document.getElementById('btnSave');
     const rut = document.getElementById('f_rut').value.trim(); 
     const serie = document.getElementById('f_serie').value.trim();
-    
     if(!rut || !serie) { 
         if(!rut) document.getElementById('f_rut').classList.add('error-input');
         if(!serie) document.getElementById('f_serie').classList.add('error-input');
-        showToast("Faltan campos obligatorios (RUT o Serie)", "error");
-        return; 
+        return showToast("Faltan campos (RUT o Serie)", "error"); 
     }
     
     btn.innerText = "PROCESANDO..."; btn.disabled = true;
@@ -399,7 +429,8 @@ async function guardarTodoSincronizado() {
     const colab = { rut, nombre: document.getElementById('f_nombre').value, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value, estado_contractual: document.getElementById('f_contractual').value };
     const activo = { 
         serie, rut_responsable: rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, 
-        estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value, observaciones: document.getElementById('f_obs').value,
+        estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value, 
+        entrega_it: document.getElementById('f_ent_it').value, observaciones: document.getElementById('f_obs').value,
         marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null,
         modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
         imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
@@ -408,27 +439,15 @@ async function guardarTodoSincronizado() {
 
     try {
         await sb.from('colaboradores').upsert(colab, {onConflict:'rut'});
-        const res = await sb.from('activos').upsert(activo, {onConflict:'serie'});
-        if(res.error) throw res.error;
-        
-        showToast("Registro guardado exitosamente");
-        cerrarFicha(); 
-        cargarDatos();
-    } catch(e) {
-        console.error(e);
-        showToast("Error al guardar: " + e.message, "error");
-    } finally {
-        btn.innerText = "GUARDAR"; btn.disabled = false;
-    }
+        await sb.from('activos').upsert(activo, {onConflict:'serie'});
+        showToast("Registro guardado exitosamente"); cerrarFicha(); cargarDatos();
+    } catch(e) { console.error(e); showToast("Error al guardar", "error"); } 
+    finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
 }
 
 async function procesarCSV() {
-    const file = document.getElementById('csvFile').files[0]; 
-    if (!file) return showToast("Selecciona un archivo CSV", "error");
-    
-    const btn = document.getElementById('btnCsv');
-    btn.innerText = "CARGANDO..."; btn.disabled = true;
-
+    const file = document.getElementById('csvFile').files[0]; if (!file) return showToast("Selecciona CSV", "error");
+    const btn = document.getElementById('btnCsv'); btn.innerText = "CARGANDO..."; btn.disabled = true;
     const reader = new FileReader(); reader.readAsText(file, 'UTF-8');
     reader.onload = async function(e) {
         const lines = e.target.result.split(/\r?\n/);
@@ -439,16 +458,10 @@ async function procesarCSV() {
             if(col.length<5) continue;
             const c = { rut: formatearRut(col[0]), nombre: col[1], correo: col[4], area: col[5], estado_contractual: col[16] || 'Vigente' };
             const a = { serie: col[9], rut_responsable: c.rut, ubicacion: col[6], marca: col[7], modelo: col[8], estado: col[3], fecha_entrega: formatearFechaCSV(col[2]), entrega_it: col[13], observaciones: col[15] };
-            
             sb.from('colaboradores').upsert(c, { onConflict: 'rut' }).then();
-            sb.from('activos').upsert(a, { onConflict: 'serie' }).then();
-            count++;
+            sb.from('activos').upsert(a, { onConflict: 'serie' }).then(); count++;
         }
-        setTimeout(() => { 
-            showToast(`Carga masiva iniciada (${count} registros)`); 
-            cargarDatos(); 
-            btn.innerText = "PROCESAR"; btn.disabled = false;
-        }, 2000);
+        setTimeout(() => { showToast(`Procesados ${count} registros`); cargarDatos(); btn.innerText = "PROCESAR"; btn.disabled = false; }, 2000);
     };
 }
 
@@ -457,10 +470,10 @@ function formatearRut(rut) { if(!rut) return ''; let v = rut.replace(/\./g, '').
 function formatearFechaCSV(str) { if(!str) return null; const p = str.split(/[\/-]/); return (p.length === 3 && p[2].length === 4) ? `${p[2]}-${p[1]}-${p[0]}` : str; }
 function setSelect(id, val) { const el = document.getElementById(id); if(el) el.value = val; }
 function toggleTelefonia() { const eq = document.getElementById('sw_equipo').checked; const sim = document.getElementById('sw_sim').checked; ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { const el = document.getElementById(id); el.disabled = !eq; el.classList.toggle('disabled-field', !eq); if(!eq) el.value = ""; }); const simEl = document.getElementById('f_imsi'); simEl.disabled = !sim; simEl.classList.toggle('disabled-field', !sim); if(!sim) simEl.value = ""; }
-function setupListeners() { const inputRut = document.getElementById('f_rut'); const inputNombre = document.getElementById('f_nombre'); inputRut.addEventListener('blur', () => { inputRut.value = formatearRut(inputRut.value); const c = DB_COLABS.find(x => x.rut === inputRut.value); if(c) { document.getElementById('f_nombre').value = c.nombre||''; document.getElementById('f_correo').value = c.correo||''; setSelect('f_area', c.area||'Operaciones'); setSelect('f_contractual', c.estado_contractual||'Vigente'); } }); inputNombre.addEventListener('input', () => { const c = DB_COLABS.find(x => x.nombre === inputNombre.value); if(c) { inputRut.value = c.rut; document.getElementById('f_correo').value = c.correo; setSelect('f_area', c.area); setSelect('f_contractual', c.estado_contractual); } if ((document.getElementById('f_correo').value === "" || document.getElementById('f_correo').value.includes('@dominos.cl')) && inputNombre.value.includes(' ')) { const parts = inputNombre.value.toLowerCase().trim().split(" "); if (parts.length >= 2) document.getElementById('f_correo').value = `${parts[0][0]}${parts[1]}@dominospizza.cl`.replace(/\s/g, ''); } }); }
+function setupListeners() { const inputRut = document.getElementById('f_rut'); const inputNombre = document.getElementById('f_nombre'); inputRut.addEventListener('blur', () => { inputRut.value = formatearRut(inputRut.value); const c = DB_COLABS.find(x => x.rut === inputRut.value); if(c) { document.getElementById('f_nombre').value = c.nombre||''; document.getElementById('f_correo').value = c.correo||''; setSelect('f_area', c.area); setSelect('f_contractual', c.estado_contractual); } }); inputNombre.addEventListener('input', () => { const c = DB_COLABS.find(x => x.nombre === inputNombre.value); if(c) { inputRut.value = c.rut; document.getElementById('f_correo').value = c.correo; setSelect('f_area', c.area); setSelect('f_contractual', c.estado_contractual); } }); }
 function initCharts() { if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy(); const a = {}, e = {}; DB_COLABS.forEach(x => a[x.area] = (a[x.area]||0)+1); DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado]||0)+1); charts.a = new Chart(document.getElementById('chartArea').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b'] }] } }); charts.e = new Chart(document.getElementById('chartEstado').getContext('2d'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Total', data: Object.values(e), backgroundColor: '#E31837' }] } }); }
 function showView(v) { document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); }
-function abrirFicha() { setupListeners(); } // Se llama desde nuevoRegistro o editar
+function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); setupListeners(); }
 function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 
 // ARRANQUE
