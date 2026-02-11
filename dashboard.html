@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v70.2</title>
+    <title>Dashboard - TI Maestro v71.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -100,6 +100,7 @@
         <img src="https://logos-world.net/wp-content/uploads/2021/08/Dominos-Logo.png" class="logo-img">
         <button class="nav-btn active" id="btn-home" onclick="showView('home')"><i class="fas fa-home"></i> Inicio</button>
         <button class="nav-btn" id="btn-inv" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario Data</button>
+        <button class="nav-btn" id="btn-phone" onclick="showView('telephony')"><i class="fas fa-mobile-alt"></i> Telefonía</button>
         <button class="nav-btn" id="btn-metrics" onclick="showView('metrics')"><i class="fas fa-chart-pie"></i> Reportes TI</button>
         <hr style="margin: 20px 0; opacity: 0.2;">
         <button class="nav-btn admin-only" style="background: var(--success);" onclick="nuevoRegistro()"><i class="fas fa-plus-circle"></i> NUEVO REGISTRO</button>
@@ -161,6 +162,31 @@
                 </div>
             </div>
 
+            <div id="view-telephony" class="hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="color: var(--primary);">Gestión de Líneas y Equipos Móviles</h3>
+                    <input type="search" id="phoneSearch" placeholder="🔍 Buscar teléfono, IMEI, Usuario..." style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); width: 300px;" oninput="renderPhoneTable()">
+                </div>
+                <div class="table-wrapper">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Usuario / Cargo</th>
+                                    <th>Número</th>
+                                    <th>Equipo</th>
+                                    <th>IMEI</th>
+                                    <th>SIM (IMSI)</th>
+                                    <th>Observaciones</th>
+                                    <th class="admin-only">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="phoneTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div id="view-metrics" class="hidden">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div style="background:white; padding:20px; border-radius:12px; height: 400px;"><canvas id="chartArea"></canvas></div>
@@ -179,13 +205,7 @@
                 <div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div>
                 <div class="field"><label>Correo</label><input type="email" id="f_correo"></div>
                 <div class="field"><label>Área</label><select id="f_area">
-                    <option>Operaciones</option>
-                    <option>Informática</option>
-                    <option>Administración</option>
-                    <option>Marketing</option>
-                    <option>Logística</option>
-                    <option>Finanzas</option>
-                    <option>RRHH</option>
+                    <option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option>
                 </select></div>
                 <div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div>
                 <div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div>
@@ -199,6 +219,7 @@
                 <div class="section-tag">3. Telefonía Móvil</div>
                 <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div>
                 <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div>
+                <div class="field"><label>Número Telefónico</label><input type="text" id="f_numero" placeholder="+569..."></div>
                 <div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div>
                 <div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div>
                 <div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled></div>
@@ -228,7 +249,6 @@ if(typeof ChartDataLabels!=='undefined') Chart.register(ChartDataLabels);
 const CONFIG = { URL: "https://ivjwxvhixrskraepqzse.supabase.co", KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o" };
 let sb; try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY); } catch(e) { console.error(e); }
 
-// --- LISTA DE TIENDAS REAL ---
 const TIENDAS = [
     "Antofagasta - Estadio Regional", "Antofagasta - Sector Norte", "Arica", "Buin", "Bustamante", "Calama", 
     "Chiguayante", "Chillán", "Concepcion - Plaza Acevedo", "Concón", "Copiapó", "Curicó", "Froilan Roa", 
@@ -286,7 +306,7 @@ async function cargarDatos() {
     if(resA.data) DB_ACTIVOS = resA.data.sort((a,b)=> new Date(b.created_at||0) - new Date(a.created_at||0));
     if(resC.data) DB_COLABS = resC.data;
     document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c=>`<option value="${c.nombre}">`).join('');
-    actualizarDashboard(); renderTablaMaestra(); initCharts();
+    actualizarDashboard(); renderTablaMaestra(); renderPhoneTable(); initCharts();
 }
 
 // --- DASHBOARD ---
@@ -324,6 +344,34 @@ function renderTablaHome(data, title) {
     }).join('') : '<tr><td colspan="3" style="text-align:center; padding:15px; color:#94a3b8;">Sin datos recientes</td></tr>';
 }
 function resetHomeTable() { renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); }
+
+// --- TABLA TELEFONÍA (NUEVA) ---
+function renderPhoneTable() {
+    const inputVal = document.getElementById('phoneSearch').value.toLowerCase();
+    const b = document.getElementById('phoneTableBody');
+    
+    const filtered = DB_ACTIVOS.filter(a => {
+        if (!a.marca_cel && !a.imei_sim) return false; // Solo mostrar si tiene datos de telefonía
+        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
+        const text = `${c.nombre} ${a.numero||''} ${a.imei_cel||''} ${a.imei_sim||''}`.toLowerCase();
+        return text.includes(inputVal);
+    });
+
+    b.innerHTML = filtered.length ? filtered.map(a => {
+        const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', area: '-' };
+        const action = currentUserRole==='admin' ? `<i class="fas fa-edit" style="cursor:pointer; color:var(--primary); font-size:14px;" onclick="editar('${a.serie}')"></i>` : '';
+        
+        return `<tr>
+            <td><div style="font-weight:700;">${c.nombre}</div><small style="color:#64748b">${c.area}</small></td>
+            <td><span style="font-weight:700; color:var(--primary);">${a.numero || '-'}</span></td>
+            <td>${a.marca_cel || '-'} ${a.modelo_cel || ''}</td>
+            <td>${a.imei_cel || '-'}</td>
+            <td>${a.imei_sim || '-'}</td>
+            <td><div style="font-size:11px; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.observaciones || ''}</div></td>
+            <td>${action}</td>
+        </tr>`;
+    }).join('') : '<tr><td colspan="7" style="text-align:center; padding:20px; color:#64748b;">No hay registros de telefonía</td></tr>';
+}
 
 // --- TABLA MAESTRA ---
 function renderTablaMaestra() {
@@ -386,6 +434,7 @@ function editar(serie) {
     
     document.getElementById('sw_equipo').checked = !!a.marca_cel;
     document.getElementById('sw_sim').checked = !!a.imei_sim;
+    document.getElementById('f_numero').value = a.numero || ''; // Cargar Número
     document.getElementById('f_mar_cel').value = a.marca_cel || '';
     document.getElementById('f_mod_cel').value = a.modelo_cel || '';
     document.getElementById('f_imei').value = a.imei_cel || '';
@@ -394,7 +443,7 @@ function editar(serie) {
     document.getElementById('modalFicha').classList.remove('hidden');
 }
 
-// --- MODAL USUARIO MEJORADO ---
+// --- MODAL USUARIO ---
 function verUser(rut) {
     const c = DB_COLABS.find(x => x.rut === rut); if(!c) return;
     const activos = DB_ACTIVOS.filter(x => x.rut_responsable === rut);
@@ -421,6 +470,7 @@ function verUser(rut) {
                     ${a.imei_sim ? `
                     <div class="asset-detail-row">
                         <div><span class="asset-icon"><i class="fas fa-sim-card"></i></span> <strong>SIM:</strong> ${a.imei_sim}</div>
+                        ${a.numero ? `<div><strong>Nº:</strong> ${a.numero}</div>` : ''}
                     </div>` : ''}
                     <div style="text-align:right; margin-top:5px;"><span class="role-badge badge-viewer">${a.estado}</span></div>
                 </li>
@@ -447,6 +497,7 @@ async function guardarTodoSincronizado() {
         serie, rut_responsable: rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, 
         estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value, 
         entrega_it: document.getElementById('f_ent_it').value, observaciones: document.getElementById('f_obs').value,
+        numero: document.getElementById('f_numero').value, // GUARDAR NUMERO
         marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null,
         modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
         imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
@@ -488,7 +539,7 @@ function setSelect(id, val) { const el = document.getElementById(id); if(el) el.
 function toggleTelefonia() { const eq = document.getElementById('sw_equipo').checked; const sim = document.getElementById('sw_sim').checked; ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { const el = document.getElementById(id); el.disabled = !eq; el.classList.toggle('disabled-field', !eq); if(!eq) el.value = ""; }); const simEl = document.getElementById('f_imsi'); simEl.disabled = !sim; simEl.classList.toggle('disabled-field', !sim); if(!sim) simEl.value = ""; }
 function setupListeners() { const inputRut = document.getElementById('f_rut'); const inputNombre = document.getElementById('f_nombre'); inputRut.addEventListener('blur', () => { inputRut.value = formatearRut(inputRut.value); const c = DB_COLABS.find(x => x.rut === inputRut.value); if(c) { document.getElementById('f_nombre').value = c.nombre||''; document.getElementById('f_correo').value = c.correo||''; setSelect('f_area', c.area); setSelect('f_contractual', c.estado_contractual); } }); inputNombre.addEventListener('input', () => { const c = DB_COLABS.find(x => x.nombre === inputNombre.value); if(c) { inputRut.value = c.rut; document.getElementById('f_correo').value = c.correo; setSelect('f_area', c.area); setSelect('f_contractual', c.estado_contractual); } }); }
 function initCharts() { if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy(); const a = {}, e = {}; DB_COLABS.forEach(x => a[x.area] = (a[x.area]||0)+1); DB_ACTIVOS.forEach(x => e[x.estado] = (e[x.estado]||0)+1); charts.a = new Chart(document.getElementById('chartArea').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b'] }] } }); charts.e = new Chart(document.getElementById('chartEstado').getContext('2d'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label: 'Total', data: Object.values(e), backgroundColor: '#E31837' }] } }); }
-function showView(v) { document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); }
+function showView(v) { document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='telephony') document.getElementById('btn-phone').classList.add('active'); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); }
 function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); setupListeners(); }
 function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 
