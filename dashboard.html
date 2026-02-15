@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v71.0</title>
+    <title>Dashboard - TI Maestro v72.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root { --primary: #0066CC; --secondary: #E31837; --success: #22c55e; --bg: #f8fafc; --border: #e2e8f0; --dark: #0f172a; --radius: 12px; }
+        :root { --primary: #0066CC; --secondary: #E31837; --success: #22c55e; --warning: #f59e0b; --bg: #f8fafc; --border: #e2e8f0; --dark: #0f172a; --radius: 12px; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); height: 100vh; display: flex; font-size: 13px; overflow: hidden; }
         
@@ -45,6 +45,13 @@
 
         .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; align-items: center; gap: 20px; }
 
+        /* ACTIONS BUTTONS */
+        .action-group { display: flex; gap: 8px; }
+        .btn-icon { border: none; background: none; cursor: pointer; font-size: 14px; transition: 0.2s; padding: 4px; border-radius: 4px; }
+        .btn-edit { color: var(--primary); } .btn-edit:hover { background: #e0f2fe; }
+        .btn-return { color: var(--warning); } .btn-return:hover { background: #fef3c7; }
+        .btn-delete { color: var(--secondary); } .btn-delete:hover { background: #fee2e2; }
+
         /* TOAST */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-left: 5px solid; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease-out; font-weight: 600; }
@@ -55,12 +62,11 @@
         .hidden { display: none !important; }
         .admin-only { display: none !important; }
         body.role-admin .admin-only { display: flex !important; }
-        
         .role-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; font-weight: 800; margin-left: 10px; }
         .badge-viewer { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
         .badge-admin { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
-        /* MODAL FORM */
+        /* MODAL */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
@@ -68,9 +74,9 @@
         .field label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
         input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; transition: 0.2s; }
         input:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
-        .error-input { border-color: var(--secondary) !important; background-color: #fff1f2; }
         .section-tag { grid-column: span 4; color: var(--primary); font-weight: 800; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; margin: 20px 0 10px 0; font-size: 12px; }
         
+        /* SWITCHES */
         .switch-box { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
         .toggle input { opacity: 0; width: 0; height: 0; }
@@ -155,7 +161,7 @@
                 <div class="table-wrapper">
                     <div class="table-scroll">
                         <table>
-                            <thead><tr><th>RUT</th><th>Responsable</th><th>Estado</th><th>Contrato</th><th>Área</th><th>Tienda</th><th>Modelo</th><th>Serie</th><th class="admin-only">Acción</th></tr></thead>
+                            <thead><tr><th>RUT</th><th>Responsable</th><th>Estado</th><th>Contrato</th><th>Área</th><th>Tienda</th><th>Modelo</th><th>Serie</th><th class="admin-only">Acciones</th></tr></thead>
                             <tbody id="masterTableBody"></tbody>
                         </table>
                     </div>
@@ -170,17 +176,7 @@
                 <div class="table-wrapper">
                     <div class="table-scroll">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Usuario / Cargo</th>
-                                    <th>Número</th>
-                                    <th>Equipo</th>
-                                    <th>IMEI</th>
-                                    <th>SIM (IMSI)</th>
-                                    <th>Observaciones</th>
-                                    <th class="admin-only">Acción</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Usuario / Cargo</th><th>Número</th><th>Equipo</th><th>IMEI</th><th>SIM (IMSI)</th><th>Observaciones</th><th class="admin-only">Acciones</th></tr></thead>
                             <tbody id="phoneTableBody"></tbody>
                         </table>
                     </div>
@@ -204,9 +200,7 @@
                 <div class="field"><label>RUT *</label><input type="text" id="f_rut" placeholder="Ej: 11.222.333-k"></div>
                 <div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div>
                 <div class="field"><label>Correo</label><input type="email" id="f_correo"></div>
-                <div class="field"><label>Área</label><select id="f_area">
-                    <option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option>
-                </select></div>
+                <div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div>
                 <div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div>
                 <div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div>
 
@@ -214,7 +208,7 @@
                 <div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div>
                 <div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div>
                 <div class="field"><label>Serie PC *</label><input type="text" id="f_serie"></div>
-                <div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option></select></div>
+                <div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div>
                 
                 <div class="section-tag">3. Telefonía Móvil</div>
                 <div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div>
@@ -233,6 +227,39 @@
             <div style="margin-top: 25px; text-align: right; border-top: 1px solid #f1f5f9; padding-top: 20px;">
                 <button onclick="cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; color:#64748b; cursor:pointer; border-radius:6px; margin-right: 10px; font-weight:600;">Cancelar</button>
                 <button onclick="guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--primary); color:white; font-weight:700; cursor:pointer; border-radius:6px;">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3 style="color: var(--warning); margin-bottom: 15px;"><i class="fas fa-box-open"></i> Devolución / Desvinculación</h3>
+            <p style="margin-bottom: 20px;">Estás a punto de desvincular el equipo serie <strong id="dev_serie"></strong> del usuario actual.</p>
+            
+            <div class="field" style="margin-bottom: 15px;">
+                <label>Nuevo Estado</label>
+                <select id="dev_estado">
+                    <option value="Disponible">Disponible (Stock)</option>
+                    <option value="Mantención">A Mantención</option>
+                    <option value="Baja">Dar de Baja</option>
+                </select>
+            </div>
+            <div class="field" style="margin-bottom: 15px;">
+                <label>Nueva Ubicación</label>
+                <select id="dev_ubicacion">
+                    <option>Bodega Central</option>
+                    <option>Casa Matriz</option>
+                    <option>Soporte IT</option>
+                </select>
+            </div>
+            <div class="field" style="margin-bottom: 20px;">
+                <label>Observaciones de Retorno</label>
+                <textarea id="dev_obs" rows="3" placeholder="Ej: Pantalla con rayas, cargador original..."></textarea>
+            </div>
+            
+            <div style="text-align: right;">
+                <button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button>
+                <button onclick="procesarDevolucion()" style="padding:10px 20px; border:none; background:var(--warning); color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR DEVOLUCIÓN</button>
             </div>
         </div>
     </div>
@@ -261,6 +288,7 @@ const TIENDAS = [
 ];
 
 let DB_ACTIVOS = [], DB_COLABS = [], charts = {}, currentUserRole = 'viewer';
+let currentSerieDevolucion = null;
 
 function showToast(msg, type='success') {
     const d = document.createElement('div'); d.className = `toast ${type}`;
@@ -294,7 +322,9 @@ function loadApp(email, role) {
         document.body.classList.remove('role-admin');
         badge.className = 'role-badge badge-viewer'; badge.innerText = 'VISUALIZADOR';
     }
-    document.getElementById('f_tienda').innerHTML = TIENDAS.map(t=>`<option>${t}</option>`).join('');
+    const storeOptions = TIENDAS.map(t=>`<option>${t}</option>`).join('');
+    document.getElementById('f_tienda').innerHTML = storeOptions;
+    document.getElementById('dev_ubicacion').innerHTML = `<option>Bodega Central</option><option>Soporte IT</option>${storeOptions}`;
     cargarDatos();
 }
 
@@ -334,10 +364,7 @@ function renderTablaHome(data, title) {
     b.innerHTML = data.length ? data.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
         return `<tr>
-            <td>
-                <div class="click-name" onclick="verUser('${a.rut_responsable}')" style="font-size:13px;">${c.nombre}</div>
-                <div style="font-size:10px; color:#64748b">${a.rut_responsable}</div>
-            </td>
+            <td><div class="click-name" onclick="verUser('${a.rut_responsable}')" style="font-size:13px;">${c.nombre}</div><div style="font-size:10px; color:#64748b">${a.rut_responsable}</div></td>
             <td><span style="font-size:10px; padding:2px 6px; border-radius:4px; font-weight:600; background:${a.estado==='Disponible'?'#dcfce7':(a.estado==='Mantención'?'#ffedd5':'#f1f5f9')}; color:${a.estado==='Disponible'?'#166534':(a.estado==='Mantención'?'#9a3412':'#334155')}">${a.estado}</span></td>
             <td><div style="font-weight:600; font-size:12px;">${a.ubicacion||'-'}</div><code style="font-size:10px; color:var(--primary)">${a.serie}</code></td>
         </tr>`;
@@ -345,22 +372,28 @@ function renderTablaHome(data, title) {
 }
 function resetHomeTable() { renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); }
 
-// --- TABLA TELEFONÍA (NUEVA) ---
+// --- TABLAS CON ACCIONES (EDITAR, DEVOLVER, BORRAR) ---
+function getActionButtons(serie) {
+    if (currentUserRole !== 'admin') return '';
+    return `
+        <div class="action-group">
+            <button class="btn-icon btn-edit" title="Editar" onclick="editar('${serie}')"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon btn-return" title="Devolver / Desvincular" onclick="abrirDevolucion('${serie}')"><i class="fas fa-undo"></i></button>
+            <button class="btn-icon btn-delete" title="Eliminar Registro" onclick="eliminarActivo('${serie}')"><i class="fas fa-trash-alt"></i></button>
+        </div>
+    `;
+}
+
 function renderPhoneTable() {
     const inputVal = document.getElementById('phoneSearch').value.toLowerCase();
     const b = document.getElementById('phoneTableBody');
-    
     const filtered = DB_ACTIVOS.filter(a => {
-        if (!a.marca_cel && !a.imei_sim) return false; // Solo mostrar si tiene datos de telefonía
+        if (!a.marca_cel && !a.imei_sim) return false;
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
-        const text = `${c.nombre} ${a.numero||''} ${a.imei_cel||''} ${a.imei_sim||''}`.toLowerCase();
-        return text.includes(inputVal);
+        return `${c.nombre} ${a.numero||''} ${a.imei_cel||''} ${a.imei_sim||''}`.toLowerCase().includes(inputVal);
     });
-
     b.innerHTML = filtered.length ? filtered.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', area: '-' };
-        const action = currentUserRole==='admin' ? `<i class="fas fa-edit" style="cursor:pointer; color:var(--primary); font-size:14px;" onclick="editar('${a.serie}')"></i>` : '';
-        
         return `<tr>
             <td><div style="font-weight:700;">${c.nombre}</div><small style="color:#64748b">${c.area}</small></td>
             <td><span style="font-weight:700; color:var(--primary);">${a.numero || '-'}</span></td>
@@ -368,18 +401,14 @@ function renderPhoneTable() {
             <td>${a.imei_cel || '-'}</td>
             <td>${a.imei_sim || '-'}</td>
             <td><div style="font-size:11px; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.observaciones || ''}</div></td>
-            <td>${action}</td>
+            <td>${getActionButtons(a.serie)}</td>
         </tr>`;
-    }).join('') : '<tr><td colspan="7" style="text-align:center; padding:20px; color:#64748b;">No hay registros de telefonía</td></tr>';
+    }).join('') : '<tr><td colspan="7" style="text-align:center; padding:20px; color:#64748b;">No hay registros</td></tr>';
 }
 
-// --- TABLA MAESTRA ---
 function renderTablaMaestra() {
-    const inputVal = document.getElementById('mainSearch').value;
-    const s = inputVal ? inputVal.toLowerCase() : "";
+    const s = document.getElementById('mainSearch').value.toLowerCase();
     const b = document.getElementById('masterTableBody');
-    let lastRut = null;
-    
     const filtered = DB_ACTIVOS.filter(a => {
         if(!s) return true;
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
@@ -388,33 +417,69 @@ function renderTablaMaestra() {
 
     b.innerHTML = filtered.length ? filtered.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', estado_contractual: 'Vigente' };
-        const isSame = lastRut === a.rut_responsable; lastRut = a.rut_responsable;
-        const border = isSame ? 'border-top:none;' : 'border-top:1px solid #e2e8f0;';
-        const opacity = isSame ? 'opacity:0; pointer-events:none;' : '';
-        const action = currentUserRole==='admin' ? `<i class="fas fa-edit" style="cursor:pointer; color:var(--primary); font-size:14px;" onclick="editar('${a.serie}')"></i>` : `<i class="fas fa-eye" style="cursor:pointer; color:#94a3b8" onclick="verUser('${a.rut_responsable}')"></i>`;
-
-        return `<tr style="${border}">
-            <td style="${opacity} color:#64748b">${a.rut_responsable}</td>
-            <td style="${opacity}" class="click-name" onclick="verUser('${a.rut_responsable}')">${c.nombre}</td>
+        return `<tr>
+            <td style="color:#64748b">${a.rut_responsable}</td>
+            <td class="click-name" onclick="verUser('${a.rut_responsable}')">${c.nombre}</td>
             <td>${a.estado}</td>
-            <td style="${opacity} color:${c.estado_contractual==='Cesado'?'#b91c1c':'#166534'}; font-weight:700;">${c.estado_contractual||'Vigente'}</td>
-            <td style="${opacity}">${c.area}</td>
-            <td style="${opacity}">${a.ubicacion}</td>
+            <td style="color:${c.estado_contractual==='Cesado'?'#b91c1c':'#166534'}; font-weight:700;">${c.estado_contractual||'Vigente'}</td>
+            <td>${c.area}</td>
+            <td>${a.ubicacion}</td>
             <td>${a.marca} ${a.modelo}</td>
             <td><code style="color:var(--primary); font-weight:600;">${a.serie}</code></td>
-            <td>${action}</td>
+            <td>${getActionButtons(a.serie)}</td>
         </tr>`;
     }).join('') : '<tr><td colspan="9" style="text-align:center; padding:20px; font-style:italic; color:#64748b;">No se encontraron resultados</td></tr>';
 }
 
-// --- CRUD ---
+// --- FUNCIONES NUEVAS: DEVOLUCIÓN Y ELIMINACIÓN ---
+function abrirDevolucion(serie) {
+    currentSerieDevolucion = serie;
+    document.getElementById('dev_serie').innerText = serie;
+    document.getElementById('dev_obs').value = '';
+    document.getElementById('modalDevolucion').classList.remove('hidden');
+}
+
+async function procesarDevolucion() {
+    if (!currentSerieDevolucion) return;
+    const nuevoEstado = document.getElementById('dev_estado').value;
+    const nuevaUbicacion = document.getElementById('dev_ubicacion').value;
+    const obs = document.getElementById('dev_obs').value;
+
+    try {
+        const { error } = await sb.from('activos').update({
+            rut_responsable: null, 
+            estado: nuevoEstado,
+            ubicacion: nuevaUbicacion,
+            observaciones: obs ? `DEVOLUCIÓN: ${obs}` : 'Equipo devuelto a bodega'
+        }).eq('serie', currentSerieDevolucion);
+
+        if (error) throw error;
+        showToast("Equipo devuelto y desvinculado correctamente");
+        document.getElementById('modalDevolucion').classList.add('hidden');
+        cargarDatos();
+    } catch (e) {
+        showToast("Error al procesar devolución: " + e.message, "error");
+    }
+}
+
+async function eliminarActivo(serie) {
+    if(!confirm("¿Estás seguro de que quieres ELIMINAR definitivamente este activo? Esta acción no se puede deshacer.")) return;
+    try {
+        const { error } = await sb.from('activos').delete().eq('serie', serie);
+        if (error) throw error;
+        showToast("Registro eliminado permanentemente");
+        cargarDatos();
+    } catch (e) {
+        showToast("Error al eliminar: " + e.message, "error");
+    }
+}
+
+// --- CRUD EXISTENTE ---
 function nuevoRegistro() {
     document.querySelectorAll('#modalFicha input').forEach(i => { i.value = ''; i.classList.remove('error-input'); });
     document.querySelectorAll('#modalFicha select').forEach(s => s.selectedIndex = 0);
-    document.getElementById('sw_equipo').checked = false;
-    document.getElementById('sw_sim').checked = false;
-    toggleTelefonia(); 
-    document.getElementById('modalFicha').classList.remove('hidden');
+    document.getElementById('sw_equipo').checked = false; document.getElementById('sw_sim').checked = false;
+    toggleTelefonia(); document.getElementById('modalFicha').classList.remove('hidden');
 }
 
 function editar(serie) {
@@ -434,7 +499,7 @@ function editar(serie) {
     
     document.getElementById('sw_equipo').checked = !!a.marca_cel;
     document.getElementById('sw_sim').checked = !!a.imei_sim;
-    document.getElementById('f_numero').value = a.numero || ''; // Cargar Número
+    document.getElementById('f_numero').value = a.numero || '';
     document.getElementById('f_mar_cel').value = a.marca_cel || '';
     document.getElementById('f_mod_cel').value = a.modelo_cel || '';
     document.getElementById('f_imei').value = a.imei_cel || '';
@@ -443,39 +508,15 @@ function editar(serie) {
     document.getElementById('modalFicha').classList.remove('hidden');
 }
 
-// --- MODAL USUARIO ---
 function verUser(rut) {
     const c = DB_COLABS.find(x => x.rut === rut); if(!c) return;
     const activos = DB_ACTIVOS.filter(x => x.rut_responsable === rut);
-    
-    const html = `
-        <div class="user-header">
-            <div class="user-avatar">${c.nombre.charAt(0)}</div>
-            <div><h3 style="margin:0; font-size:20px;">${c.nombre}</h3><p style="color:#64748b;">${c.rut} | ${c.area}</p></div>
-        </div>
-        <h4 style="color:var(--primary); margin-bottom:15px;">Equipos Asignados (${activos.length})</h4>
-        <ul class="asset-list">
-            ${activos.map(a => `
-                <li class="asset-item">
-                    <div class="asset-detail-row">
-                        <div><span class="asset-icon"><i class="fas fa-laptop"></i></span> <strong>PC:</strong> ${a.marca} ${a.modelo}</div>
-                        <code style="color:var(--primary)">${a.serie}</code>
-                    </div>
-                    ${a.marca_cel ? `
-                    <div class="separator"></div>
-                    <div class="asset-detail-row">
-                        <div><span class="asset-icon"><i class="fas fa-mobile-alt"></i></span> <strong>Cel:</strong> ${a.marca_cel} ${a.modelo_cel}</div>
-                        <small>IMEI: ${a.imei_cel}</small>
-                    </div>` : ''}
-                    ${a.imei_sim ? `
-                    <div class="asset-detail-row">
-                        <div><span class="asset-icon"><i class="fas fa-sim-card"></i></span> <strong>SIM:</strong> ${a.imei_sim}</div>
-                        ${a.numero ? `<div><strong>Nº:</strong> ${a.numero}</div>` : ''}
-                    </div>` : ''}
-                    <div style="text-align:right; margin-top:5px;"><span class="role-badge badge-viewer">${a.estado}</span></div>
-                </li>
-            `).join('')}
-        </ul>`;
+    const html = `<div class="user-header"><div class="user-avatar">${c.nombre.charAt(0)}</div><div><h3 style="margin:0; font-size:20px;">${c.nombre}</h3><p style="color:#64748b;">${c.rut} | ${c.area}</p></div></div>
+        <h4 style="color:var(--primary); margin-bottom:15px;">Equipos Asignados (${activos.length})</h4><ul class="asset-list">${activos.map(a => `
+        <li class="asset-item"><div class="asset-detail-row"><div><span class="asset-icon"><i class="fas fa-laptop"></i></span> <strong>PC:</strong> ${a.marca} ${a.modelo}</div><code style="color:var(--primary)">${a.serie}</code></div>
+        ${a.marca_cel ? `<div class="separator"></div><div class="asset-detail-row"><div><span class="asset-icon"><i class="fas fa-mobile-alt"></i></span> <strong>Cel:</strong> ${a.marca_cel}</div><small>IMEI: ${a.imei_cel}</small></div>` : ''}
+        ${a.imei_sim ? `<div class="asset-detail-row"><div><span class="asset-icon"><i class="fas fa-sim-card"></i></span> <strong>SIM:</strong> ${a.imei_sim}</div>${a.numero ? `<div><strong>Nº:</strong> ${a.numero}</div>` : ''}</div>` : ''}
+        <div style="text-align:right; margin-top:5px;"><span class="role-badge badge-viewer">${a.estado}</span></div></li>`).join('')}</ul>`;
     document.getElementById('userProfileContent').innerHTML = html;
     document.getElementById('modalVerUsuario').classList.remove('hidden');
 }
@@ -484,32 +525,23 @@ async function guardarTodoSincronizado() {
     const btn = document.getElementById('btnSave');
     const rut = document.getElementById('f_rut').value.trim(); 
     const serie = document.getElementById('f_serie').value.trim();
-    if(!rut || !serie) { 
-        if(!rut) document.getElementById('f_rut').classList.add('error-input');
-        if(!serie) document.getElementById('f_serie').classList.add('error-input');
-        return showToast("Faltan campos (RUT o Serie)", "error"); 
-    }
-    
+    if(!rut || !serie) { return showToast("Faltan campos (RUT o Serie)", "error"); }
     btn.innerText = "PROCESANDO..."; btn.disabled = true;
-
+    
     const colab = { rut, nombre: document.getElementById('f_nombre').value, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value, estado_contractual: document.getElementById('f_contractual').value };
     const activo = { 
         serie, rut_responsable: rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, 
         estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value, 
         entrega_it: document.getElementById('f_ent_it').value, observaciones: document.getElementById('f_obs').value,
-        numero: document.getElementById('f_numero').value, // GUARDAR NUMERO
+        numero: document.getElementById('f_numero').value,
         marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null,
         modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null,
         imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null,
         imei_sim: document.getElementById('sw_sim').checked ? document.getElementById('f_imsi').value : null
     };
 
-    try {
-        await sb.from('colaboradores').upsert(colab, {onConflict:'rut'});
-        await sb.from('activos').upsert(activo, {onConflict:'serie'});
-        showToast("Registro guardado exitosamente"); cerrarFicha(); cargarDatos();
-    } catch(e) { console.error(e); showToast("Error al guardar", "error"); } 
-    finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
+    try { await sb.from('colaboradores').upsert(colab, {onConflict:'rut'}); await sb.from('activos').upsert(activo, {onConflict:'serie'}); showToast("Registro guardado exitosamente"); cerrarFicha(); cargarDatos(); } 
+    catch(e) { console.error(e); showToast("Error al guardar", "error"); } finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
 }
 
 async function procesarCSV() {
@@ -517,16 +549,14 @@ async function procesarCSV() {
     const btn = document.getElementById('btnCsv'); btn.innerText = "CARGANDO..."; btn.disabled = true;
     const reader = new FileReader(); reader.readAsText(file, 'UTF-8');
     reader.onload = async function(e) {
-        const lines = e.target.result.split(/\r?\n/);
-        let count = 0;
+        const lines = e.target.result.split(/\r?\n/); let count = 0;
         for (let i = 1; i < lines.length; i++) {
             if (!lines[i].trim()) continue;
             const col = lines[i].split(',').map(v => v.replace(/^"|"$/g, '').trim());
             if(col.length<5) continue;
             const c = { rut: formatearRut(col[0]), nombre: col[1], correo: col[4], area: col[5], estado_contractual: col[16] || 'Vigente' };
             const a = { serie: col[9], rut_responsable: c.rut, ubicacion: col[6], marca: col[7], modelo: col[8], estado: col[3], fecha_entrega: formatearFechaCSV(col[2]), entrega_it: col[13], observaciones: col[15] };
-            sb.from('colaboradores').upsert(c, { onConflict: 'rut' }).then();
-            sb.from('activos').upsert(a, { onConflict: 'serie' }).then(); count++;
+            sb.from('colaboradores').upsert(c, { onConflict: 'rut' }).then(); sb.from('activos').upsert(a, { onConflict: 'serie' }).then(); count++;
         }
         setTimeout(() => { showToast(`Procesados ${count} registros`); cargarDatos(); btn.innerText = "PROCESAR"; btn.disabled = false; }, 2000);
     };
