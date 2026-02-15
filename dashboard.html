@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v78.0</title>
+    <title>Dashboard - TI Maestro v78.1</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -353,7 +353,7 @@ async function cargarDatos() {
         actualizarDashboard(); 
         
         // 3. INICIALIZAR REPORTES
-        document.getElementById('chartsContainer').innerHTML = '';
+        document.getElementById('chartsContainer').innerHTML = ''; // Limpiar
         addChart('estado', 'doughnut');
         addChart('tienda', 'bar');
 
@@ -376,14 +376,13 @@ function actualizarDashboard() {
     const asig = DB_ACTIVOS.filter(a=>a.estado==='Asignado').length;
     const baja = DB_ACTIVOS.filter(a=>a.estado==='Baja').length;
     
-    // Contadores Específicos
+    // Contadores Específicos Actualizados
     const pcs = DB_ACTIVOS.filter(a => a.marca && a.marca.trim() !== '').length;
-    const cels = DB_ACTIVOS.filter(a => a.marca_cel && a.marca_cel.trim() !== '').length;
-    const sims = DB_ACTIVOS.filter(a => a.imei_sim && a.imei_sim.trim() !== '').length;
+    const cels = DB_ACTIVOS.filter(a => (a.marca_cel && a.marca_cel.trim() !== '') || (a.imei_cel && a.imei_cel.trim() !== '')).length;
+    const sims = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.trim() !== '') || (a.numero && a.numero.trim() !== '')).length;
     
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
-    // Uso de safeSetText para evitar el crash "Cannot set properties of null"
     safeSetText('kpi-total', total);
     safeSetText('kpi-dispo', disp);
     safeSetText('kpi-mant', mant);
