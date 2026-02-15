@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v77.0</title>
+    <title>Dashboard - TI Maestro v78.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -26,40 +26,34 @@
         header { background: white; padding: 18px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .content-area { padding: 25px; overflow-y: auto; flex-grow: 1; }
         
-        /* DASHBOARD GRID ACTUALIZADO */
+        /* KPIS */
         .kpi-section { margin-bottom: 25px; }
         .kpi-title { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
-        
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        
-        .kpi-card { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; }
-        .kpi-card:hover { transform: translateY(-3px); border-color: var(--primary); }
-        
-        .kpi-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; flex-shrink: 0; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
+        .kpi-card { background: white; padding: 15px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .kpi-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; flex-shrink: 0; }
         .kpi-content { display: flex; flex-direction: column; }
-        .kpi-number { font-size: 24px; font-weight: 800; color: var(--dark); line-height: 1; }
-        .kpi-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; margin-top: 4px; }
+        .kpi-number { font-size: 20px; font-weight: 800; color: var(--dark); line-height: 1; }
+        .kpi-label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; margin-top: 4px; }
 
-        /* HOME TABLA */
+        /* TABLAS & LISTAS */
         .home-table-section { background: white; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; min-height: 300px; }
         .home-table-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-
-        /* REPORTES DINÁMICOS */
-        .reports-toolbar { display: flex; justify-content: flex-end; margin-bottom: 15px; }
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; padding-bottom: 50px; }
-        .chart-card { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); position: relative; display: flex; flex-direction: column; }
-        .chart-header { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
-        .chart-select { padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 11px; flex-grow: 1; }
-        .chart-canvas-container { flex-grow: 1; position: relative; min-height: 300px; }
-        .btn-remove-chart { color: #cbd5e1; cursor: pointer; } .btn-remove-chart:hover { color: var(--secondary); }
-
-        /* TABLAS GENÉRICAS */
         .table-wrapper { background: white; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; height: calc(100vh - 180px); }
         .table-scroll { overflow: auto; width: 100%; height: 100%; }
         table { width: 100%; border-collapse: collapse; table-layout: auto; }
         th { background: #f1f5f9; padding: 10px; text-align: left; position: sticky; top: 0; z-index: 10; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); white-space: nowrap; color: #64748b; font-weight: 700; }
         td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
         tr:hover td { background-color: #f8fafc; }
+
+        /* CHARTS */
+        .reports-toolbar { display: flex; justify-content: flex-end; margin-bottom: 15px; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; padding-bottom: 50px; }
+        .chart-card { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; }
+        .chart-header { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+        .chart-select { padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 11px; flex-grow: 1; }
+        .chart-canvas-container { flex-grow: 1; position: relative; min-height: 300px; }
+        .btn-remove-chart { color: #cbd5e1; cursor: pointer; } .btn-remove-chart:hover { color: var(--secondary); }
 
         /* UTILS */
         .hidden { display: none !important; }
@@ -69,8 +63,7 @@
         .badge-viewer { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
         .badge-admin { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
         .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; align-items: center; gap: 20px; }
-
-        /* ACTIONS */
+        
         .action-group { display: flex; gap: 5px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 14px; transition: 0.2s; padding: 6px; border-radius: 4px; }
         .btn-edit { color: var(--primary); background: #e0f2fe; }
@@ -160,7 +153,7 @@
                         <div class="kpi-card"><div class="kpi-icon" style="background: var(--info);"><i class="fas fa-laptop"></i></div><div class="kpi-content"><span class="kpi-number" id="kpi-pcs">-</span><span class="kpi-label">Computadores</span></div></div>
                         <div class="kpi-card"><div class="kpi-icon" style="background: var(--info);"><i class="fas fa-mobile-alt"></i></div><div class="kpi-content"><span class="kpi-number" id="kpi-cels">-</span><span class="kpi-label">Celulares</span></div></div>
                         <div class="kpi-card"><div class="kpi-icon" style="background: var(--info);"><i class="fas fa-sim-card"></i></div><div class="kpi-content"><span class="kpi-number" id="kpi-sims">-</span><span class="kpi-label">Chips / SIMs</span></div></div>
-                        <div class="kpi-card"><div class="kpi-icon" style="background: var(--secondary);"><i class="fas fa-user-slash"></i></div><div class="kpi-content"><span class="kpi-number" id="kpi-cesados">-</span><span class="kpi-label">En Cesados (Alerta)</span></div></div>
+                        <div class="kpi-card"><div class="kpi-icon" style="background: var(--secondary);"><i class="fas fa-user-slash"></i></div><div class="kpi-content"><span class="kpi-number" id="kpi-cesados">-</span><span class="kpi-label">Usuario Cesado</span></div></div>
                     </div>
                 </div>
 
@@ -351,13 +344,16 @@ async function cargarDatos() {
         
         document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c=>`<option value="${c.nombre}">`).join('');
         
-        // FORZAR ACTUALIZACIÓN DE TODAS LAS VISTAS
-        actualizarDashboard(); 
+        // 1. CARGAR TABLAS PRIMERO (Para evitar que un error de KPI deje las tablas vacías)
         renderTablaMaestra(); 
         renderPhoneTable(); 
+        renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
+
+        // 2. LUEGO CARGAR DASHBOARD (KPIS)
+        actualizarDashboard(); 
         
-        // Inicializar Reportes (2 por defecto)
-        document.getElementById('chartsContainer').innerHTML = ''; // Limpiar
+        // 3. INICIALIZAR REPORTES
+        document.getElementById('chartsContainer').innerHTML = '';
         addChart('estado', 'doughnut');
         addChart('tienda', 'bar');
 
@@ -367,7 +363,12 @@ async function cargarDatos() {
     }
 }
 
-// --- DASHBOARD (HOME) ---
+// --- DASHBOARD (HOME) & PROTECCIÓN DE ERRORES ---
+function safeSetText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = value;
+}
+
 function actualizarDashboard() {
     const total = DB_ACTIVOS.length;
     const disp = DB_ACTIVOS.filter(a=>a.estado==='Disponible').length;
@@ -382,25 +383,22 @@ function actualizarDashboard() {
     
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
-    // KPIs Generales
-    document.getElementById('kpi-total').innerText = total; 
-    document.getElementById('kpi-dispo').innerText = disp;
-    document.getElementById('kpi-mant').innerText = mant; 
-    document.getElementById('kpi-asig').innerText = asig;
-    document.getElementById('kpi-baja').innerText = baja; // NUEVO
-
-    // KPIs Específicos
-    document.getElementById('kpi-pcs').innerText = pcs;
-    document.getElementById('kpi-cels').innerText = cels;
-    document.getElementById('kpi-sims').innerText = sims;
-    document.getElementById('kpi-cesados').innerText = ces;
-
-    renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
+    // Uso de safeSetText para evitar el crash "Cannot set properties of null"
+    safeSetText('kpi-total', total);
+    safeSetText('kpi-dispo', disp);
+    safeSetText('kpi-mant', mant);
+    safeSetText('kpi-asig', asig);
+    safeSetText('kpi-baja', baja);
+    safeSetText('kpi-pcs', pcs);
+    safeSetText('kpi-cels', cels);
+    safeSetText('kpi-sims', sims);
+    safeSetText('kpi-cesados', ces);
 }
 
 function renderTablaHome(data, title) {
-    document.getElementById('homeTableTitle').innerText = title;
+    safeSetText('homeTableTitle', title);
     const b = document.getElementById('lastMovesTable');
+    if(!b) return;
     if(data.length === 0) { b.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b;">No hay movimientos recientes</td></tr>'; return; }
     b.innerHTML = data.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
@@ -413,7 +411,7 @@ function renderTablaHome(data, title) {
 }
 function resetHomeTable() { renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); }
 
-// --- REPORTES DINÁMICOS (NUEVO) ---
+// --- REPORTES DINÁMICOS ---
 let chartCounter = 0;
 function addChart(defaultKey='estado', defaultType='bar') {
     chartCounter++;
@@ -448,11 +446,9 @@ function updateDynamicChart(id) {
     const keyFilter = document.getElementById(`sel_key_${id}`).value;
     const typeFilter = document.getElementById(`sel_type_${id}`).value;
 
-    // Destruir si existe
     const existing = Chart.getChart(id);
     if(existing) existing.destroy();
 
-    // Procesar Datos
     const dataCounts = {};
     DB_ACTIVOS.forEach(a => {
         let key = 'N/A';
@@ -514,6 +510,7 @@ function getActionButtons(serie) {
 function renderPhoneTable() {
     const inputVal = document.getElementById('phoneSearch').value.toLowerCase();
     const b = document.getElementById('phoneTableBody');
+    if(!b) return;
     const filtered = DB_ACTIVOS.filter(a => {
         if (!a.marca_cel && !a.imei_sim) return false;
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
@@ -529,6 +526,7 @@ function renderPhoneTable() {
 function renderTablaMaestra() {
     const s = document.getElementById('mainSearch').value.toLowerCase();
     const b = document.getElementById('masterTableBody');
+    if(!b) return;
     const filtered = DB_ACTIVOS.filter(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
         return `${a.serie} ${c.nombre} ${a.rut_responsable} ${a.ubicacion}`.toLowerCase().includes(s);
