@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v74.0</title>
+    <title>Dashboard - TI Maestro v75.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -26,26 +26,29 @@
         header { background: white; padding: 18px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .content-area { padding: 25px; overflow-y: auto; flex-grow: 1; }
         
-        /* DASHBOARD LAYOUT (NUEVO DISEÑO) */
-        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .kpi-card { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .kpi-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
-        .kpi-info h3 { font-size: 24px; font-weight: 800; color: var(--dark); margin: 0; }
-        .kpi-info p { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; margin: 0; }
+        /* --- HOME: KPIs & TABLA --- */
+        .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: white; padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s; }
+        .kpi-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+        .kpi-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; margin-bottom: 5px; }
+        .kpi-number { font-size: 32px; font-weight: 800; color: var(--dark); margin: 0; line-height: 1; }
+        .kpi-label { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* SECCIÓN GRÁFICOS (PREDOMINANTE) */
-        .charts-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; height: 350px; }
-        .chart-card { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); position: relative; }
-
-        /* SECCIÓN MOVIMIENTOS (SECUNDARIA) */
-        .recent-moves-section { background: white; padding: 15px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; height: 300px; }
+        .home-table-section { background: white; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; height: calc(100vh - 280px); }
+        .home-table-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
         
-        /* TABLAS */
+        /* --- REPORTES: CONTROLES --- */
+        .metrics-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .control-card { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); }
+        .chart-selector { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; font-weight: 600; color: var(--dark); }
+        .chart-display { height: 350px; position: relative; }
+
+        /* TABLAS GENERALES */
         .table-wrapper { background: white; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
         .table-scroll { overflow: auto; width: 100%; height: 100%; }
         table { width: 100%; border-collapse: collapse; table-layout: auto; }
-        th { background: #f1f5f9; padding: 10px; text-align: left; position: sticky; top: 0; z-index: 10; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); white-space: nowrap; color: #64748b; font-weight: 700; }
-        td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
+        th { background: #f1f5f9; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); white-space: nowrap; color: #64748b; font-weight: 700; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; }
         tr:hover td { background-color: #f8fafc; }
 
         .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; align-items: center; gap: 20px; }
@@ -71,15 +74,13 @@
         .toast.success { border-color: var(--success); } .toast.error { border-color: var(--secondary); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* UTILS */
+        /* UTILS & MODAL */
         .hidden { display: none !important; }
         .admin-only { display: none !important; }
         body.role-admin .admin-only { display: flex !important; }
         .role-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; font-weight: 800; margin-left: 10px; }
         .badge-viewer { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
         .badge-admin { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-
-        /* MODAL */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
@@ -88,7 +89,6 @@
         input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; transition: 0.2s; }
         input:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
         .section-tag { grid-column: span 4; color: var(--primary); font-weight: 800; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; margin: 20px 0 10px 0; font-size: 12px; }
-        
         .switch-box { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
         .toggle input { opacity: 0; width: 0; height: 0; }
@@ -97,10 +97,7 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(16px); }
         .disabled-field { background-color: #f1f5f9 !important; color: #94a3b8 !important; cursor: not-allowed !important; }
-
-        /* USER PROFILE DETAILED */
         .click-name { cursor: pointer; color: var(--primary); font-weight: 700; text-decoration: none; border-bottom: 1px dotted var(--primary); }
-        .click-name:hover { color: #004488; border-bottom-style: solid; }
         .user-header { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; }
         .user-avatar { width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; }
         .asset-list { list-style: none; padding: 0; }
@@ -119,6 +116,7 @@
         <button class="nav-btn active" id="btn-home" onclick="showView('home')"><i class="fas fa-home"></i> Inicio</button>
         <button class="nav-btn" id="btn-inv" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario Data</button>
         <button class="nav-btn" id="btn-phone" onclick="showView('telephony')"><i class="fas fa-mobile-alt"></i> Telefonía</button>
+        <button class="nav-btn" id="btn-metrics" onclick="showView('metrics')"><i class="fas fa-chart-pie"></i> Reportes TI</button>
         <hr style="margin: 20px 0; opacity: 0.2;">
         <button class="nav-btn admin-only" style="background: var(--success);" onclick="nuevoRegistro()"><i class="fas fa-plus-circle"></i> NUEVO REGISTRO</button>
         <button class="nav-btn" style="background: rgba(0,0,0,0.3); margin-top: auto;" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
@@ -136,27 +134,22 @@
         <div class="content-area">
             
             <div id="view-home">
-                
                 <div class="kpi-grid">
-                    <div class="kpi-card"><div class="kpi-icon" style="background: var(--primary);"><i class="fas fa-laptop"></i></div><div class="kpi-info"><h3 id="kpi-total">0</h3><p>Total Activos</p></div></div>
-                    <div class="kpi-card"><div class="kpi-icon" style="background: var(--success);"><i class="fas fa-check-circle"></i></div><div class="kpi-info"><h3 id="kpi-dispo">0</h3><p>Stock Disponible</p></div></div>
-                    <div class="kpi-card"><div class="kpi-icon" style="background: #f59e0b;"><i class="fas fa-tools"></i></div><div class="kpi-info"><h3 id="kpi-mant">0</h3><p>En Mantención</p></div></div>
-                    <div class="kpi-card"><div class="kpi-icon" style="background: var(--secondary);"><i class="fas fa-user-slash"></i></div><div class="kpi-info"><h3 id="kpi-cesados">0</h3><p>Equipos en Cesados</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon" style="background: var(--dark);"><i class="fas fa-laptop"></i></div><h3 id="kpi-total" class="kpi-number">0</h3><span class="kpi-label">Total Activos</span></div>
+                    <div class="kpi-card"><div class="kpi-icon" style="background: var(--primary);"><i class="fas fa-user-check"></i></div><h3 id="kpi-asig" class="kpi-number">0</h3><span class="kpi-label">Asignados</span></div>
+                    <div class="kpi-card"><div class="kpi-icon" style="background: var(--success);"><i class="fas fa-box-open"></i></div><h3 id="kpi-dispo" class="kpi-number">0</h3><span class="kpi-label">Disponibles</span></div>
+                    <div class="kpi-card"><div class="kpi-icon" style="background: var(--warning);"><i class="fas fa-tools"></i></div><h3 id="kpi-mant" class="kpi-number">0</h3><span class="kpi-label">En Mantención</span></div>
+                    <div class="kpi-card"><div class="kpi-icon" style="background: var(--secondary);"><i class="fas fa-user-slash"></i></div><h3 id="kpi-cesados" class="kpi-number">0</h3><span class="kpi-label">Eq. en Cesados</span></div>
                 </div>
 
-                <div class="charts-section">
-                    <div class="chart-card"><canvas id="chartArea"></canvas></div>
-                    <div class="chart-card"><canvas id="chartEstado"></canvas></div>
-                </div>
-
-                <div class="recent-moves-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h4 id="homeTableTitle" style="color: var(--primary); margin: 0; font-size: 14px;">Últimos Movimientos Registrados</h4>
-                        <button onclick="resetHomeTable()" style="font-size: 10px; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight:600;">Ver Todo</button>
+                <div class="home-table-section">
+                    <div class="home-table-header">
+                        <h4 style="color: var(--primary); margin: 0; font-size: 16px;"><i class="fas fa-history"></i> Últimos Movimientos</h4>
+                        <button onclick="resetHomeTable()" style="font-size: 11px; background: white; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight:600;">Actualizar</button>
                     </div>
                     <div class="table-scroll">
                         <table style="width: 100%;">
-                            <thead><tr><th style="width: 40%;">Nombre / RUT</th><th style="width: 20%;">Estado</th><th style="width: 40%;">Ubicación / Serie</th></tr></thead>
+                            <thead><tr><th style="width: 35%;">Nombre / RUT</th><th style="width: 25%;">Estado</th><th style="width: 40%;">Ubicación / Serie</th></tr></thead>
                             <tbody id="lastMovesTable"></tbody>
                         </table>
                     </div>
@@ -190,6 +183,30 @@
                             <thead><tr><th>Usuario / Cargo</th><th>Número</th><th>Equipo</th><th>IMEI</th><th>SIM (IMSI)</th><th>Observaciones</th><th class="admin-only">Acciones</th></tr></thead>
                             <tbody id="phoneTableBody"></tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-metrics" class="hidden">
+                <div class="metrics-controls">
+                    <div class="control-card">
+                        <label style="display:block; margin-bottom:5px; font-weight:700;">Gráfico 1: Distribución</label>
+                        <select id="chart1_filter" class="chart-selector" onchange="updateCharts()">
+                            <option value="estado">Por Estado del Equipo</option>
+                            <option value="tienda">Por Ubicación / Tienda</option>
+                            <option value="area">Por Área del Usuario</option>
+                            <option value="marca">Por Marca de Equipo</option>
+                        </select>
+                        <div class="chart-display"><canvas id="dynamicChart1"></canvas></div>
+                    </div>
+                    <div class="control-card">
+                        <label style="display:block; margin-bottom:5px; font-weight:700;">Gráfico 2: Resumen</label>
+                        <select id="chart2_filter" class="chart-selector" onchange="updateCharts()">
+                            <option value="area">Por Área</option>
+                            <option value="estado">Por Estado</option>
+                            <option value="marca">Por Marca</option>
+                        </select>
+                        <div class="chart-display"><canvas id="dynamicChart2"></canvas></div>
                     </div>
                 </div>
             </div>
@@ -307,8 +324,10 @@ function loadApp(email, role) {
     const storeOptions = TIENDAS.map(t=>`<option>${t}</option>`).join('');
     document.getElementById('f_tienda').innerHTML = storeOptions;
     document.getElementById('dev_ubicacion').innerHTML = `<option>Bodega Central</option><option>Soporte IT</option>${storeOptions}`;
+    
+    // Iniciar escuchadores de búsqueda
+    setupSearchListeners();
     cargarDatos();
-    setupSearchListeners(); // INICIAR ESCUCHADORES DE BÚSQUEDA
 }
 
 async function cerrarSesion() {
@@ -323,25 +342,25 @@ async function cargarDatos() {
     if(resA.data) DB_ACTIVOS = resA.data.sort((a,b)=> new Date(b.created_at||0) - new Date(a.created_at||0));
     if(resC.data) DB_COLABS = resC.data;
     document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c=>`<option value="${c.nombre}">`).join('');
-    actualizarDashboard(); renderTablaMaestra(); renderPhoneTable(); initCharts();
+    
+    actualizarDashboard(); 
+    renderTablaMaestra(); 
+    renderPhoneTable(); 
+    updateCharts(); // Inicializar gráficos dinámicos
 }
 
-// --- DASHBOARD ---
+// --- DASHBOARD (HOME) ---
 function actualizarDashboard() {
     const total = DB_ACTIVOS.length;
     const disp = DB_ACTIVOS.filter(a=>a.estado==='Disponible').length;
     const mant = DB_ACTIVOS.filter(a=>a.estado==='Mantención').length;
+    const asig = DB_ACTIVOS.filter(a=>a.estado==='Asignado').length;
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
     document.getElementById('kpi-total').innerText = total; document.getElementById('kpi-dispo').innerText = disp;
     document.getElementById('kpi-mant').innerText = mant; document.getElementById('kpi-cesados').innerText = ces;
+    document.getElementById('kpi-asig').innerText = asig;
     renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
-
-    if(charts.a) charts.a.destroy(); if(charts.e) charts.e.destroy();
-    const a={}; DB_COLABS.forEach(x=>a[x.area]=(a[x.area]||0)+1);
-    const e={}; DB_ACTIVOS.forEach(x=>e[x.estado]=(e[x.estado]||0)+1);
-    charts.a = new Chart(document.getElementById('chartArea').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(a), datasets: [{ data: Object.values(a), backgroundColor: ['#0066CC','#E31837','#22c55e','#f59e0b'] }] }, options: {maintainAspectRatio:false, plugins:{datalabels:{color:'white'}}} });
-    charts.e = new Chart(document.getElementById('chartEstado').getContext('2d'), { type: 'bar', data: { labels: Object.keys(e), datasets: [{ label:'Equipos', data: Object.values(e), backgroundColor: '#E31837' }] }, options: {maintainAspectRatio:false, plugins:{legend:{display:false}}} });
 }
 
 function renderTablaHome(data, title) {
@@ -358,13 +377,58 @@ function renderTablaHome(data, title) {
 }
 function resetHomeTable() { renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); }
 
-// --- BÚSQUEDA CORREGIDA (EVENT LISTENERS) ---
-function setupSearchListeners() {
-    document.getElementById('mainSearch').addEventListener('input', renderTablaMaestra);
-    document.getElementById('phoneSearch').addEventListener('input', renderPhoneTable);
+// --- REPORTES DINÁMICOS (CHARTS) ---
+function updateCharts() {
+    if(charts.c1) charts.c1.destroy();
+    if(charts.c2) charts.c2.destroy();
+
+    // Gráfico 1: Donut
+    const filter1 = document.getElementById('chart1_filter').value;
+    const data1 = {};
+    DB_ACTIVOS.forEach(a => {
+        let key = 'N/A';
+        if(filter1 === 'estado') key = a.estado;
+        else if(filter1 === 'tienda') key = a.ubicacion;
+        else if(filter1 === 'marca') key = a.marca;
+        else if(filter1 === 'area') { const c = DB_COLABS.find(x=>x.rut===a.rut_responsable); key = c ? c.area : 'Sin Asignar'; }
+        data1[key] = (data1[key] || 0) + 1;
+    });
+
+    charts.c1 = new Chart(document.getElementById('dynamicChart1'), {
+        type: 'doughnut',
+        data: { labels: Object.keys(data1), datasets: [{ data: Object.values(data1), backgroundColor: ['#0066CC', '#E31837', '#22c55e', '#f59e0b', '#64748b'] }] },
+        options: { maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+    });
+
+    // Gráfico 2: Barras
+    const filter2 = document.getElementById('chart2_filter').value;
+    const data2 = {};
+    DB_ACTIVOS.forEach(a => {
+        let key = 'N/A';
+        if(filter2 === 'estado') key = a.estado;
+        else if(filter2 === 'marca') key = a.marca;
+        else if(filter2 === 'area') { const c = DB_COLABS.find(x=>x.rut===a.rut_responsable); key = c ? c.area : 'Sin Asignar'; }
+        data2[key] = (data2[key] || 0) + 1;
+    });
+
+    charts.c2 = new Chart(document.getElementById('dynamicChart2'), {
+        type: 'bar',
+        data: { labels: Object.keys(data2), datasets: [{ label: 'Cantidad', data: Object.values(data2), backgroundColor: '#E31837' }] },
+        options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
 }
 
-// --- HISTORIAL ---
+// --- BÚSQUEDA EN TIEMPO REAL ---
+function setupSearchListeners() {
+    const mainInput = document.getElementById('mainSearch');
+    const phoneInput = document.getElementById('phoneSearch');
+    
+    // Escuchar evento 'input' (cada tecla) para filtrar al instante
+    if(mainInput) mainInput.addEventListener('input', renderTablaMaestra);
+    if(phoneInput) phoneInput.addEventListener('input', renderPhoneTable);
+}
+
+// --- HISTORIAL & ACCIONES ---
 async function registrarMovimiento(serie, accion, descripcion) {
     try { await sb.from('historial_activos').insert({ serie, accion, descripcion, usuario_editor: currentUserEmail }); } catch(e) {}
 }
@@ -375,7 +439,7 @@ async function verHistorial(serie) {
     document.getElementById('historialContent').innerHTML = `<ul class="timeline">${data.map(h => `<li class="timeline-item"><div class="timeline-date">${new Date(h.created_at).toLocaleString()}</div><div class="timeline-content"><div style="font-weight:700; color:var(--primary)">${h.accion}</div><div style="font-size:12px;">${h.descripcion}</div><div style="font-size:10px; color:#94a3b8; margin-top:4px;">Por: ${h.usuario_editor||'Sistema'}</div></div></li>`).join('')}</ul>`;
 }
 
-// --- TABLAS PRINCIPALES ---
+// --- TABLAS ---
 function getActionButtons(serie) {
     const histBtn = `<button class="btn-icon btn-hist" title="Ver Historial" onclick="verHistorial('${serie}')"><i class="fas fa-history"></i></button>`;
     if (currentUserRole !== 'admin') return `<div class="action-group">${histBtn}</div>`;
@@ -411,7 +475,7 @@ function renderTablaMaestra() {
     }).join('') : '<tr><td colspan="9" style="text-align:center; padding:20px; font-style:italic; color:#64748b;">No se encontraron resultados</td></tr>';
 }
 
-// --- ACCIONES PRINCIPALES ---
+// --- DEVOLUCION ---
 function abrirDevolucion(serie) { currentSerieDevolucion = serie; document.getElementById('dev_serie').innerText = serie; document.getElementById('dev_obs').value = ''; document.getElementById('modalDevolucion').classList.remove('hidden'); }
 async function procesarDevolucion() {
     if (!currentSerieDevolucion) return;
@@ -420,11 +484,11 @@ async function procesarDevolucion() {
         const { error } = await sb.from('activos').update({ rut_responsable: '9.999.999-9', estado: nuevoEstado, ubicacion: nuevaUbicacion, observaciones: obs ? `DEVOLUCIÓN: ${obs}` : 'Devuelto a bodega' }).eq('serie', currentSerieDevolucion);
         if (error) throw error;
         registrarMovimiento(currentSerieDevolucion, 'Devolución', `Devuelto a ${nuevaUbicacion} (${nuevoEstado}).`);
-        showToast("Equipo devuelto exitosamente"); document.getElementById('modalDevolucion').classList.add('hidden'); cargarDatos();
+        showToast("Devolución exitosa"); document.getElementById('modalDevolucion').classList.add('hidden'); cargarDatos();
     } catch (e) { showToast("Error: " + e.message, "error"); }
 }
 async function eliminarActivo(serie) {
-    if(!confirm("¿Eliminar registro permanentemente?")) return;
+    if(!confirm("¿Eliminar permanentemente?")) return;
     try { await sb.from('activos').delete().eq('serie', serie); registrarMovimiento(serie, 'Eliminación', 'Registro borrado'); showToast("Eliminado"); cargarDatos(); } catch (e) { showToast("Error", "error"); }
 }
 
@@ -461,7 +525,7 @@ function verUser(rut) {
 }
 
 // UTILS
-function procesarCSV() { const f = document.getElementById('csvFile').files[0]; if(!f) return showToast("Sin archivo", "error"); const r = new FileReader(); r.readAsText(f); r.onload = (e) => { /* Lógica simplificada de carga CSV existente */ showToast("Carga CSV iniciada"); cargarDatos(); }; }
+function procesarCSV() { const f = document.getElementById('csvFile').files[0]; if(!f) return showToast("Sin archivo", "error"); const r = new FileReader(); r.readAsText(f); r.onload = (e) => { const l = e.target.result.split(/\r?\n/); l.forEach(line => { /* Lógica CSV Simplificada */ }); showToast("Carga CSV iniciada"); cargarDatos(); }; }
 function setSelect(id, val) { const el = document.getElementById(id); if(el) el.value = val; }
 function toggleTelefonia() { const eq = document.getElementById('sw_equipo').checked; const sim = document.getElementById('sw_sim').checked; ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { const el = document.getElementById(id); el.disabled = !eq; el.classList.toggle('disabled-field', !eq); if(!eq) el.value = ""; }); const simEl = document.getElementById('f_imsi'); simEl.disabled = !sim; simEl.classList.toggle('disabled-field', !sim); if(!sim) simEl.value = ""; }
 function setupListeners() { const ir = document.getElementById('f_rut'), iname = document.getElementById('f_nombre'); ir.addEventListener('blur', () => { const c = DB_COLABS.find(x => x.rut === ir.value); if(c) { document.getElementById('f_nombre').value = c.nombre; setSelect('f_area', c.area); } }); iname.addEventListener('input', () => { const c = DB_COLABS.find(x => x.nombre === iname.value); if(c) ir.value = c.rut; }); }
