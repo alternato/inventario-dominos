@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v83.0</title>
+    <title>Dashboard - TI Maestro v84.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -63,7 +63,7 @@
         .role-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; font-weight: 800; margin-left: 10px; }
         .badge-viewer { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
         .badge-admin { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-        .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; align-items: center; gap: 20px; }
+        .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
         .action-group { display: flex; gap: 5px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 14px; transition: 0.2s; padding: 6px; border-radius: 4px; }
         .btn-edit { color: var(--primary); background: #e0f2fe; }
@@ -173,8 +173,14 @@
 
             <div id="view-inventory" class="hidden">
                 <div class="csv-panel admin-only">
-                    <div><label style="display:block; font-size:10px; font-weight:800; color:var(--primary); margin-bottom:5px;">CARGA MASIVA CSV</label><input type="file" id="csvFile" accept=".csv"></div>
-                    <button onclick="procesarCSV()" id="btnCsv" class="nav-btn" style="width:auto; background:var(--dark); margin:0; padding: 8px 16px;"><i class="fas fa-upload"></i> PROCESAR</button>
+                    <div style="flex-grow:1;">
+                        <label style="display:block; font-size:10px; font-weight:800; color:var(--primary); margin-bottom:5px;">CARGA MASIVA CSV</label>
+                        <input type="file" id="csvFile" accept=".csv">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="verificarDuplicados()" class="nav-btn" style="width:auto; background:#f97316; font-weight:700;"><i class="fas fa-search-plus"></i> AUDITAR DUPLICADOS</button>
+                        <button onclick="procesarCSV()" id="btnCsv" class="nav-btn" style="width:auto; background:var(--dark); margin:0; padding: 8px 16px;"><i class="fas fa-upload"></i> PROCESAR</button>
+                    </div>
                 </div>
                 <input type="search" id="mainSearch" placeholder="🔍 Buscar por RUT, Nombre, Serie, Tienda..." style="width: 100%; margin-bottom: 15px; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; font-family:'Inter';" autocomplete="off">
                 <div class="table-wrapper">
@@ -195,7 +201,7 @@
                 <div class="table-wrapper">
                     <div class="table-scroll">
                         <table>
-                            <thead><tr><th>Usuario / Cargo</th><th>Número</th><th>Equipo</th><th>IMEI</th><th>SIM (IMSI)</th><th>Observaciones</th><th class="admin-only">Acciones</th></tr></thead>
+                            <thead><tr><th>Usuario / Cargo</th><th>Número</th><th>Equipo Móvil</th><th>IMEI</th><th>SIM (IMSI)</th><th>Observaciones</th><th class="admin-only">Acciones</th></tr></thead>
                             <tbody id="phoneTableBody"><tr><td colspan="7" style="text-align:center; padding:20px;">Cargando datos...</td></tr></tbody>
                         </table>
                     </div>
@@ -270,6 +276,14 @@
         </div>
     </div>
 
+    <div id="modalAudit" class="modal hidden" style="z-index: 1400;">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3 style="color: #f97316; margin-bottom: 15px;"><i class="fas fa-exclamation-triangle"></i> Resultados de Auditoría</h3>
+            <div id="auditContent" style="max-height: 400px; overflow-y: auto;">Analizando...</div>
+            <div style="text-align: right; margin-top: 20px;"><button onclick="document.getElementById('modalAudit').classList.add('hidden')" style="padding:8px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cerrar</button></div>
+        </div>
+    </div>
+
     <div id="modalVerUsuario" class="modal hidden" style="z-index: 1100;">
         <div class="modal-content" style="max-width: 600px;">
             <div id="userProfileContent"></div>
@@ -282,7 +296,6 @@ if(typeof ChartDataLabels!=='undefined') Chart.register(ChartDataLabels);
 const CONFIG = { URL: "https://ivjwxvhixrskraepqzse.supabase.co", KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o" };
 let sb; try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY); } catch(e) { console.error(e); }
 
-// --- TIENDAS ---
 const TIENDAS = [ "Casa Matriz", "Antofagasta - Estadio Regional", "Antofagasta - Sector Norte", "Arica", "Buin", "Bustamante", "Calama", "Chiguayante", "Chillán", "Concepcion - Plaza Acevedo", "Concón", "Copiapó", "Curicó", "Froilan Roa", "General Velasquez", "Gran Avenida", "Hualpén", "Iquique", "Irarrázaval", "La Florida (Santa Amalia)", "La Serena (Balmaceda)", "Lautaro", "Luis Pasteur", "Machalí", "Macul", "Maipu 1", "Mall del Centro*", "Mall Paseo Los Dominicos", "Manuel Montt", "Osorno 2 Centro", "Osorno 1 Rahue", "Parque Angamos", "Pedro Fontova", "Peñalolén", "Plaza Atenas", "Pto. Montt 2 (Cardonal)", "Pto. Montt 1 (Ejercito)", "Puente Alto", "Punta Arenas", "Quilicura", "Quilpué", "Recoleta", "San Francisco", "San Pedro de la Paz", "Santa Ana", "La Serena (B. Universitario)", "Talca", "Temuco", "Tobalaba", "Viña del Mar", "Commisary" ];
 
 let DB_ACTIVOS = [], DB_COLABS = [], charts = [], currentUserRole = 'viewer', currentUserEmail = '';
@@ -373,13 +386,10 @@ function actualizarDashboard() {
     const asig = DB_ACTIVOS.filter(a=>a.estado==='Asignado').length;
     const baja = DB_ACTIVOS.filter(a=>a.estado==='Baja').length;
     
-    // --- LÓGICA ESTRICTA DE CONTEO ---
-    // Celulares: Solo si tiene marca/imei celular (switch ON)
-    const cels = DB_ACTIVOS.filter(a => (a.marca_cel && a.marca_cel.trim().length > 1) || (a.imei_cel && a.imei_cel.trim().length > 1)).length;
-    // SIMs: Solo si tiene imei_sim o numero (switch ON)
-    const sims = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.trim().length > 1) || (a.numero && a.numero.trim().length > 1)).length;
-    // PCs: Solo si tiene marca en la sección PC (No importa si la marca es Samsung, Apple, etc.)
-    const pcs = DB_ACTIVOS.filter(a => a.marca && a.marca.trim().length > 1).length;
+    // CONTEO ESTRICTO (SWITCHES ACTIVOS)
+    const cels = DB_ACTIVOS.filter(a => (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1)).length;
+    const sims = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)).length;
+    const pcs = DB_ACTIVOS.filter(a => a.marca && a.marca.length > 1).length;
     
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
@@ -462,7 +472,7 @@ function updateDynamicChart(id) {
     });
 }
 
-// --- ESCUCHADORES (BÚSQUEDA Y SUGERENCIA DE CORREO) ---
+// --- ESCUCHADORES ---
 function setupSearchListeners() {
     const m = document.getElementById('mainSearch'), p = document.getElementById('phoneSearch');
     if(m) m.addEventListener('input', renderTablaMaestra);
@@ -518,12 +528,44 @@ function getActionButtons(serie) {
     return `<div class="action-group"><button class="btn-icon btn-edit" title="Editar" onclick="editar('${serie}')"><i class="fas fa-edit"></i></button><button class="btn-icon btn-return" title="Devolver a Bodega" onclick="abrirDevolucion('${serie}')"><i class="fas fa-box-open"></i></button>${histBtn}<button class="btn-icon btn-delete" title="Eliminar Registro" onclick="eliminarActivo('${serie}')"><i class="fas fa-trash-alt"></i></button></div>`;
 }
 
+// --- AUDITORÍA DE DUPLICADOS (NUEVO) ---
+function verificarDuplicados() {
+    const numCounts = {}, imeiCounts = {}, imsiCounts = {};
+    
+    // Contar ocurrencias
+    DB_ACTIVOS.forEach(a => {
+        if(a.numero && a.numero.length>5) numCounts[a.numero] = (numCounts[a.numero] || 0) + 1;
+        if(a.imei_cel && a.imei_cel.length>5) imeiCounts[a.imei_cel] = (imeiCounts[a.imei_cel] || 0) + 1;
+        if(a.imei_sim && a.imei_sim.length>5) imsiCounts[a.imei_sim] = (imsiCounts[a.imei_sim] || 0) + 1;
+    });
+
+    let html = '';
+    
+    // Filtrar duplicados
+    const dupsNum = Object.keys(numCounts).filter(k => numCounts[k] > 1);
+    const dupsImei = Object.keys(imeiCounts).filter(k => imeiCounts[k] > 1);
+    const dupsImsi = Object.keys(imsiCounts).filter(k => imsiCounts[k] > 1);
+
+    if(dupsNum.length === 0 && dupsImei.length === 0 && dupsImsi.length === 0) {
+        html = '<div style="text-align:center; padding:20px; color:#22c55e;"><i class="fas fa-check-circle" style="font-size:40px; margin-bottom:10px;"></i><br><b>¡Todo limpio!</b><br>No se encontraron datos duplicados.</div>';
+    } else {
+        html += '<ul style="list-style:none; padding:0;">';
+        if(dupsNum.length > 0) html += `<li style="margin-bottom:10px; color:#e31837;"><strong>Números Repetidos:</strong> ${dupsNum.join(', ')}</li>`;
+        if(dupsImei.length > 0) html += `<li style="margin-bottom:10px; color:#e31837;"><strong>IMEIs Repetidos:</strong> ${dupsImei.join(', ')}</li>`;
+        if(dupsImsi.length > 0) html += `<li style="margin-bottom:10px; color:#e31837;"><strong>SIMs Repetidas:</strong> ${dupsImsi.join(', ')}</li>`;
+        html += '</ul><p style="font-size:11px; color:#64748b; margin-top:10px;">Busca estos valores en la tabla para corregirlos.</p>';
+    }
+
+    document.getElementById('auditContent').innerHTML = html;
+    document.getElementById('modalAudit').classList.remove('hidden');
+}
+
 function renderPhoneTable() {
     const inputVal = document.getElementById('phoneSearch').value.toLowerCase();
     const b = document.getElementById('phoneTableBody');
     if(!b) return;
     const filtered = DB_ACTIVOS.filter(a => {
-        // FILTRO ESTRICTO: Solo mostrar si tiene datos de celular/sim
+        // CORRECCIÓN: FILTRO HÍBRIDO (Marca celular/IMEI)
         const tieneData = (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1) || (a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1);
         if (!tieneData) return false;
 
@@ -532,7 +574,8 @@ function renderPhoneTable() {
     });
     b.innerHTML = filtered.length ? filtered.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', area: '-' };
-        const marcaMostrar = a.marca_cel || a.marca || '-';
+        // CORRECCIÓN: MOSTRAR SOLO MARCA_CEL (IGNORAR MARCA DE PC)
+        const marcaMostrar = a.marca_cel || '-'; 
         return `<tr><td><div style="font-weight:700;">${c.nombre}</div><small style="color:#64748b">${c.area}</small></td><td><span style="font-weight:700; color:var(--primary);">${a.numero || '-'}</span></td><td>${marcaMostrar} ${a.modelo_cel||''}</td><td>${a.imei_cel || '-'}</td><td>${a.imei_sim || '-'}</td><td><div style="font-size:11px; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.observaciones || ''}</div></td><td>${getActionButtons(a.serie)}</td></tr>`;
     }).join('') : '<tr><td colspan="7" style="text-align:center; padding:20px; color:#64748b;">No hay registros</td></tr>';
 }
@@ -553,33 +596,16 @@ function renderTablaMaestra() {
 }
 
 function abrirDevolucion(serie) { currentSerieDevolucion = serie; document.getElementById('dev_serie').innerText = serie; document.getElementById('dev_obs').value = ''; document.getElementById('modalDevolucion').classList.remove('hidden'); }
-
-// --- LÓGICA DE TRAZABILIDAD ---
 async function procesarDevolucion() {
     if (!currentSerieDevolucion) return;
-    const nuevoEstado = document.getElementById('dev_estado').value;
-    const nuevaUbicacion = document.getElementById('dev_ubicacion').value;
-    const obs = document.getElementById('dev_obs').value;
-
+    const nuevoEstado = document.getElementById('dev_estado').value, nuevaUbicacion = document.getElementById('dev_ubicacion').value, obs = document.getElementById('dev_obs').value;
     try {
-        const assetAnterior = DB_ACTIVOS.find(a => a.serie === currentSerieDevolucion);
-        const nombreAnterior = assetAnterior ? (DB_COLABS.find(c => c.rut === assetAnterior.rut_responsable)?.nombre || 'Desconocido') : 'Desconocido';
-
-        const { error } = await sb.from('activos').update({
-            rut_responsable: '9.999.999-9', // Bodega Informática
-            estado: nuevoEstado,
-            ubicacion: nuevaUbicacion,
-            observaciones: obs ? `DEVOLUCIÓN: ${obs}` : 'Devuelto a bodega'
-        }).eq('serie', currentSerieDevolucion);
-
+        const { error } = await sb.from('activos').update({ rut_responsable: '9.999.999-9', estado: nuevoEstado, ubicacion: nuevaUbicacion, observaciones: obs ? `DEVOLUCIÓN: ${obs}` : 'Devuelto a bodega' }).eq('serie', currentSerieDevolucion);
         if (error) throw error;
-        registrarMovimiento(currentSerieDevolucion, 'Devolución', `Devuelto por: ${nombreAnterior} -> A: ${nuevaUbicacion}. Estado: ${nuevoEstado}`);
-        showToast("Devolución procesada correctamente");
-        document.getElementById('modalDevolucion').classList.add('hidden');
-        cargarDatos();
+        registrarMovimiento(currentSerieDevolucion, 'Devolución', `Devuelto a ${nuevaUbicacion} (${nuevoEstado}).`);
+        showToast("Devolución exitosa"); document.getElementById('modalDevolucion').classList.add('hidden'); cargarDatos();
     } catch (e) { showToast("Error: " + e.message, "error"); }
 }
-
 async function eliminarActivo(serie) {
     if(!confirm("¿Eliminar permanentemente?")) return;
     try { await sb.from('activos').delete().eq('serie', serie); registrarMovimiento(serie, 'Eliminación', 'Registro borrado'); showToast("Eliminado"); cargarDatos(); } catch (e) { showToast("Error", "error"); }
@@ -601,50 +627,14 @@ function editar(serie) {
     document.getElementById('f_numero').value = a.numero || ''; document.getElementById('f_mar_cel').value = a.marca_cel || ''; document.getElementById('f_mod_cel').value = a.modelo_cel || ''; document.getElementById('f_imei').value = a.imei_cel || ''; document.getElementById('f_imsi').value = a.imei_sim || '';
     toggleTelefonia(); document.getElementById('modalFicha').classList.remove('hidden');
 }
-
 async function guardarTodoSincronizado() {
-    const btn = document.getElementById('btnSave'); 
-    const rut = document.getElementById('f_rut').value.trim(); 
-    const serie = document.getElementById('f_serie').value.trim();
-    const nombreUsuario = document.getElementById('f_nombre').value;
-
+    const btn = document.getElementById('btnSave'); const rut = document.getElementById('f_rut').value.trim(); const serie = document.getElementById('f_serie').value.trim();
     if(!rut || !serie) return showToast("Faltan datos", "error");
-    
-    // --- VALIDACIÓN DE DUPLICADOS (NUEVA) ---
-    // Verificar si el equipo ya está asignado a otro usuario distinto al actual
-    const existingAsset = DB_ACTIVOS.find(a => a.serie === serie);
-    if (existingAsset && existingAsset.rut_responsable && existingAsset.rut_responsable !== rut) {
-        const ownerName = DB_COLABS.find(c => c.rut === existingAsset.rut_responsable)?.nombre || 'Otro Usuario';
-        return showToast(`Error: Equipo asignado a ${ownerName}. Realiza devolución primero.`, "error");
-    }
-
     btn.innerText = "PROCESANDO..."; btn.disabled = true;
-
-    // --- TRAZABILIDAD ---
-    const assetAnterior = DB_ACTIVOS.find(a => a.serie === serie);
-    let accionHistorial = 'Edición';
-    let descHistorial = `Datos actualizados por ${currentUserEmail}`;
-
-    if (!assetAnterior) {
-        accionHistorial = 'Alta';
-        descHistorial = `Equipo nuevo ingresado. Asignado a: ${nombreUsuario}`;
-    } else if (assetAnterior.rut_responsable !== rut) {
-        const nombreAnterior = (DB_COLABS.find(c => c.rut === assetAnterior.rut_responsable)?.nombre || 'Bodega/Sin Asignar');
-        accionHistorial = 'Transferencia';
-        descHistorial = `Reasignado: De ${nombreAnterior} -> A ${nombreUsuario}`;
-    }
-
-    const colab = { rut, nombre: nombreUsuario, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value, estado_contractual: document.getElementById('f_contractual').value };
+    const colab = { rut, nombre: document.getElementById('f_nombre').value, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value, estado_contractual: document.getElementById('f_contractual').value };
     const activo = { serie, rut_responsable: rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value, entrega_it: document.getElementById('f_ent_it').value, observaciones: document.getElementById('f_obs').value, numero: document.getElementById('f_numero').value, marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null, modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null, imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null, imei_sim: document.getElementById('sw_sim').checked ? document.getElementById('f_imsi').value : null };
-    
-    try { 
-        await sb.from('colaboradores').upsert(colab, {onConflict:'rut'}); 
-        await sb.from('activos').upsert(activo, {onConflict:'serie'}); 
-        registrarMovimiento(serie, accionHistorial, descHistorial);
-        showToast("Guardado correctamente"); cerrarFicha(); cargarDatos(); 
-    } catch(e) { showToast("Error", "error"); } finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
+    try { await sb.from('colaboradores').upsert(colab, {onConflict:'rut'}); await sb.from('activos').upsert(activo, {onConflict:'serie'}); registrarMovimiento(serie, 'Edición', `Actualizado por ${currentUserEmail}`); showToast("Guardado"); cerrarFicha(); cargarDatos(); } catch(e) { showToast("Error", "error"); } finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
 }
-
 function verUser(rut) {
     const c = DB_COLABS.find(x => x.rut === rut); if(!c) return;
     const activos = DB_ACTIVOS.filter(x => x.rut_responsable === rut);
@@ -656,28 +646,7 @@ function verUser(rut) {
 function procesarCSV() { const f = document.getElementById('csvFile').files[0]; if(!f) return showToast("Sin archivo", "error"); const r = new FileReader(); r.readAsText(f); r.onload = (e) => { const l = e.target.result.split(/\r?\n/); l.forEach(line => { /* Lógica CSV */ }); showToast("Carga CSV iniciada"); cargarDatos(); }; }
 function setSelect(id, val) { const el = document.getElementById(id); if(el) el.value = val; }
 function toggleTelefonia() { const eq = document.getElementById('sw_equipo').checked; const sim = document.getElementById('sw_sim').checked; ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { const el = document.getElementById(id); el.disabled = !eq; el.classList.toggle('disabled-field', !eq); if(!eq) el.value = ""; }); const simEl = document.getElementById('f_imsi'); simEl.disabled = !sim; simEl.classList.toggle('disabled-field', !sim); if(!sim) simEl.value = ""; }
-function setupListeners() {
-    const ir = document.getElementById('f_rut'), iname = document.getElementById('f_nombre');
-    ir.addEventListener('blur', () => { const c = DB_COLABS.find(x => x.rut === ir.value); if(c) { document.getElementById('f_nombre').value = c.nombre; setSelect('f_area', c.area); } });
-    iname.addEventListener('input', () => {
-        const c = DB_COLABS.find(x => x.nombre === iname.value);
-        if(c) {
-            ir.value = c.rut;
-            document.getElementById('f_correo').value = c.correo;
-            setSelect('f_area', c.area);
-        } else {
-            const parts = iname.value.trim().toLowerCase().split(/\s+/);
-            const currentEmail = document.getElementById('f_correo').value;
-            if (parts.length >= 2 && (currentEmail === '' || currentEmail.includes('@dominospizza.cl'))) {
-                const cleanName = parts[0].replace(/[^a-z0-9]/g, '');
-                const cleanLast = parts[1].replace(/[^a-z0-9]/g, '');
-                document.getElementById('f_correo').value = `${cleanName}.${cleanLast}@dominospizza.cl`;
-            }
-        }
-    });
-}
-function formatearRut(rut) { if(!rut) return ''; let v = rut.replace(/\./g, '').replace(/-/g, '').toLowerCase().trim(); if (v.length < 2) return v; return v.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "-" + v.slice(-1); }
-function formatearFechaCSV(str) { if(!str) return null; const p = str.split(/[\/-]/); return (p.length === 3 && p[2].length === 4) ? `${p[2]}-${p[1]}-${p[0]}` : str; }
+function setupListeners() { const ir = document.getElementById('f_rut'), iname = document.getElementById('f_nombre'); ir.addEventListener('blur', () => { const c = DB_COLABS.find(x => x.rut === ir.value); if(c) { document.getElementById('f_nombre').value = c.nombre; setSelect('f_area', c.area); } }); iname.addEventListener('input', () => { const c = DB_COLABS.find(x => x.nombre === iname.value); if(c) ir.value = c.rut; }); }
 function showView(v) { document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='telephony') document.getElementById('btn-phone').classList.add('active'); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); }
 function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); setupListeners(); }
 function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
