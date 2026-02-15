@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v82.0 (Trazabilidad)</title>
+    <title>Dashboard - TI Maestro v83.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -282,6 +282,7 @@ if(typeof ChartDataLabels!=='undefined') Chart.register(ChartDataLabels);
 const CONFIG = { URL: "https://ivjwxvhixrskraepqzse.supabase.co", KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o" };
 let sb; try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY); } catch(e) { console.error(e); }
 
+// --- TIENDAS ---
 const TIENDAS = [ "Casa Matriz", "Antofagasta - Estadio Regional", "Antofagasta - Sector Norte", "Arica", "Buin", "Bustamante", "Calama", "Chiguayante", "Chillán", "Concepcion - Plaza Acevedo", "Concón", "Copiapó", "Curicó", "Froilan Roa", "General Velasquez", "Gran Avenida", "Hualpén", "Iquique", "Irarrázaval", "La Florida (Santa Amalia)", "La Serena (Balmaceda)", "Lautaro", "Luis Pasteur", "Machalí", "Macul", "Maipu 1", "Mall del Centro*", "Mall Paseo Los Dominicos", "Manuel Montt", "Osorno 2 Centro", "Osorno 1 Rahue", "Parque Angamos", "Pedro Fontova", "Peñalolén", "Plaza Atenas", "Pto. Montt 2 (Cardonal)", "Pto. Montt 1 (Ejercito)", "Puente Alto", "Punta Arenas", "Quilicura", "Quilpué", "Recoleta", "San Francisco", "San Pedro de la Paz", "Santa Ana", "La Serena (B. Universitario)", "Talca", "Temuco", "Tobalaba", "Viña del Mar", "Commisary" ];
 
 let DB_ACTIVOS = [], DB_COLABS = [], charts = [], currentUserRole = 'viewer', currentUserEmail = '';
@@ -344,16 +345,12 @@ async function cargarDatos() {
         
         document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c=>`<option value="${c.nombre}">`).join('');
         
-        // 1. CARGAR TABLAS PRIMERO
         renderTablaMaestra(); 
         renderPhoneTable(); 
         renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
-
-        // 2. LUEGO CARGAR DASHBOARD (KPIS)
         actualizarDashboard(); 
         
-        // 3. INICIALIZAR REPORTES
-        document.getElementById('chartsContainer').innerHTML = ''; // Limpiar
+        document.getElementById('chartsContainer').innerHTML = ''; 
         addChart('estado', 'doughnut');
         addChart('tienda', 'bar');
 
@@ -376,9 +373,12 @@ function actualizarDashboard() {
     const asig = DB_ACTIVOS.filter(a=>a.estado==='Asignado').length;
     const baja = DB_ACTIVOS.filter(a=>a.estado==='Baja').length;
     
-    // CONTEO ESTRICTO (SOLO SI HAY DATA EN COLUMNAS ESPECÍFICAS)
+    // --- LÓGICA ESTRICTA DE CONTEO ---
+    // Celulares: Solo si tiene marca/imei celular (switch ON)
     const cels = DB_ACTIVOS.filter(a => (a.marca_cel && a.marca_cel.trim().length > 1) || (a.imei_cel && a.imei_cel.trim().length > 1)).length;
+    // SIMs: Solo si tiene imei_sim o numero (switch ON)
     const sims = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.trim().length > 1) || (a.numero && a.numero.trim().length > 1)).length;
+    // PCs: Solo si tiene marca en la sección PC (No importa si la marca es Samsung, Apple, etc.)
     const pcs = DB_ACTIVOS.filter(a => a.marca && a.marca.trim().length > 1).length;
     
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
@@ -523,8 +523,10 @@ function renderPhoneTable() {
     const b = document.getElementById('phoneTableBody');
     if(!b) return;
     const filtered = DB_ACTIVOS.filter(a => {
+        // FILTRO ESTRICTO: Solo mostrar si tiene datos de celular/sim
         const tieneData = (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1) || (a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1);
         if (!tieneData) return false;
+
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
         return `${c.nombre} ${a.numero||''} ${a.imei_cel||''} ${a.imei_sim||''}`.toLowerCase().includes(inputVal);
     });
@@ -552,7 +554,7 @@ function renderTablaMaestra() {
 
 function abrirDevolucion(serie) { currentSerieDevolucion = serie; document.getElementById('dev_serie').innerText = serie; document.getElementById('dev_obs').value = ''; document.getElementById('modalDevolucion').classList.remove('hidden'); }
 
-// --- LÓGICA DE TRAZABILIDAD (NUEVA) ---
+// --- LÓGICA DE TRAZABILIDAD ---
 async function procesarDevolucion() {
     if (!currentSerieDevolucion) return;
     const nuevoEstado = document.getElementById('dev_estado').value;
@@ -560,11 +562,9 @@ async function procesarDevolucion() {
     const obs = document.getElementById('dev_obs').value;
 
     try {
-        // 1. Obtener dueño anterior antes de cambiar
         const assetAnterior = DB_ACTIVOS.find(a => a.serie === currentSerieDevolucion);
         const nombreAnterior = assetAnterior ? (DB_COLABS.find(c => c.rut === assetAnterior.rut_responsable)?.nombre || 'Desconocido') : 'Desconocido';
 
-        // 2. Realizar Devolución
         const { error } = await sb.from('activos').update({
             rut_responsable: '9.999.999-9', // Bodega Informática
             estado: nuevoEstado,
@@ -573,10 +573,7 @@ async function procesarDevolucion() {
         }).eq('serie', currentSerieDevolucion);
 
         if (error) throw error;
-        
-        // 3. Registrar con Detalle
         registrarMovimiento(currentSerieDevolucion, 'Devolución', `Devuelto por: ${nombreAnterior} -> A: ${nuevaUbicacion}. Estado: ${nuevoEstado}`);
-        
         showToast("Devolución procesada correctamente");
         document.getElementById('modalDevolucion').classList.add('hidden');
         cargarDatos();
@@ -612,10 +609,18 @@ async function guardarTodoSincronizado() {
     const nombreUsuario = document.getElementById('f_nombre').value;
 
     if(!rut || !serie) return showToast("Faltan datos", "error");
+    
+    // --- VALIDACIÓN DE DUPLICADOS (NUEVA) ---
+    // Verificar si el equipo ya está asignado a otro usuario distinto al actual
+    const existingAsset = DB_ACTIVOS.find(a => a.serie === serie);
+    if (existingAsset && existingAsset.rut_responsable && existingAsset.rut_responsable !== rut) {
+        const ownerName = DB_COLABS.find(c => c.rut === existingAsset.rut_responsable)?.nombre || 'Otro Usuario';
+        return showToast(`Error: Equipo asignado a ${ownerName}. Realiza devolución primero.`, "error");
+    }
+
     btn.innerText = "PROCESANDO..."; btn.disabled = true;
 
-    // --- LÓGICA DE TRAZABILIDAD ---
-    // Buscar dueño anterior en memoria antes de sobrescribir
+    // --- TRAZABILIDAD ---
     const assetAnterior = DB_ACTIVOS.find(a => a.serie === serie);
     let accionHistorial = 'Edición';
     let descHistorial = `Datos actualizados por ${currentUserEmail}`;
@@ -635,10 +640,7 @@ async function guardarTodoSincronizado() {
     try { 
         await sb.from('colaboradores').upsert(colab, {onConflict:'rut'}); 
         await sb.from('activos').upsert(activo, {onConflict:'serie'}); 
-        
-        // Registrar Historial
         registrarMovimiento(serie, accionHistorial, descHistorial);
-        
         showToast("Guardado correctamente"); cerrarFicha(); cargarDatos(); 
     } catch(e) { showToast("Error", "error"); } finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
 }
