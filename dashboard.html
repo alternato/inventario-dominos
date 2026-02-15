@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v80.0</title>
+    <title>Dashboard - TI Maestro v81.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -56,7 +56,7 @@
         .chart-canvas-container { flex-grow: 1; position: relative; min-height: 300px; }
         .btn-remove-chart { color: #cbd5e1; cursor: pointer; } .btn-remove-chart:hover { color: var(--secondary); }
 
-        /* UTILS */
+        /* UTILS & UI */
         .hidden { display: none !important; }
         .admin-only { display: none !important; }
         body.role-admin .admin-only { display: flex !important; }
@@ -64,7 +64,6 @@
         .badge-viewer { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
         .badge-admin { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
         .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; align-items: center; gap: 20px; }
-        
         .action-group { display: flex; gap: 5px; }
         .btn-icon { border: none; background: none; cursor: pointer; font-size: 14px; transition: 0.2s; padding: 6px; border-radius: 4px; }
         .btn-edit { color: var(--primary); background: #e0f2fe; }
@@ -283,7 +282,7 @@ if(typeof ChartDataLabels!=='undefined') Chart.register(ChartDataLabels);
 const CONFIG = { URL: "https://ivjwxvhixrskraepqzse.supabase.co", KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o" };
 let sb; try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY); } catch(e) { console.error(e); }
 
-// --- LISTA DE TIENDAS CON "CASA MATRIZ" AGREGADA ---
+// --- TIENDAS ACTUALIZADA ---
 const TIENDAS = [ "Casa Matriz", "Antofagasta - Estadio Regional", "Antofagasta - Sector Norte", "Arica", "Buin", "Bustamante", "Calama", "Chiguayante", "Chillán", "Concepcion - Plaza Acevedo", "Concón", "Copiapó", "Curicó", "Froilan Roa", "General Velasquez", "Gran Avenida", "Hualpén", "Iquique", "Irarrázaval", "La Florida (Santa Amalia)", "La Serena (Balmaceda)", "Lautaro", "Luis Pasteur", "Machalí", "Macul", "Maipu 1", "Mall del Centro*", "Mall Paseo Los Dominicos", "Manuel Montt", "Osorno 2 Centro", "Osorno 1 Rahue", "Parque Angamos", "Pedro Fontova", "Peñalolén", "Plaza Atenas", "Pto. Montt 2 (Cardonal)", "Pto. Montt 1 (Ejercito)", "Puente Alto", "Punta Arenas", "Quilicura", "Quilpué", "Recoleta", "San Francisco", "San Pedro de la Paz", "Santa Ana", "La Serena (B. Universitario)", "Talca", "Temuco", "Tobalaba", "Viña del Mar", "Commisary" ];
 
 let DB_ACTIVOS = [], DB_COLABS = [], charts = [], currentUserRole = 'viewer', currentUserEmail = '';
@@ -346,12 +345,16 @@ async function cargarDatos() {
         
         document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c=>`<option value="${c.nombre}">`).join('');
         
+        // 1. CARGAR TABLAS PRIMERO
         renderTablaMaestra(); 
         renderPhoneTable(); 
         renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
+
+        // 2. LUEGO CARGAR DASHBOARD (KPIS)
         actualizarDashboard(); 
         
-        document.getElementById('chartsContainer').innerHTML = ''; 
+        // 3. INICIALIZAR REPORTES
+        document.getElementById('chartsContainer').innerHTML = ''; // Limpiar
         addChart('estado', 'doughnut');
         addChart('tienda', 'bar');
 
@@ -374,24 +377,10 @@ function actualizarDashboard() {
     const asig = DB_ACTIVOS.filter(a=>a.estado==='Asignado').length;
     const baja = DB_ACTIVOS.filter(a=>a.estado==='Baja').length;
     
-    // --- LÓGICA HÍBRIDA DE CONTEO ---
-    const phoneBrands = ['samsung', 'apple', 'iphone', 'xiaomi', 'motorola', 'huawei', 'vivo', 'oppo', 'nokia', 'redmi'];
-    
-    const cels = DB_ACTIVOS.filter(a => {
-        const marcaMain = (a.marca || '').toLowerCase();
-        const tieneDataCel = (a.marca_cel && a.marca_cel.trim() !== '') || (a.imei_cel && a.imei_cel.trim() !== '');
-        const pareceCel = phoneBrands.some(brand => marcaMain.includes(brand));
-        return tieneDataCel || pareceCel;
-    }).length;
-
-    const pcs = DB_ACTIVOS.filter(a => {
-        const marcaMain = (a.marca || '').toLowerCase();
-        const tieneDataCel = (a.marca_cel && a.marca_cel.trim() !== '') || (a.imei_cel && a.imei_cel.trim() !== '');
-        const pareceCel = phoneBrands.some(brand => marcaMain.includes(brand));
-        return (a.marca && a.marca.trim() !== '') && !tieneDataCel && !pareceCel;
-    }).length;
-
-    const sims = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.trim() !== '') || (a.numero && a.numero.trim() !== '')).length;
+    // CONTEO ESTRICTO (SOLO SI HAY DATA EN COLUMNAS ESPECÍFICAS)
+    const cels = DB_ACTIVOS.filter(a => (a.marca_cel && a.marca_cel.trim().length > 1) || (a.imei_cel && a.imei_cel.trim().length > 1)).length;
+    const sims = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.trim().length > 1) || (a.numero && a.numero.trim().length > 1)).length;
+    const pcs = DB_ACTIVOS.filter(a => a.marca && a.marca.trim().length > 1).length;
     
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
@@ -474,10 +463,51 @@ function updateDynamicChart(id) {
     });
 }
 
+// --- ESCUCHADORES (BÚSQUEDA Y SUGERENCIA DE CORREO) ---
 function setupSearchListeners() {
     const m = document.getElementById('mainSearch'), p = document.getElementById('phoneSearch');
     if(m) m.addEventListener('input', renderTablaMaestra);
     if(p) p.addEventListener('input', renderPhoneTable);
+
+    // SUGERENCIA DE CORREO AUTOMÁTICA
+    const inputNombre = document.getElementById('f_nombre');
+    const inputRut = document.getElementById('f_rut');
+    
+    if(inputNombre) {
+        inputNombre.addEventListener('input', () => {
+            const val = inputNombre.value;
+            // 1. Si existe el usuario, autocompletar RUT y Correo
+            const c = DB_COLABS.find(x => x.nombre === val);
+            if(c) {
+                document.getElementById('f_rut').value = c.rut;
+                document.getElementById('f_correo').value = c.correo;
+                setSelect('f_area', c.area);
+            } 
+            // 2. Si es nuevo, sugerir correo formato nombre.apellido
+            else {
+                const parts = val.trim().toLowerCase().split(/\s+/);
+                const currentEmail = document.getElementById('f_correo').value;
+                if (parts.length >= 2 && (currentEmail === '' || currentEmail.includes('@dominospizza.cl'))) {
+                    // Evita caracteres raros
+                    const cleanName = parts[0].replace(/[^a-z0-9]/g, '');
+                    const cleanLast = parts[1].replace(/[^a-z0-9]/g, '');
+                    document.getElementById('f_correo').value = `${cleanName}.${cleanLast}@dominospizza.cl`;
+                }
+            }
+        });
+    }
+
+    if(inputRut) {
+        inputRut.addEventListener('blur', () => {
+            inputRut.value = formatearRut(inputRut.value);
+            const c = DB_COLABS.find(x => x.rut === inputRut.value);
+            if(c) { 
+                document.getElementById('f_nombre').value = c.nombre; 
+                document.getElementById('f_correo').value = c.correo;
+                setSelect('f_area', c.area);
+            }
+        });
+    }
 }
 
 async function registrarMovimiento(serie, accion, descripcion) { try { await sb.from('historial_activos').insert({ serie, accion, descripcion, usuario_editor: currentUserEmail }); } catch(e) {} }
@@ -499,9 +529,10 @@ function renderPhoneTable() {
     const b = document.getElementById('phoneTableBody');
     if(!b) return;
     const filtered = DB_ACTIVOS.filter(a => {
-        const dataCel = (a.marca_cel || '') + (a.imei_cel || '') + (a.imei_sim || '') + (a.numero || '');
-        const dataGral = (a.marca || '') + (a.modelo || '');
-        if (dataCel.length < 2 && !['samsung','iphone','motorola','xiaomi'].some(k=>dataGral.toLowerCase().includes(k))) return false;
+        // FILTRO ESTRICTO: Solo mostrar si tiene datos de celular/sim
+        const tieneData = (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1) || (a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1);
+        if (!tieneData) return false;
+
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
         return `${c.nombre} ${a.numero||''} ${a.imei_cel||''} ${a.imei_sim||''}`.toLowerCase().includes(inputVal);
     });
@@ -578,26 +609,10 @@ function verUser(rut) {
 function procesarCSV() { const f = document.getElementById('csvFile').files[0]; if(!f) return showToast("Sin archivo", "error"); const r = new FileReader(); r.readAsText(f); r.onload = (e) => { const l = e.target.result.split(/\r?\n/); l.forEach(line => { /* Lógica CSV */ }); showToast("Carga CSV iniciada"); cargarDatos(); }; }
 function setSelect(id, val) { const el = document.getElementById(id); if(el) el.value = val; }
 function toggleTelefonia() { const eq = document.getElementById('sw_equipo').checked; const sim = document.getElementById('sw_sim').checked; ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { const el = document.getElementById(id); el.disabled = !eq; el.classList.toggle('disabled-field', !eq); if(!eq) el.value = ""; }); const simEl = document.getElementById('f_imsi'); simEl.disabled = !sim; simEl.classList.toggle('disabled-field', !sim); if(!sim) simEl.value = ""; }
-function setupListeners() {
-    const ir = document.getElementById('f_rut'), iname = document.getElementById('f_nombre');
-    ir.addEventListener('blur', () => { const c = DB_COLABS.find(x => x.rut === ir.value); if(c) { document.getElementById('f_nombre').value = c.nombre; setSelect('f_area', c.area); } });
-    iname.addEventListener('input', () => {
-        const c = DB_COLABS.find(x => x.nombre === iname.value);
-        if(c) {
-            ir.value = c.rut;
-            document.getElementById('f_correo').value = c.correo;
-        } else {
-            // Lógica de Sugerencia de Correo
-            const parts = iname.value.trim().toLowerCase().split(/\s+/);
-            const currentEmail = document.getElementById('f_correo').value;
-            if (parts.length >= 2 && (currentEmail === '' || currentEmail.includes('@dominospizza.cl'))) {
-                document.getElementById('f_correo').value = `${parts[0]}.${parts[1]}@dominospizza.cl`;
-            }
-        }
-    });
-}
+function formatearRut(rut) { if(!rut) return ''; let v = rut.replace(/\./g, '').replace(/-/g, '').toLowerCase().trim(); if (v.length < 2) return v; return v.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "-" + v.slice(-1); }
+function formatearFechaCSV(str) { if(!str) return null; const p = str.split(/[\/-]/); return (p.length === 3 && p[2].length === 4) ? `${p[2]}-${p[1]}-${p[0]}` : str; }
 function showView(v) { document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='telephony') document.getElementById('btn-phone').classList.add('active'); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); }
-function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); setupListeners(); }
+function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
 function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 
 initSystem();
