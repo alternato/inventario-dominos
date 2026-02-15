@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v81.0</title>
+    <title>Dashboard - TI Maestro v82.0 (Trazabilidad)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -282,7 +282,6 @@ if(typeof ChartDataLabels!=='undefined') Chart.register(ChartDataLabels);
 const CONFIG = { URL: "https://ivjwxvhixrskraepqzse.supabase.co", KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o" };
 let sb; try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY); } catch(e) { console.error(e); }
 
-// --- TIENDAS ACTUALIZADA ---
 const TIENDAS = [ "Casa Matriz", "Antofagasta - Estadio Regional", "Antofagasta - Sector Norte", "Arica", "Buin", "Bustamante", "Calama", "Chiguayante", "Chillán", "Concepcion - Plaza Acevedo", "Concón", "Copiapó", "Curicó", "Froilan Roa", "General Velasquez", "Gran Avenida", "Hualpén", "Iquique", "Irarrázaval", "La Florida (Santa Amalia)", "La Serena (Balmaceda)", "Lautaro", "Luis Pasteur", "Machalí", "Macul", "Maipu 1", "Mall del Centro*", "Mall Paseo Los Dominicos", "Manuel Montt", "Osorno 2 Centro", "Osorno 1 Rahue", "Parque Angamos", "Pedro Fontova", "Peñalolén", "Plaza Atenas", "Pto. Montt 2 (Cardonal)", "Pto. Montt 1 (Ejercito)", "Puente Alto", "Punta Arenas", "Quilicura", "Quilpué", "Recoleta", "San Francisco", "San Pedro de la Paz", "Santa Ana", "La Serena (B. Universitario)", "Talca", "Temuco", "Tobalaba", "Viña del Mar", "Commisary" ];
 
 let DB_ACTIVOS = [], DB_COLABS = [], charts = [], currentUserRole = 'viewer', currentUserEmail = '';
@@ -469,26 +468,21 @@ function setupSearchListeners() {
     if(m) m.addEventListener('input', renderTablaMaestra);
     if(p) p.addEventListener('input', renderPhoneTable);
 
-    // SUGERENCIA DE CORREO AUTOMÁTICA
     const inputNombre = document.getElementById('f_nombre');
     const inputRut = document.getElementById('f_rut');
     
     if(inputNombre) {
         inputNombre.addEventListener('input', () => {
             const val = inputNombre.value;
-            // 1. Si existe el usuario, autocompletar RUT y Correo
             const c = DB_COLABS.find(x => x.nombre === val);
             if(c) {
                 document.getElementById('f_rut').value = c.rut;
                 document.getElementById('f_correo').value = c.correo;
                 setSelect('f_area', c.area);
-            } 
-            // 2. Si es nuevo, sugerir correo formato nombre.apellido
-            else {
+            } else {
                 const parts = val.trim().toLowerCase().split(/\s+/);
                 const currentEmail = document.getElementById('f_correo').value;
                 if (parts.length >= 2 && (currentEmail === '' || currentEmail.includes('@dominospizza.cl'))) {
-                    // Evita caracteres raros
                     const cleanName = parts[0].replace(/[^a-z0-9]/g, '');
                     const cleanLast = parts[1].replace(/[^a-z0-9]/g, '');
                     document.getElementById('f_correo').value = `${cleanName}.${cleanLast}@dominospizza.cl`;
@@ -529,10 +523,8 @@ function renderPhoneTable() {
     const b = document.getElementById('phoneTableBody');
     if(!b) return;
     const filtered = DB_ACTIVOS.filter(a => {
-        // FILTRO ESTRICTO: Solo mostrar si tiene datos de celular/sim
         const tieneData = (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1) || (a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1);
         if (!tieneData) return false;
-
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: '' };
         return `${c.nombre} ${a.numero||''} ${a.imei_cel||''} ${a.imei_sim||''}`.toLowerCase().includes(inputVal);
     });
@@ -559,16 +551,38 @@ function renderTablaMaestra() {
 }
 
 function abrirDevolucion(serie) { currentSerieDevolucion = serie; document.getElementById('dev_serie').innerText = serie; document.getElementById('dev_obs').value = ''; document.getElementById('modalDevolucion').classList.remove('hidden'); }
+
+// --- LÓGICA DE TRAZABILIDAD (NUEVA) ---
 async function procesarDevolucion() {
     if (!currentSerieDevolucion) return;
-    const nuevoEstado = document.getElementById('dev_estado').value, nuevaUbicacion = document.getElementById('dev_ubicacion').value, obs = document.getElementById('dev_obs').value;
+    const nuevoEstado = document.getElementById('dev_estado').value;
+    const nuevaUbicacion = document.getElementById('dev_ubicacion').value;
+    const obs = document.getElementById('dev_obs').value;
+
     try {
-        const { error } = await sb.from('activos').update({ rut_responsable: '9.999.999-9', estado: nuevoEstado, ubicacion: nuevaUbicacion, observaciones: obs ? `DEVOLUCIÓN: ${obs}` : 'Devuelto a bodega' }).eq('serie', currentSerieDevolucion);
+        // 1. Obtener dueño anterior antes de cambiar
+        const assetAnterior = DB_ACTIVOS.find(a => a.serie === currentSerieDevolucion);
+        const nombreAnterior = assetAnterior ? (DB_COLABS.find(c => c.rut === assetAnterior.rut_responsable)?.nombre || 'Desconocido') : 'Desconocido';
+
+        // 2. Realizar Devolución
+        const { error } = await sb.from('activos').update({
+            rut_responsable: '9.999.999-9', // Bodega Informática
+            estado: nuevoEstado,
+            ubicacion: nuevaUbicacion,
+            observaciones: obs ? `DEVOLUCIÓN: ${obs}` : 'Devuelto a bodega'
+        }).eq('serie', currentSerieDevolucion);
+
         if (error) throw error;
-        registrarMovimiento(currentSerieDevolucion, 'Devolución', `Devuelto a ${nuevaUbicacion} (${nuevoEstado}).`);
-        showToast("Devolución exitosa"); document.getElementById('modalDevolucion').classList.add('hidden'); cargarDatos();
+        
+        // 3. Registrar con Detalle
+        registrarMovimiento(currentSerieDevolucion, 'Devolución', `Devuelto por: ${nombreAnterior} -> A: ${nuevaUbicacion}. Estado: ${nuevoEstado}`);
+        
+        showToast("Devolución procesada correctamente");
+        document.getElementById('modalDevolucion').classList.add('hidden');
+        cargarDatos();
     } catch (e) { showToast("Error: " + e.message, "error"); }
 }
+
 async function eliminarActivo(serie) {
     if(!confirm("¿Eliminar permanentemente?")) return;
     try { await sb.from('activos').delete().eq('serie', serie); registrarMovimiento(serie, 'Eliminación', 'Registro borrado'); showToast("Eliminado"); cargarDatos(); } catch (e) { showToast("Error", "error"); }
@@ -590,14 +604,45 @@ function editar(serie) {
     document.getElementById('f_numero').value = a.numero || ''; document.getElementById('f_mar_cel').value = a.marca_cel || ''; document.getElementById('f_mod_cel').value = a.modelo_cel || ''; document.getElementById('f_imei').value = a.imei_cel || ''; document.getElementById('f_imsi').value = a.imei_sim || '';
     toggleTelefonia(); document.getElementById('modalFicha').classList.remove('hidden');
 }
+
 async function guardarTodoSincronizado() {
-    const btn = document.getElementById('btnSave'); const rut = document.getElementById('f_rut').value.trim(); const serie = document.getElementById('f_serie').value.trim();
+    const btn = document.getElementById('btnSave'); 
+    const rut = document.getElementById('f_rut').value.trim(); 
+    const serie = document.getElementById('f_serie').value.trim();
+    const nombreUsuario = document.getElementById('f_nombre').value;
+
     if(!rut || !serie) return showToast("Faltan datos", "error");
     btn.innerText = "PROCESANDO..."; btn.disabled = true;
-    const colab = { rut, nombre: document.getElementById('f_nombre').value, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value, estado_contractual: document.getElementById('f_contractual').value };
+
+    // --- LÓGICA DE TRAZABILIDAD ---
+    // Buscar dueño anterior en memoria antes de sobrescribir
+    const assetAnterior = DB_ACTIVOS.find(a => a.serie === serie);
+    let accionHistorial = 'Edición';
+    let descHistorial = `Datos actualizados por ${currentUserEmail}`;
+
+    if (!assetAnterior) {
+        accionHistorial = 'Alta';
+        descHistorial = `Equipo nuevo ingresado. Asignado a: ${nombreUsuario}`;
+    } else if (assetAnterior.rut_responsable !== rut) {
+        const nombreAnterior = (DB_COLABS.find(c => c.rut === assetAnterior.rut_responsable)?.nombre || 'Bodega/Sin Asignar');
+        accionHistorial = 'Transferencia';
+        descHistorial = `Reasignado: De ${nombreAnterior} -> A ${nombreUsuario}`;
+    }
+
+    const colab = { rut, nombre: nombreUsuario, correo: document.getElementById('f_correo').value, area: document.getElementById('f_area').value, estado_contractual: document.getElementById('f_contractual').value };
     const activo = { serie, rut_responsable: rut, marca: document.getElementById('f_marca').value, modelo: document.getElementById('f_modelo').value, estado: document.getElementById('f_estado').value, ubicacion: document.getElementById('f_tienda').value, fecha_entrega: document.getElementById('f_fecha_ent').value, entrega_it: document.getElementById('f_ent_it').value, observaciones: document.getElementById('f_obs').value, numero: document.getElementById('f_numero').value, marca_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mar_cel').value : null, modelo_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_mod_cel').value : null, imei_cel: document.getElementById('sw_equipo').checked ? document.getElementById('f_imei').value : null, imei_sim: document.getElementById('sw_sim').checked ? document.getElementById('f_imsi').value : null };
-    try { await sb.from('colaboradores').upsert(colab, {onConflict:'rut'}); await sb.from('activos').upsert(activo, {onConflict:'serie'}); registrarMovimiento(serie, 'Edición', `Actualizado por ${currentUserEmail}`); showToast("Guardado"); cerrarFicha(); cargarDatos(); } catch(e) { showToast("Error", "error"); } finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
+    
+    try { 
+        await sb.from('colaboradores').upsert(colab, {onConflict:'rut'}); 
+        await sb.from('activos').upsert(activo, {onConflict:'serie'}); 
+        
+        // Registrar Historial
+        registrarMovimiento(serie, accionHistorial, descHistorial);
+        
+        showToast("Guardado correctamente"); cerrarFicha(); cargarDatos(); 
+    } catch(e) { showToast("Error", "error"); } finally { btn.innerText = "GUARDAR"; btn.disabled = false; }
 }
+
 function verUser(rut) {
     const c = DB_COLABS.find(x => x.rut === rut); if(!c) return;
     const activos = DB_ACTIVOS.filter(x => x.rut_responsable === rut);
@@ -609,10 +654,30 @@ function verUser(rut) {
 function procesarCSV() { const f = document.getElementById('csvFile').files[0]; if(!f) return showToast("Sin archivo", "error"); const r = new FileReader(); r.readAsText(f); r.onload = (e) => { const l = e.target.result.split(/\r?\n/); l.forEach(line => { /* Lógica CSV */ }); showToast("Carga CSV iniciada"); cargarDatos(); }; }
 function setSelect(id, val) { const el = document.getElementById(id); if(el) el.value = val; }
 function toggleTelefonia() { const eq = document.getElementById('sw_equipo').checked; const sim = document.getElementById('sw_sim').checked; ['f_mar_cel', 'f_mod_cel', 'f_imei'].forEach(id => { const el = document.getElementById(id); el.disabled = !eq; el.classList.toggle('disabled-field', !eq); if(!eq) el.value = ""; }); const simEl = document.getElementById('f_imsi'); simEl.disabled = !sim; simEl.classList.toggle('disabled-field', !sim); if(!sim) simEl.value = ""; }
+function setupListeners() {
+    const ir = document.getElementById('f_rut'), iname = document.getElementById('f_nombre');
+    ir.addEventListener('blur', () => { const c = DB_COLABS.find(x => x.rut === ir.value); if(c) { document.getElementById('f_nombre').value = c.nombre; setSelect('f_area', c.area); } });
+    iname.addEventListener('input', () => {
+        const c = DB_COLABS.find(x => x.nombre === iname.value);
+        if(c) {
+            ir.value = c.rut;
+            document.getElementById('f_correo').value = c.correo;
+            setSelect('f_area', c.area);
+        } else {
+            const parts = iname.value.trim().toLowerCase().split(/\s+/);
+            const currentEmail = document.getElementById('f_correo').value;
+            if (parts.length >= 2 && (currentEmail === '' || currentEmail.includes('@dominospizza.cl'))) {
+                const cleanName = parts[0].replace(/[^a-z0-9]/g, '');
+                const cleanLast = parts[1].replace(/[^a-z0-9]/g, '');
+                document.getElementById('f_correo').value = `${cleanName}.${cleanLast}@dominospizza.cl`;
+            }
+        }
+    });
+}
 function formatearRut(rut) { if(!rut) return ''; let v = rut.replace(/\./g, '').replace(/-/g, '').toLowerCase().trim(); if (v.length < 2) return v; return v.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "-" + v.slice(-1); }
 function formatearFechaCSV(str) { if(!str) return null; const p = str.split(/[\/-]/); return (p.length === 3 && p[2].length === 4) ? `${p[2]}-${p[1]}-${p[0]}` : str; }
 function showView(v) { document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='telephony') document.getElementById('btn-phone').classList.add('active'); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); }
-function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); }
+function abrirFicha() { document.getElementById('modalFicha').classList.remove('hidden'); setupListeners(); }
 function cerrarFicha() { document.getElementById('modalFicha').classList.add('hidden'); }
 
 initSystem();
