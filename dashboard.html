@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v92.0</title>
+    <title>Dashboard - TI Maestro v93.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> <style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
         :root { --primary: #0066CC; --secondary: #E31837; --success: #10b981; --warning: #f59e0b; --info: #3b82f6; --dark: #1e293b; --bg: #f1f5f9; --border: #e2e8f0; --radius: 8px; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); height: 100vh; display: flex; font-size: 13px; overflow: hidden; color: #334155; }
@@ -75,20 +77,17 @@
         .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; padding-bottom: 50px; }
         .chart-card { background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         
-        .role-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; font-weight: 800; margin-left: 10px; }
-        .badge-viewer { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
-        .badge-admin { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
         .csv-panel { background: #fff; border: 2px dashed var(--primary); padding: 15px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-left: 5px solid; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease-out; font-weight: 600; }
         .toast.success { border-color: var(--success); } .toast.error { border-color: var(--secondary); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
+        /* USER PROFILE CON ICONOS */
         .user-header { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; }
         .user-avatar { width: 70px; height: 70px; background: var(--primary); color: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .asset-list { list-style: none; padding: 0; }
         .asset-item { border: 1px solid #e2e8f0; margin-bottom: 12px; border-radius: 10px; background: #fff; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .asset-item:hover { transform: translateX(5px); border-color: var(--primary); }
         .asset-block { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #e2e8f0; }
         .asset-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
         .asset-icon-box { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
@@ -97,6 +96,12 @@
         .icon-sim { background: #f3e8ff; color: #7e22ce; }
         .asset-info h5 { margin: 0; font-size: 13px; font-weight: 700; color: #1e293b; }
         .asset-info p { margin: 2px 0 0 0; font-size: 11px; color: #64748b; font-family: monospace; }
+        .action-group { display: flex; gap: 5px; }
+        .btn-icon { border: none; background: none; cursor: pointer; font-size: 14px; transition: 0.2s; padding: 6px; border-radius: 4px; }
+        .btn-edit { color: var(--primary); background: #e0f2fe; }
+        .btn-return { color: var(--warning); background: #fef3c7; }
+        .btn-hist { color: #64748b; background: #f1f5f9; } .btn-hist:hover { background: #cbd5e1; color: var(--dark); }
+        .btn-delete { color: var(--secondary); background: #fee2e2; }
     </style>
 </head>
 <body>
@@ -105,7 +110,6 @@
 
     <aside id="sidebar">
         <img src="https://logos-world.net/wp-content/uploads/2021/08/Dominos-Logo.png" class="logo-img" alt="Domino's Logo">
-        
         <button class="nav-btn active" id="btn-home" onclick="showView('home')"><i class="fas fa-home"></i> Inicio</button>
         <button class="nav-btn" id="btn-inv" onclick="showView('inventory')"><i class="fas fa-boxes"></i> Inventario Data</button>
         <button class="nav-btn" id="btn-phone" onclick="showView('telephony')"><i class="fas fa-mobile-alt"></i> Telefonía</button>
@@ -113,7 +117,6 @@
         <hr style="margin: 20px 0; opacity: 0.2;">
         <button class="nav-btn admin-only" style="background: var(--success);" onclick="nuevoRegistro()"><i class="fas fa-plus-circle"></i> NUEVO REGISTRO</button>
         <button class="nav-btn" style="background: rgba(0,0,0,0.2); margin-top: 10px;" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
-        
         <div class="sidebar-footer">
             <div class="watermark">
                 <span>Designed & Developed by EDC &</span>
@@ -136,7 +139,6 @@
         </header>
         
         <div class="content-area">
-            
             <div id="view-home">
                 <div class="kpi-section">
                     <div class="kpi-title"><i class="fas fa-chart-bar"></i> Estado del Inventario (Click para filtrar)</div>
@@ -179,7 +181,7 @@
                     <div style="display: flex; gap: 10px;">
                         <button onclick="exportarExcel()" class="nav-btn" style="width:auto; background:#10b981; font-weight:700; margin:0;"><i class="fas fa-file-excel"></i> EXCEL</button>
                         <button onclick="verificarDuplicados()" class="nav-btn" style="width:auto; background:#f97316; font-weight:700; color:white; margin:0;"><i class="fas fa-search-plus"></i> DUPLICADOS</button>
-                        <button onclick="procesarCSV()" id="btnCsv" class="nav-btn" style="width:auto; background:var(--dark); margin:0; padding: 8px 16px;"><i class="fas fa-upload"></i> CARGAR</button>
+                        <button onclick="procesarCSV()" id="btnCsv" class="nav-btn" style="width:auto; background:var(--dark); margin:0; padding: 8px 16px;"><i class="fas fa-upload"></i> PROCESAR</button>
                     </div>
                 </div>
                 <input type="search" id="mainSearch" placeholder="🔍 Buscar por RUT, Nombre, Serie, Tienda..." style="width: 100%; margin-bottom: 20px; padding: 15px; border-radius: 12px; border: 1px solid var(--border); font-size: 14px; font-family:'Inter'; box-shadow: 0 2px 5px rgba(0,0,0,0.02);" autocomplete="off">
@@ -209,12 +211,11 @@ if(typeof ChartDataLabels!=='undefined') Chart.register(ChartDataLabels);
 const CONFIG = { URL: "https://ivjwxvhixrskraepqzse.supabase.co", KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o" };
 let sb; try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY); } catch(e) { console.error(e); }
 
-// --- VARIABLES GLOBALES ---
-let DB_ACTIVOS = [], DB_COLABS = [], DB_TIENDAS = [];
-let charts = [], currentUserRole = 'viewer', currentUserEmail = '';
-let currentSerieDevolucion = null;
+// --- VARS ---
+let DB_ACTIVOS=[], DB_COLABS=[], DB_TIENDAS=[];
+let charts=[], currentUserRole='viewer', currentUserEmail='';
+let currentSerieDevolucion=null;
 
-// --- UTILS BÁSICOS ---
 function showToast(msg, type='success') {
     const d = document.createElement('div'); d.className = `toast ${type}`;
     d.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
@@ -222,7 +223,6 @@ function showToast(msg, type='success') {
     setTimeout(() => d.remove(), 3000);
 }
 
-// --- ARRANQUE DEL SISTEMA ---
 function initSystem() {
     if(localStorage.getItem('manualAuth') === 'true') { loadApp("Admin Local", "admin"); return; }
     sb.auth.getSession().then(({ data: { session } }) => {
@@ -249,7 +249,7 @@ function loadApp(email, role) {
         badge.className = 'role-badge badge-viewer'; badge.innerText = 'VISUALIZADOR';
     }
     
-    // CARGAR TIENDAS DINÁMICAMENTE
+    // CARGAR TIENDAS DINÁMICAMENTE DESDE DB
     cargarTiendas();
     setupSearchListeners();
     cargarDatos();
@@ -261,7 +261,6 @@ async function cerrarSesion() {
     window.location.href = 'index.html';
 }
 
-// --- CARGA DE TIENDAS DESDE BD (NUEVO) ---
 async function cargarTiendas() {
     try {
         const { data, error } = await sb.from('tiendas').select('nombre').order('nombre');
@@ -296,7 +295,6 @@ async function cargarDatos() {
     } catch(e) { console.error(e); showToast("Error al cargar datos.", "error"); }
 }
 
-// --- DASHBOARD CORE ---
 function safeSetText(id, value) { const el = document.getElementById(id); if (el) el.innerText = value; }
 
 function actualizarDashboard() {
@@ -349,7 +347,11 @@ function renderTablaHome(data, title) {
     if(data.length === 0) { b.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b;">No hay datos para esta selección</td></tr>'; return; }
     b.innerHTML = data.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
-        return `<tr><td><div class="click-name" onclick="verUser('${a.rut_responsable}')">${c.nombre}</div><div style="font-size:11px; color:#64748b">${a.rut_responsable}</div></td><td>${getStatusBadge(a.estado)}</td><td><div style="font-weight:600;">${a.ubicacion||'-'}</div><code style="color:var(--primary)">${a.serie}</code></td></tr>`;
+        return `<tr>
+            <td><div class="click-name" onclick="verUser('${a.rut_responsable}')">${c.nombre}</div><div style="font-size:11px; color:#64748b">${a.rut_responsable}</div></td>
+            <td>${getStatusBadge(a.estado)}</td>
+            <td><div style="font-weight:600;">${a.ubicacion||'-'}</div><code style="color:var(--primary)">${a.serie}</code></td>
+        </tr>`;
     }).join('');
 }
 function resetHomeTable() { document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); }
@@ -392,7 +394,7 @@ function renderPhoneTable() {
     }).join('') : '<tr><td colspan="7" style="text-align:center; padding:30px; color:#64748b;">No hay registros</td></tr>';
 }
 
-// --- EXPORTAR A EXCEL (NUEVO) ---
+// --- EXPORTAR A EXCEL ---
 function exportarExcel() {
     const dataExport = DB_ACTIVOS.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
@@ -428,7 +430,51 @@ async function eliminarActivo(s){ if(!confirm("¿Eliminar?")) return; try{ await
 function nuevoRegistro(){ document.querySelectorAll('#modalFicha input').forEach(i=>{i.value='';i.classList.remove('error-input')}); document.querySelectorAll('#modalFicha select').forEach(s=>s.selectedIndex=0); document.getElementById('sw_equipo').checked=false; document.getElementById('sw_sim').checked=false; toggleTelefonia(); document.getElementById('modalFicha').classList.remove('hidden'); }
 function editar(s){ const a=DB_ACTIVOS.find(x=>x.serie===s); if(!a) return; const c=DB_COLABS.find(x=>x.rut===a.rut_responsable)||{}; document.getElementById('f_rut').value=a.rut_responsable; document.getElementById('f_nombre').value=c.nombre||''; document.getElementById('f_correo').value=c.correo||''; setSelect('f_area',c.area); setSelect('f_tienda',a.ubicacion); setSelect('f_contractual',c.estado_contractual); setSelect('f_estado',a.estado); document.getElementById('f_marca').value=a.marca; document.getElementById('f_modelo').value=a.modelo; document.getElementById('f_serie').value=a.serie; document.getElementById('f_fecha_ent').value=a.fecha_entrega; document.getElementById('f_ent_it').value=a.entrega_it||''; document.getElementById('f_obs').value=a.observaciones||''; document.getElementById('sw_equipo').checked=!!a.marca_cel; document.getElementById('sw_sim').checked=!!a.imei_sim; document.getElementById('f_numero').value=a.numero||''; document.getElementById('f_mar_cel').value=a.marca_cel||''; document.getElementById('f_mod_cel').value=a.modelo_cel||''; document.getElementById('f_imei').value=a.imei_cel||''; document.getElementById('f_imsi').value=a.imei_sim||''; toggleTelefonia(); document.getElementById('modalFicha').classList.remove('hidden'); }
 async function guardarTodoSincronizado(){ const btn=document.getElementById('btnSave'), rut=document.getElementById('f_rut').value.trim(), serie=document.getElementById('f_serie').value.trim(), nom=document.getElementById('f_nombre').value; if(!rut||!serie) return showToast("Faltan datos","error"); const exist=DB_ACTIVOS.find(a=>a.serie===serie); if(exist&&exist.rut_responsable&&exist.rut_responsable!==rut) return showToast(`Asignado a otro usuario.`,"error"); btn.innerText="PROCESANDO..."; btn.disabled=true; const prev=DB_ACTIVOS.find(a=>a.serie===serie); let acc='Edición', desc=`Actualizado por ${currentUserEmail}`; if(!prev){ acc='Alta'; desc=`Nuevo ingreso. Asignado a: ${nom}`; } else if(prev.rut_responsable!==rut){ const nm=(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Bodega'); acc='Transferencia'; desc=`De ${nm} -> A ${nom}`; } const colab={rut,nombre:nom,correo:document.getElementById('f_correo').value,area:document.getElementById('f_area').value,estado_contractual:document.getElementById('f_contractual').value}; const activo={serie,rut_responsable:rut,marca:document.getElementById('f_marca').value,modelo:document.getElementById('f_modelo').value,estado:document.getElementById('f_estado').value,ubicacion:document.getElementById('f_tienda').value,fecha_entrega:document.getElementById('f_fecha_ent').value,entrega_it:document.getElementById('f_ent_it').value,observaciones:document.getElementById('f_obs').value,numero:document.getElementById('f_numero').value,marca_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mar_cel').value:null,modelo_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mod_cel').value:null,imei_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_imei').value:null,imei_sim:document.getElementById('sw_sim').checked?document.getElementById('f_imsi').value:null}; try{ await sb.from('colaboradores').upsert(colab,{onConflict:'rut'}); await sb.from('activos').upsert(activo,{onConflict:'serie'}); registrarMovimiento(serie,acc,desc); showToast("Guardado"); cerrarFicha(); cargarDatos(); }catch(e){ showToast("Error","error"); } finally{ btn.innerText="GUARDAR"; btn.disabled=false; } }
-function verUser(rut){ const c=DB_COLABS.find(x=>x.rut===rut); if(!c) return; const as=DB_ACTIVOS.filter(x=>x.rut_responsable===rut); const h=`<div class="user-header"><div class="user-avatar">${c.nombre.charAt(0)}</div><div><h3 style="margin:0;font-size:20px;">${c.nombre}</h3><p style="color:#64748b;">${c.rut} | ${c.area}</p></div></div><h4 style="color:var(--primary); margin-bottom:15px;">Equipos Asignados (${as.length})</h4><ul class="asset-list">${as.map(a=>`<li class="asset-item"><div class="asset-detail-row"><div><strong>${a.marca||a.marca_cel||'Equipo'}</strong> <span style="font-size:11px;color:#64748b">${a.serie||a.imei_cel}</span></div><div style="text-align:right;">${getStatusBadge(a.estado)}</div></div></li>`).join('')}</ul>`; document.getElementById('userProfileContent').innerHTML=h; document.getElementById('modalVerUsuario').classList.remove('hidden'); }
+
+function verUser(rut){
+    const c = DB_COLABS.find(x => x.rut === rut);
+    if(!c) return;
+    const activos = DB_ACTIVOS.filter(x => x.rut_responsable === rut);
+
+    const html = `
+        <div class="user-header">
+            <div class="user-avatar">${c.nombre.charAt(0)}</div>
+            <div>
+                <h3 style="margin:0;font-size:20px;">${c.nombre}</h3>
+                <p style="color:#64748b;">${c.rut} | ${c.area}</p>
+            </div>
+        </div>
+        <h4 style="color:var(--primary); margin-bottom:15px;">Equipos Asignados (${activos.length})</h4>
+        <ul class="asset-list">
+            ${activos.map(a => {
+                let content = '';
+                // 1. PC (Se considera PC si tiene marca definida en la sección PC)
+                if(a.marca && a.marca.length > 1) {
+                    content += `<div class="asset-block"><div class="asset-icon-box icon-pc"><i class="fas fa-laptop"></i></div><div class="asset-info"><h5>${a.marca} ${a.modelo}</h5><p>Serie: ${a.serie}</p></div></div>`;
+                }
+                // 2. Celular (Se considera Celular si tiene marca_cel o imei_cel)
+                if((a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1)) {
+                    content += `<div class="asset-block"><div class="asset-icon-box icon-phone"><i class="fas fa-mobile-alt"></i></div><div class="asset-info"><h5>${a.marca_cel || 'Celular'} ${a.modelo_cel||''}</h5><p>IMEI: ${a.imei_cel || 'N/A'}</p></div></div>`;
+                }
+                // 3. SIM (Se considera SIM si tiene numero o imsi)
+                if((a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)) {
+                    content += `<div class="asset-block"><div class="asset-icon-box icon-sim"><i class="fas fa-sim-card"></i></div><div class="asset-info"><h5>SIM / Chip</h5><p>Nº: ${a.numero || 'N/A'} | IMSI: ${a.imei_sim || 'N/A'}</p></div></div>`;
+                }
+                // Fallback: Si no tiene datos específicos pero existe el registro, mostrar genérico
+                if(content === '') {
+                    content = `<div class="asset-block"><div style="color:#94a3b8; font-style:italic;">Registro sin detalle específico</div><div style="font-size:11px;">S/N: ${a.serie}</div></div>`;
+                }
+
+                return `<li class="asset-item">
+                    ${content}
+                    <div style="text-align:right; margin-top:5px;">${getStatusBadge(a.estado)}</div>
+                </li>`;
+            }).join('')}
+        </ul>`;
+    document.getElementById('userProfileContent').innerHTML = html;
+    document.getElementById('modalVerUsuario').classList.remove('hidden');
+}
+
 function procesarCSV(){ const f=document.getElementById('csvFile').files[0]; if(!f) return showToast("Sin archivo","error"); const r=new FileReader(); r.readAsText(f); r.onload=(e)=>{ showToast("Carga CSV iniciada"); cargarDatos(); }; }
 function setSelect(id,v){ const e=document.getElementById(id); if(e) e.value=v; }
 function toggleTelefonia(){ const eq=document.getElementById('sw_equipo').checked, sim=document.getElementById('sw_sim').checked; ['f_mar_cel','f_mod_cel','f_imei'].forEach(id=>{const el=document.getElementById(id);el.disabled=!eq;el.classList.toggle('disabled-field',!eq);if(!eq)el.value=''}); const el=document.getElementById('f_imsi');el.disabled=!sim;el.classList.toggle('disabled-field',!sim);if(!sim)el.value=''; }
