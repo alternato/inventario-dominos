@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v94.0</title>
+    <title>Dashboard - TI Maestro v95.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -58,13 +58,16 @@
         .click-name { color: var(--primary); font-weight: 600; text-decoration: none; cursor: pointer; } .click-name:hover { text-decoration: underline; }
 
         .hidden { display: none !important; } .admin-only { display: none !important; } body.role-admin .admin-only { display: flex !important; }
+        
+        /* ESTILO PARA MODALES */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); animation: scaleIn 0.2s ease-out; }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .field { display: flex; flex-direction: column; gap: 6px; }
         .field label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
         input, select, textarea { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; transition: 0.2s; background: #fff; }
-        /* Error Validation Style */
         .input-error { border-color: #E31837 !important; background-color: #fff5f5 !important; }
         .error-msg { color: #E31837; font-size: 10px; font-weight: 700; margin-top: 2px; }
 
@@ -91,7 +94,6 @@
         .user-avatar { width: 70px; height: 70px; background: var(--primary); color: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .asset-list { list-style: none; padding: 0; }
         .asset-item { border: 1px solid #e2e8f0; margin-bottom: 12px; border-radius: 10px; background: #fff; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .asset-item:hover { transform: translateX(5px); border-color: var(--primary); }
         .asset-block { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #e2e8f0; }
         .asset-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
         .asset-icon-box { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
@@ -143,6 +145,7 @@
         </header>
         
         <div class="content-area">
+            
             <div id="view-home">
                 <div class="kpi-section">
                     <div class="kpi-title"><i class="fas fa-chart-bar"></i> Estado del Inventario (Click para filtrar)</div>
@@ -167,7 +170,9 @@
 
                 <div class="table-wrapper home-table-section">
                     <div class="home-table-header">
-                        <h4 id="homeTableTitle" style="color: var(--primary); margin: 0; font-size: 15px; font-weight:800;"><i class="fas fa-history"></i> Últimos Movimientos</h4>
+                        <h4 id="homeTableTitle" style="color: var(--primary); margin: 0; font-size: 15px; font-weight:800; display:flex; align-items:center; gap:10px;">
+                            <i class="fas fa-history"></i> Últimos Movimientos
+                        </h4>
                         <button onclick="resetHomeTable()" style="font-size: 11px; background: white; border: 1px solid #cbd5e1; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight:600; color:#64748b;"><i class="fas fa-sync-alt"></i> Ver Recientes</button>
                     </div>
                     <div class="table-scroll">
@@ -206,6 +211,18 @@
 
     <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:var(--primary);margin-bottom:20px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut" placeholder="Ej: 11.222.333-k"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div><div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div><div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div><div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero" placeholder="+569..."><div id="err_numero" class="error-msg"></div></div><div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div><div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div><div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control & Auditoría</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por (IT)</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:25px; text-align:right; border-top:1px solid #f1f5f9; padding-top:20px;"><button onclick="cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; color:#64748b; cursor:pointer; border-radius:6px; margin-right:10px; font-weight:600;">Cancelar</button><button onclick="guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--primary); color:white; font-weight:700; cursor:pointer; border-radius:6px;">GUARDAR</button></div></div></div>
 
+    <div id="modalConfirm" class="modal hidden" style="z-index: 1500;">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: var(--secondary); margin-bottom: 15px;"></i>
+            <h3 style="color: var(--dark); margin-bottom: 10px;">¿Estás seguro?</h3>
+            <p style="color: #64748b; margin-bottom: 25px;">Esta acción eliminará el registro permanentemente. No se puede deshacer.</p>
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <button onclick="document.getElementById('modalConfirm').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cancelar</button>
+                <button id="btnConfirmDelete" style="padding:10px 20px; border:none; background:var(--secondary); color:white; font-weight:700; cursor:pointer; border-radius:6px;">SÍ, ELIMINAR</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:var(--warning); margin-bottom:15px;"><i class="fas fa-box-open"></i> Devolución a Bodega</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será asignado a <strong>INFORMATICA</strong>.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field" style="margin-bottom:20px;"><label>Observaciones</label><textarea id="dev_obs" rows="3" placeholder="Ej: Pantalla con rayas..."></textarea></div><div style="text-align:right;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="procesarDevolucion()" style="padding:10px 20px; border:none; background:var(--warning); color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
     <div id="modalHistorial" class="modal hidden" style="z-index: 1300;"><div class="modal-content" style="max-width: 600px;"><h3 style="color:var(--dark); margin-bottom:15px;">Historial de Trazabilidad</h3><div id="historialContent" style="max-height: 400px; overflow-y: auto;">Cargando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalHistorial').classList.add('hidden')" style="padding:8px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
     <div id="modalAudit" class="modal hidden" style="z-index: 1400;"><div class="modal-content" style="max-width: 600px;"><h3 style="color:#f97316; margin-bottom:15px;"><i class="fas fa-exclamation-triangle"></i> Resultados de Auditoría</h3><div id="auditContent" style="max-height: 400px; overflow-y: auto;">Analizando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalAudit').classList.add('hidden')" style="padding:8px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
@@ -219,7 +236,8 @@ let sb; try { sb = window.supabase.createClient(CONFIG.URL, CONFIG.KEY); } catch
 let DB_ACTIVOS=[], DB_COLABS=[], DB_TIENDAS=[];
 let charts=[], currentUserRole='viewer', currentUserEmail='';
 let currentSerieDevolucion=null;
-let currentEditingSerie=null; // Controla duplicados al editar
+let currentEditingSerie=null; 
+let deleteSerieTarget=null; // Para el modal de confirmación
 
 function showToast(msg, type='success') {
     const d = document.createElement('div'); d.className = `toast ${type}`;
@@ -254,10 +272,9 @@ function loadApp(email, role) {
         badge.className = 'role-badge badge-viewer'; badge.innerText = 'VISUALIZADOR';
     }
     
-    // INICIALIZACIÓN COMPLETA
     cargarTiendas();
     setupSearchListeners();
-    setupValidationListeners(); // NUEVO: Listeners de seguridad
+    setupValidationListeners();
     cargarDatos();
 }
 
@@ -304,29 +321,25 @@ async function cargarDatos() {
 function safeSetText(id, value) { const el = document.getElementById(id); if (el) el.innerText = value; }
 
 function actualizarDashboard() {
-    // 1. Conteo de filas base
-    const db_rows = DB_ACTIVOS.length;
+    // KPIS MEJORADOS: SUMA REAL DE HARDWARE
     const disp = DB_ACTIVOS.filter(a=>a.estado==='Disponible').length;
     const mant = DB_ACTIVOS.filter(a=>a.estado==='Mantención').length;
     const asig = DB_ACTIVOS.filter(a=>a.estado==='Asignado').length;
     const baja = DB_ACTIVOS.filter(a=>a.estado==='Baja').length;
     
-    // 2. Conteo de EQUIPOS FÍSICOS (Suma Real)
     const cels = DB_ACTIVOS.filter(a => (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1)).length;
     const sims = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)).length;
     const pcs = DB_ACTIVOS.filter(a => a.marca && a.marca.length > 1).length;
     
-    // TOTAL REAL = Suma de todos los dispositivos, no solo filas
     const totalReal = pcs + cels + sims;
     
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
-    safeSetText('kpi-total', totalReal); // CORREGIDO: Muestra suma real de hardware
-    safeSetText('kpi-dispo', disp); safeSetText('kpi-mant', mant); safeSetText('kpi-asig', asig); 
+    safeSetText('kpi-total', totalReal); safeSetText('kpi-dispo', disp); safeSetText('kpi-mant', mant); safeSetText('kpi-asig', asig); 
     safeSetText('kpi-baja', baja); safeSetText('kpi-pcs', pcs); safeSetText('kpi-cels', cels); safeSetText('kpi-sims', sims); safeSetText('kpi-cesados', ces);
 }
 
-// --- VALIDACIÓN REACTIVA (SEGURIDAD) ---
+// --- VALIDACIÓN REACTIVA ---
 function setupValidationListeners() {
     const fields = [
         { id: 'f_serie', key: 'serie', errorId: 'err_serie', msg: 'Serie ya existe' },
@@ -347,10 +360,7 @@ function setupValidationListeners() {
                 document.getElementById('btnSave').disabled = false;
                 return; 
             }
-
-            // Buscar duplicado (excluyendo el actual si estamos editando)
             const dup = DB_ACTIVOS.find(a => a[f.key] === val && a.serie !== currentEditingSerie);
-            
             if (dup) {
                 const owner = DB_COLABS.find(c => c.rut === dup.rut_responsable)?.nombre || 'Otro usuario';
                 input.classList.add('input-error');
@@ -381,6 +391,9 @@ function filterDashboard(card, type) {
         case 'cesados': data = DB_ACTIVOS.filter(a => { const c = DB_COLABS.find(u => u.rut === a.rut_responsable); return c && c.estado_contractual === 'Cesado'; }); title = "Equipos en manos de Cesados"; break;
     }
     renderTablaHome(data, title);
+    // Agrega un indicador visual de filtro
+    const badgeHtml = `<span style="background:#0066CC; color:white; padding:4px 8px; border-radius:12px; font-size:11px; margin-left:10px;">Filtro: ${title} <i class="fas fa-times" style="cursor:pointer; margin-left:5px;" onclick="resetHomeTable()"></i></span>`;
+    document.getElementById('homeTableTitle').innerHTML = `<i class="fas fa-history"></i> ${title} ${badgeHtml}`;
 }
 
 function getStatusBadge(estado) {
@@ -405,12 +418,16 @@ function renderTablaHome(data, title) {
         </tr>`;
     }).join('');
 }
-function resetHomeTable() { document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); }
+function resetHomeTable() { 
+    document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); 
+    renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
+    document.getElementById('homeTableTitle').innerHTML = `<i class="fas fa-history"></i> Últimos Movimientos`;
+}
 
 function getActionButtons(serie) {
     const histBtn = `<button class="btn-action-outline" title="Ver Historial" onclick="verHistorial('${serie}')"><i class="fas fa-history"></i></button>`;
     if (currentUserRole !== 'admin') return `<div class="action-group">${histBtn}</div>`;
-    return `<div class="action-group"><button class="btn-action-outline" title="Editar" onclick="editar('${serie}')"><i class="fas fa-pencil-alt"></i></button><button class="btn-action-outline return" title="Devolver a Bodega" onclick="abrirDevolucion('${serie}')"><i class="fas fa-undo"></i></button>${histBtn}<button class="btn-action-outline delete" title="Eliminar Registro" onclick="eliminarActivo('${serie}')"><i class="fas fa-trash-alt"></i></button></div>`;
+    return `<div class="action-group"><button class="btn-action-outline" title="Editar" onclick="editar('${serie}')"><i class="fas fa-pencil-alt"></i></button><button class="btn-action-outline return" title="Devolver a Bodega" onclick="abrirDevolucion('${serie}')"><i class="fas fa-undo"></i></button>${histBtn}<button class="btn-action-outline delete" title="Eliminar Registro" onclick="prepararEliminar('${serie}')"><i class="fas fa-trash-alt"></i></button></div>`;
 }
 
 function renderTablaMaestra() {
@@ -461,14 +478,18 @@ function setupSearchListeners(){
     const m=document.getElementById('mainSearch'), p=document.getElementById('phoneSearch'), n=document.getElementById('f_nombre'), r=document.getElementById('f_rut'); 
     if(m) m.addEventListener('input', renderTablaMaestra); 
     if(p) p.addEventListener('input', renderPhoneTable); 
-    // CORRECCIÓN SUGERENCIA CORREO (Ahora está activo siempre)
+    
+    // MEJORA: Sugerencia de correo solo si es nuevo o el campo está vacío
     if(n) n.addEventListener('input',()=>{ 
         const c=DB_COLABS.find(x=>x.nombre===n.value); 
-        if(c){ document.getElementById('f_rut').value=c.rut; document.getElementById('f_correo').value=c.correo; setSelect('f_area',c.area); } 
-        else { 
+        if(c){ 
+            document.getElementById('f_rut').value=c.rut; 
+            document.getElementById('f_correo').value=c.correo; 
+            setSelect('f_area',c.area); 
+        } 
+        else if (currentEditingSerie === null || document.getElementById('f_correo').value === '') { 
             const p=n.value.trim().toLowerCase().split(/\s+/); 
-            const ce=document.getElementById('f_correo').value; 
-            if(p.length>=2 && (ce===''||ce.includes('@dominospizza.cl'))) document.getElementById('f_correo').value=`${p[0].replace(/[^a-z0-9]/g,'')}.${p[1].replace(/[^a-z0-9]/g,'')}@dominospizza.cl`; 
+            if(p.length>=2) document.getElementById('f_correo').value=`${p[0].replace(/[^a-z0-9]/g,'')}.${p[1].replace(/[^a-z0-9]/g,'')}@dominospizza.cl`; 
         } 
     }); 
     if(r) r.addEventListener('blur',()=>{ r.value=formatearRut(r.value); const c=DB_COLABS.find(x=>x.rut===r.value); if(c){ document.getElementById('f_nombre').value=c.nombre; document.getElementById('f_correo').value=c.correo; setSelect('f_area',c.area); } }); 
@@ -479,39 +500,42 @@ async function verHistorial(s){ document.getElementById('modalHistorial').classL
 function verificarDuplicados(){ const n={}, e={}, s={}; DB_ACTIVOS.forEach(a=>{ if(a.numero&&a.numero.length>5) n[a.numero]=(n[a.numero]||0)+1; if(a.imei_cel&&a.imei_cel.length>5) e[a.imei_cel]=(e[a.imei_cel]||0)+1; if(a.imei_sim&&a.imei_sim.length>5) s[a.imei_sim]=(s[a.imei_sim]||0)+1; }); const dn=Object.keys(n).filter(k=>n[k]>1), de=Object.keys(e).filter(k=>e[k]>1), ds=Object.keys(s).filter(k=>s[k]>1); let h=''; if(!dn.length&&!de.length&&!ds.length) h='<div style="text-align:center; padding:20px; color:#10b981;"><b>¡Todo limpio!</b></div>'; else { h='<ul style="list-style:none;">'; if(dn.length) h+=`<li><strong>Números Repetidos:</strong> ${dn.join(', ')}</li>`; if(de.length) h+=`<li><strong>IMEIs Repetidos:</strong> ${de.join(', ')}</li>`; if(ds.length) h+=`<li><strong>SIMs Repetidas:</strong> ${ds.join(', ')}</li>`; h+='</ul>'; } document.getElementById('auditContent').innerHTML=h; document.getElementById('modalAudit').classList.remove('hidden'); }
 function abrirDevolucion(s){ currentSerieDevolucion=s; document.getElementById('dev_serie').innerText=s; document.getElementById('dev_obs').value=''; document.getElementById('modalDevolucion').classList.remove('hidden'); }
 async function procesarDevolucion(){ if(!currentSerieDevolucion) return; const ne=document.getElementById('dev_estado').value, nu=document.getElementById('dev_ubicacion').value, obs=document.getElementById('dev_obs').value; try{ const prev=DB_ACTIVOS.find(a=>a.serie===currentSerieDevolucion); const nm=prev?(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Desconocido'):'Desconocido'; const {error}=await sb.from('activos').update({rut_responsable:'9.999.999-9',estado:ne,ubicacion:nu,observaciones:obs?`DEVOLUCIÓN: ${obs}`:'Devuelto'}).eq('serie',currentSerieDevolucion); if(error) throw error; registrarMovimiento(currentSerieDevolucion,'Devolución',`De: ${nm} -> ${nu}`); showToast("Devolución exitosa"); document.getElementById('modalDevolucion').classList.add('hidden'); cargarDatos(); }catch(e){ showToast("Error","error"); } }
-async function eliminarActivo(s){ if(!confirm("¿Eliminar?")) return; try{ await sb.from('activos').delete().eq('serie',s); registrarMovimiento(s,'Eliminación','Borrado'); showToast("Eliminado"); cargarDatos(); }catch(e){ showToast("Error","error"); } }
+
+// --- NUEVA LÓGICA DE BORRADO SEGURO ---
+function prepararEliminar(s) { deleteSerieTarget = s; document.getElementById('modalConfirm').classList.remove('hidden'); }
+document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+    if(!deleteSerieTarget) return;
+    try { 
+        await sb.from('activos').delete().eq('serie', deleteSerieTarget); 
+        registrarMovimiento(deleteSerieTarget, 'Eliminación', 'Borrado permanente'); 
+        showToast("Eliminado correctamente"); 
+        document.getElementById('modalConfirm').classList.add('hidden');
+        cargarDatos(); 
+    } catch(e) { showToast("Error al eliminar", "error"); }
+});
+
 function nuevoRegistro(){ 
-    currentEditingSerie = null; // Modo Nuevo
+    currentEditingSerie = null; 
     document.querySelectorAll('#modalFicha input').forEach(i=>{i.value='';i.classList.remove('error-input')}); 
     document.querySelectorAll('#modalFicha select').forEach(s=>s.selectedIndex=0); 
-    document.querySelectorAll('.error-msg').forEach(e=>e.innerText=''); // Limpiar errores
+    document.querySelectorAll('.error-msg').forEach(e=>e.innerText=''); 
     document.getElementById('sw_equipo').checked=false; 
     document.getElementById('sw_sim').checked=false; 
     toggleTelefonia(); 
     document.getElementById('modalFicha').classList.remove('hidden'); 
 }
 function editar(s){ 
-    currentEditingSerie = s; // Modo Edición
+    currentEditingSerie = s; 
     const a=DB_ACTIVOS.find(x=>x.serie===s); if(!a) return; 
     const c=DB_COLABS.find(x=>x.rut===a.rut_responsable)||{}; 
     document.getElementById('f_rut').value=a.rut_responsable; document.getElementById('f_nombre').value=c.nombre||''; document.getElementById('f_correo').value=c.correo||''; 
     setSelect('f_area',c.area); setSelect('f_tienda',a.ubicacion); setSelect('f_contractual',c.estado_contractual); setSelect('f_estado',a.estado); 
     document.getElementById('f_marca').value=a.marca; document.getElementById('f_modelo').value=a.modelo; document.getElementById('f_serie').value=a.serie; 
     document.getElementById('f_fecha_ent').value=a.fecha_entrega; document.getElementById('f_ent_it').value=a.entrega_it||''; document.getElementById('f_obs').value=a.observaciones||''; 
-    
-    // AUTO-DETECTAR TELEFONÍA PARA NO BORRAR DATOS
     const hasCel = (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1);
     const hasSim = (a.imei_sim && a.imei_sim.length > 1);
-    
-    document.getElementById('sw_equipo').checked = hasCel; 
-    document.getElementById('sw_sim').checked = hasSim; 
-    
-    document.getElementById('f_numero').value=a.numero||''; 
-    document.getElementById('f_mar_cel').value=a.marca_cel||''; 
-    document.getElementById('f_mod_cel').value=a.modelo_cel||''; 
-    document.getElementById('f_imei').value=a.imei_cel||''; 
-    document.getElementById('f_imsi').value=a.imei_sim||''; 
-    
+    document.getElementById('sw_equipo').checked = hasCel; document.getElementById('sw_sim').checked = hasSim; 
+    document.getElementById('f_numero').value=a.numero||''; document.getElementById('f_mar_cel').value=a.marca_cel||''; document.getElementById('f_mod_cel').value=a.modelo_cel||''; document.getElementById('f_imei').value=a.imei_cel||''; document.getElementById('f_imsi').value=a.imei_sim||''; 
     toggleTelefonia(); 
     document.getElementById('modalFicha').classList.remove('hidden'); 
 }
@@ -534,21 +558,10 @@ function verUser(rut){
         <ul class="asset-list">
             ${activos.map(a => {
                 let content = '';
-                // 1. PC
-                if(a.marca && a.marca.length > 1) {
-                    content += `<div class="asset-block"><div class="asset-icon-box icon-pc"><i class="fas fa-laptop"></i></div><div class="asset-info"><h5>${a.marca} ${a.modelo}</h5><p>Serie: ${a.serie}</p></div></div>`;
-                }
-                // 2. Celular
-                if((a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1)) {
-                    content += `<div class="asset-block"><div class="asset-icon-box icon-phone"><i class="fas fa-mobile-alt"></i></div><div class="asset-info"><h5>${a.marca_cel || 'Celular'} ${a.modelo_cel||''}</h5><p>IMEI: ${a.imei_cel || 'N/A'}</p></div></div>`;
-                }
-                // 3. SIM
-                if((a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)) {
-                    content += `<div class="asset-block"><div class="asset-icon-box icon-sim"><i class="fas fa-sim-card"></i></div><div class="asset-info"><h5>SIM / Chip</h5><p>Nº: ${a.numero || 'N/A'} | IMSI: ${a.imei_sim || 'N/A'}</p></div></div>`;
-                }
-                if(content === '') {
-                    content = `<div class="asset-block"><div style="color:#94a3b8; font-style:italic;">Registro sin detalle específico</div><div style="font-size:11px;">S/N: ${a.serie}</div></div>`;
-                }
+                if(a.marca && a.marca.length > 1) { content += `<div class="asset-block"><div class="asset-icon-box icon-pc"><i class="fas fa-laptop"></i></div><div class="asset-info"><h5>${a.marca} ${a.modelo}</h5><p>Serie: ${a.serie}</p></div></div>`; }
+                if((a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1)) { content += `<div class="asset-block"><div class="asset-icon-box icon-phone"><i class="fas fa-mobile-alt"></i></div><div class="asset-info"><h5>${a.marca_cel || 'Celular'} ${a.modelo_cel||''}</h5><p>IMEI: ${a.imei_cel || 'N/A'}</p></div></div>`; }
+                if((a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)) { content += `<div class="asset-block"><div class="asset-icon-box icon-sim"><i class="fas fa-sim-card"></i></div><div class="asset-info"><h5>SIM / Chip</h5><p>Nº: ${a.numero || 'N/A'} | IMSI: ${a.imei_sim || 'N/A'}</p></div></div>`; }
+                if(content === '') { content = `<div class="asset-block"><div style="color:#94a3b8; font-style:italic;">Registro sin detalle específico</div><div style="font-size:11px;">S/N: ${a.serie}</div></div>`; }
                 return `<li class="asset-item">${content}<div style="text-align:right; margin-top:5px;">${getStatusBadge(a.estado)}</div></li>`;
             }).join('')}
         </ul>`;
@@ -562,7 +575,7 @@ function toggleTelefonia(){ const eq=document.getElementById('sw_equipo').checke
 function formatearRut(r){ if(!r) return ''; let v=r.replace(/\./g,'').replace(/-/g,'').toLowerCase().trim(); if(v.length<2) return v; return v.slice(0,-1).replace(/\B(?=(\d{3})+(?!\d))/g,".")+"-"+v.slice(-1); }
 function formatearFechaCSV(s){ if(!s) return null; const p=s.split(/[\/-]/); return (p.length===3&&p[2].length===4)?`${p[2]}-${p[1]}-${p[0]}`:s; }
 function showView(v){ document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='telephony') document.getElementById('btn-phone').classList.add('active'); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); }
-function abrirFicha(){ document.getElementById('modalFicha').classList.remove('hidden'); } // SetupListener is now global
+function abrirFicha(){ document.getElementById('modalFicha').classList.remove('hidden'); } // Listeners moved to global setup
 function cerrarFicha(){ document.getElementById('modalFicha').classList.add('hidden'); }
 
 initSystem();
