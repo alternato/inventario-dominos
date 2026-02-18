@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario TI - Domino's Pizza (v96.1 Fixed)</title>
+    <title>Inventario TI - Domino's Pizza (v96.2 Clean)</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -92,7 +92,7 @@
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
-            cursor: pointer;
+            cursor: pointer; /* Importante para que se sienta clickeable */
         }
 
         .sidebar-menu a:hover, .sidebar-menu a.active {
@@ -426,28 +426,29 @@
 
     <script>
         // --- 1. CONFIGURACIÓN E INICIALIZACIÓN ---
-        // Tus credenciales originales
-        const SUPABASE_URL = 'https://ivjwxvhixrskraepqzse.supabase.co'; 
-        const SUPABASE_KEY = 'AeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o'; 
+        // Configuración de conexión (Tus credenciales)
+        const DOMINOS_DB_URL = 'https://ivjwxvhixrskraepqzse.supabase.co'; 
+        const DOMINOS_DB_KEY = 'AeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o'; 
         
-        let supabase;
+        // Usamos una variable única 'appSupabase' para evitar conflicto con variables globales
+        let appSupabase;
         let isDemoMode = false;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Inicialización de Supabase
+            // Inicialización de Supabase con manejo de errores
             try {
-                if (window.supabase) {
-                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    console.log("Supabase conectado.");
+                if (typeof supabase !== 'undefined') {
+                    appSupabase = supabase.createClient(DOMINOS_DB_URL, DOMINOS_DB_KEY);
+                    console.log("Sistema conectado a Supabase exitosamente.");
                 } else {
-                    throw new Error("Librería Supabase no cargada.");
+                    throw new Error("Librería Supabase no encontrada en window.");
                 }
             } catch (err) {
-                console.warn("Error iniciando Supabase:", err);
-                isDemoMode = true;
+                console.warn("Aviso: " + err.message);
+                isDemoMode = true; // Activar modo seguro si falla
             }
 
-            // Inicialización UI - Sidebar
+            // Inicialización UI - Sidebar Toggle
             const toggleBtn = document.getElementById('sidebarToggle');
             const sidebar = document.getElementById('sidebar');
             if(toggleBtn && sidebar) {
@@ -456,7 +457,7 @@
                 });
             }
 
-            // Cargar Datos
+            // Cargar Datos Iniciales
             fetchInventory();
         });
 
@@ -468,8 +469,8 @@
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando inventario...</td></tr>';
 
             try {
-                if (!isDemoMode && supabase) {
-                    const { data, error } = await supabase
+                if (!isDemoMode && appSupabase) {
+                    const { data, error } = await appSupabase
                         .from('inventory')
                         .select('*')
                         .order('created_at', { ascending: false });
@@ -478,7 +479,7 @@
                     inventoryData = data || [];
                 } else {
                     // MODO DEMO (Solo si falla la conexión)
-                    console.log("Usando datos locales de prueba.");
+                    console.log("Usando datos locales de prueba (Modo Demo).");
                     inventoryData = [
                         { id: 1, type: 'Laptop', brand: 'Dell', model: 'Latitude 3420', serial: '8H2K92', status: 'Asignado', assigned_to: 'Emilio Droguett', location: 'Casa Matriz' },
                         { id: 2, type: 'Celular', brand: 'Samsung', model: 'A54', serial: 'IMEI39201', status: 'Stock', assigned_to: null, location: 'Bodega TI' }
@@ -545,18 +546,26 @@
             const assigned = data.filter(i => i.status === 'Asignado').length;
             const maintenance = data.filter(i => i.status === 'Mantenimiento').length;
 
-            document.getElementById('kpi-total').innerText = total;
-            document.getElementById('kpi-stock').innerText = stock;
-            document.getElementById('kpi-assigned').innerText = assigned;
-            document.getElementById('kpi-maintenance').innerText = maintenance;
+            setText('kpi-total', total);
+            setText('kpi-stock', stock);
+            setText('kpi-assigned', assigned);
+            setText('kpi-maintenance', maintenance);
+        }
+
+        function setText(id, val) {
+            const el = document.getElementById(id);
+            if(el) el.innerText = val;
         }
 
         // --- 3. UI EXTRAS (Navegación Sidebar) ---
+        // Esta función ahora está definida globalmente para que el HTML la encuentre
         window.navigate = function(element, section) {
+            // Quitar clase active de todos los links
             document.querySelectorAll('.menu-link').forEach(el => el.classList.remove('active'));
+            // Poner al actual
             element.classList.add('active');
             console.log("Navegando a: " + section);
-            // Aquí podrías ocultar/mostrar secciones si tuvieras más contenido
+            // Aquí podrías ocultar/mostrar secciones div si tuvieras más contenido
         }
 
         // --- 4. MODALES & FORMULARIOS ---
@@ -590,7 +599,6 @@
         }
 
         window.editItem = function(id) {
-            // Aseguramos que el ID sea string para comparar
             const item = inventoryData.find(i => String(i.id) === String(id));
             if(item) {
                 document.getElementById('itemId').value = item.id;
@@ -629,12 +637,12 @@
                 const itemId = document.getElementById('itemId').value;
 
                 try {
-                    if(!isDemoMode && supabase) {
+                    if(!isDemoMode && appSupabase) {
                         let result;
                         if (itemId) {
-                            result = await supabase.from('inventory').update(formData).eq('id', itemId);
+                            result = await appSupabase.from('inventory').update(formData).eq('id', itemId);
                         } else {
-                            result = await supabase.from('inventory').insert([formData]);
+                            result = await appSupabase.from('inventory').insert([formData]);
                         }
                         if (result.error) throw result.error;
                         
@@ -662,8 +670,8 @@
                 confirmButtonText: 'Sí, borrar'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    if(!isDemoMode && supabase) {
-                        const { error } = await supabase.from('inventory').delete().eq('id', id);
+                    if(!isDemoMode && appSupabase) {
+                        const { error } = await appSupabase.from('inventory').delete().eq('id', id);
                         if(error) {
                             Swal.fire('Error', error.message, 'error');
                         } else {
@@ -694,7 +702,7 @@
 
         window.logout = function() {
             if(confirm("¿Estás seguro de que deseas salir?")) {
-                if(!isDemoMode && supabase) supabase.auth.signOut();
+                if(!isDemoMode && appSupabase) appSupabase.auth.signOut();
                 window.location.href = 'index.html';
             }
         }
