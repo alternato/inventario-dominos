@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v97.0 (Platinum Hybrid)</title>
+    <title>Dashboard - TI Maestro v97.1 (Platinum Soft)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -13,12 +13,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* PALETA DE COLORES PLATINUM */
+        /* PALETA DE COLORES PLATINUM SOFT */
         :root { 
             --dominos-blue: #006491;
             --dominos-light-blue: #0088cc;
             --dominos-red: #E31837;
-            --sidebar-bg: #ffffff;
+            /* CAMBIO AQUI: El nuevo blanco suave */
+            --sidebar-bg: #FDFDFD; 
             --sidebar-text: #475569;
             --bg-color: #f8fafc;
             --border-color: #e2e8f0;
@@ -30,7 +31,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg-color); height: 100vh; display: flex; font-size: 13px; overflow: hidden; color: #334155; }
         
-        /* --- SIDEBAR PLATINUM (BLANCO) --- */
+        /* --- SIDEBAR PLATINUM (BLANCO SUAVE) --- */
         #sidebar { 
             width: 260px; 
             background: var(--sidebar-bg); 
@@ -104,13 +105,13 @@
 
         .content-area { padding: 30px; overflow-y: auto; flex-grow: 1; }
         
-        /* TARJETAS KPI (ESTILO PLATINUM) */
+        /* TARJETAS KPI (ESTILO PLATINUM SOFT) */
         .kpi-section { margin-bottom: 30px; }
         .kpi-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px; }
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; }
         
         .kpi-card { 
-            background: white; 
+            background: #FDFDFD; /* Cambio a blanco suave */
             padding: 20px; 
             border-radius: 12px; 
             border: 1px solid var(--border-color); 
@@ -129,9 +130,9 @@
         .kpi-number { font-size: 24px; font-weight: 800; color: #1e293b; line-height: 1.1; }
         .kpi-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; }
 
-        /* TABLAS MODERNAS */
-        .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; height: 100%; }
-        .home-table-header { padding: 15px 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #fff; }
+        /* TABLAS MODERNAS (FONDO SUAVE) */
+        .table-wrapper { background: #FDFDFD; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; height: 100%; }
+        .home-table-header { padding: 15px 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #FDFDFD; }
         table { width: 100%; border-collapse: collapse; }
         thead th { background: #f8fafc; color: #64748b; font-weight: 700; font-size: 11px; text-transform: uppercase; padding: 15px 25px; text-align: left; border-bottom: 1px solid var(--border-color); }
         tbody td { padding: 12px 25px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #334155; font-size: 13px; }
@@ -144,23 +145,24 @@
         .status-orange { background-color: #fef3c7; color: #b45309; } 
         .status-red { background-color: #fee2e2; color: #991b1b; }
 
-        /* BOTONES DE ACCIÓN */
-        .btn-action-outline { background: white; border: 1px solid #cbd5e1; color: #64748b; width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        /* BOTONES DE ACCIÓN (FONDO SUAVE) */
+        .btn-action-outline { background: #FDFDFD; border: 1px solid #cbd5e1; color: #64748b; width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
         .btn-action-outline:hover { border-color: var(--dominos-blue); color: var(--dominos-blue); background: #f0f9ff; }
         .click-name { color: var(--dominos-blue); font-weight: 600; text-decoration: none; cursor: pointer; } .click-name:hover { text-decoration: underline; }
 
         /* UTILIDADES */
         .hidden { display: none !important; } .admin-only { display: none !important; } body.role-admin .admin-only { display: flex !important; }
         
-        /* MODALES */
+        /* MODALES (FONDO SUAVE) */
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: scaleIn 0.2s ease-out; }
+        .modal-content { background: #FDFDFD; padding: 30px; border-radius: 16px; width: 95%; max-width: 1100px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: scaleIn 0.2s ease-out; }
         @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
+        /* FORMULARIOS E INPUTS (FONDO SUAVE) */
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .field { display: flex; flex-direction: column; gap: 6px; }
         .field label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
-        input, select, textarea { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; transition: 0.2s; background: #fff; }
+        input, select, textarea { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; transition: 0.2s; background: #FDFDFD; }
         input:focus, select:focus { border-color: var(--dominos-blue); outline: none; box-shadow: 0 0 0 3px rgba(0, 100, 145, 0.1); }
         .input-error { border-color: var(--dominos-red) !important; background-color: #fff5f5 !important; }
         .error-msg { color: var(--dominos-red); font-size: 10px; font-weight: 700; margin-top: 2px; }
@@ -176,18 +178,18 @@
         .disabled-field { background-color: #f1f5f9 !important; color: #94a3b8 !important; cursor: not-allowed !important; }
         
         .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; padding-bottom: 50px; }
-        .chart-card { background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .chart-card { background: #FDFDFD; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         
-        .csv-panel { background: #fff; border: 2px dashed var(--dominos-blue); padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+        .csv-panel { background: #FDFDFD; border: 2px dashed var(--dominos-blue); padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-left: 5px solid; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease-out; font-weight: 600; }
+        .toast { background: #FDFDFD; padding: 15px 20px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-left: 5px solid; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease-out; font-weight: 600; }
         .toast.success { border-color: var(--success); } .toast.error { border-color: var(--dominos-red); }
         
-        /* ESTILOS DE PERFIL USUARIO */
+        /* ESTILOS DE PERFIL USUARIO (FONDO SUAVE) */
         .user-header { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; }
         .user-avatar { width: 70px; height: 70px; background: var(--dominos-blue); color: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .asset-list { list-style: none; padding: 0; }
-        .asset-item { border: 1px solid #e2e8f0; margin-bottom: 12px; border-radius: 10px; background: #fff; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .asset-item { border: 1px solid #e2e8f0; margin-bottom: 12px; border-radius: 10px; background: #FDFDFD; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .asset-block { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #e2e8f0; }
         .asset-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
         .asset-icon-box { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
@@ -289,7 +291,7 @@
                         <h4 id="homeTableTitle" style="color: #006491; margin: 0; font-size: 15px; font-weight:800; display:flex; align-items:center; gap:10px;">
                             <i class="fas fa-history"></i> Últimos Movimientos
                         </h4>
-                        <button onclick="resetHomeTable()" style="font-size: 11px; background: white; border: 1px solid #cbd5e1; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight:600; color:#64748b;"><i class="fas fa-sync-alt"></i> Ver Recientes</button>
+                        <button onclick="resetHomeTable()" style="font-size: 11px; background: #FDFDFD; border: 1px solid #cbd5e1; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight:600; color:#64748b;"><i class="fas fa-sync-alt"></i> Ver Recientes</button>
                     </div>
                     <div class="table-scroll">
                         <table style="width: 100%;">
@@ -328,7 +330,7 @@
         </div>
     </main>
 
-    <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:#006491; margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut" placeholder="Ej: 11.222.333-k"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div><div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div><div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div><div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero" placeholder="+569..."><div id="err_numero" class="error-msg"></div></div><div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div><div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div><div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control & Auditoría</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por (IT)</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:25px; text-align:right; border-top:1px solid #f1f5f9; padding-top:20px;"><button onclick="cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; color:#64748b; cursor:pointer; border-radius:6px; margin-right:10px; font-weight:600;">Cancelar</button><button onclick="guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:#006491; color:white; font-weight:700; cursor:pointer; border-radius:6px;">GUARDAR</button></div></div></div>
+    <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:#006491; margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut" placeholder="Ej: 11.222.333-k"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div><div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div><div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div><div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero" placeholder="+569..."><div id="err_numero" class="error-msg"></div></div><div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div><div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div><div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control & Auditoría</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por (IT)</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:25px; text-align:right; border-top:1px solid #f1f5f9; padding-top:20px;"><button onclick="cerrarFicha()" style="padding:10px 20px; border:none; background:#FDFDFD; color:#64748b; cursor:pointer; border-radius:6px; margin-right:10px; font-weight:600;">Cancelar</button><button onclick="guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:#006491; color:white; font-weight:700; cursor:pointer; border-radius:6px;">GUARDAR</button></div></div></div>
 
     <div id="modalConfirm" class="modal hidden" style="z-index: 1500;">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
@@ -336,15 +338,15 @@
             <h3 style="color: #1e293b; margin-bottom: 10px;">¿Estás seguro?</h3>
             <p style="color: #64748b; margin-bottom: 25px;">Esta acción eliminará el registro permanentemente. No se puede deshacer.</p>
             <div style="display: flex; justify-content: center; gap: 10px;">
-                <button onclick="document.getElementById('modalConfirm').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cancelar</button>
+                <button onclick="document.getElementById('modalConfirm').classList.add('hidden')" style="padding:10px 20px; border:none; background:#FDFDFD; cursor:pointer; border-radius:6px;">Cancelar</button>
                 <button id="btnConfirmDelete" style="padding:10px 20px; border:none; background:#E31837; color:white; font-weight:700; cursor:pointer; border-radius:6px;">SÍ, ELIMINAR</button>
             </div>
         </div>
     </div>
 
-    <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:#f59e0b; margin-bottom:15px;"><i class="fas fa-box-open"></i> Devolución a Bodega</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será asignado a <strong>INFORMATICA</strong>.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field" style="margin-bottom:20px;"><label>Observaciones</label><textarea id="dev_obs" rows="3" placeholder="Ej: Pantalla con rayas..."></textarea></div><div style="text-align:right;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="procesarDevolucion()" style="padding:10px 20px; border:none; background:#f59e0b; color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
-    <div id="modalHistorial" class="modal hidden" style="z-index: 1300;"><div class="modal-content" style="max-width: 600px;"><h3 style="color:#1e293b; margin-bottom:15px;">Historial de Trazabilidad</h3><div id="historialContent" style="max-height: 400px; overflow-y: auto;">Cargando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalHistorial').classList.add('hidden')" style="padding:8px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
-    <div id="modalAudit" class="modal hidden" style="z-index: 1400;"><div class="modal-content" style="max-width: 600px;"><h3 style="color:#f59e0b; margin-bottom:15px;"><i class="fas fa-exclamation-triangle"></i> Resultados de Auditoría</h3><div id="auditContent" style="max-height: 400px; overflow-y: auto;">Analizando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalAudit').classList.add('hidden')" style="padding:8px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
+    <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:#f59e0b; margin-bottom:15px;"><i class="fas fa-box-open"></i> Devolución a Bodega</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será asignado a <strong>INFORMATICA</strong>.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field" style="margin-bottom:20px;"><label>Observaciones</label><textarea id="dev_obs" rows="3" placeholder="Ej: Pantalla con rayas..."></textarea></div><div style="text-align:right;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#FDFDFD; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="procesarDevolucion()" style="padding:10px 20px; border:none; background:#f59e0b; color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
+    <div id="modalHistorial" class="modal hidden" style="z-index: 1300;"><div class="modal-content" style="max-width: 600px;"><h3 style="color:#1e293b; margin-bottom:15px;">Historial de Trazabilidad</h3><div id="historialContent" style="max-height: 400px; overflow-y: auto;">Cargando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalHistorial').classList.add('hidden')" style="padding:8px 20px; border:none; background:#FDFDFD; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
+    <div id="modalAudit" class="modal hidden" style="z-index: 1400;"><div class="modal-content" style="max-width: 600px;"><h3 style="color:#f59e0b; margin-bottom:15px;"><i class="fas fa-exclamation-triangle"></i> Resultados de Auditoría</h3><div id="auditContent" style="max-height: 400px; overflow-y: auto;">Analizando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalAudit').classList.add('hidden')" style="padding:8px 20px; border:none; background:#FDFDFD; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
     <div id="modalVerUsuario" class="modal hidden" style="z-index: 1100;"><div class="modal-content" style="max-width: 600px;"><div id="userProfileContent"></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalVerUsuario').classList.add('hidden')" style="background:#1e293b; color:white; padding:8px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Cerrar</button></div></div></div>
 
 <script>
@@ -366,15 +368,12 @@ function showToast(msg, type='success') {
 }
 
 function initSystem() {
-    // --- LÓGICA AGREGADA PARA EL TOGGLE DEL SIDEBAR ---
     const toggleBtn = document.getElementById('sidebarToggle');
     if(toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('collapsed');
         });
     }
-    // --------------------------------------------------
-
     if(localStorage.getItem('manualAuth') === 'true') { loadApp("Admin Local", "admin"); return; }
     sb.auth.getSession().then(({ data: { session } }) => {
         if (!session) window.location.href = 'index.html'; else checkUserRole(session.user.email);
@@ -399,7 +398,6 @@ function loadApp(email, role) {
         document.body.classList.remove('role-admin');
         badge.innerText = 'VISUALIZADOR';
     }
-    
     cargarTiendas();
     setupSearchListeners();
     setupValidationListeners();
@@ -431,43 +429,34 @@ async function cargarDatos() {
 
         DB_ACTIVOS = resA.data ? resA.data.sort((a,b)=> new Date(b.created_at||0) - new Date(a.created_at||0)) : [];
         DB_COLABS = resC.data || [];
-        
         document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c=>`<option value="${c.nombre}">`).join('');
-        
         renderTablaMaestra(); 
         renderPhoneTable(); 
         renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
         actualizarDashboard(); 
-        
         document.getElementById('chartsContainer').innerHTML = ''; 
         addChart('estado', 'doughnut');
         addChart('tienda', 'bar');
-
     } catch(e) { console.error(e); showToast("Error al cargar datos.", "error"); }
 }
 
 function safeSetText(id, value) { const el = document.getElementById(id); if (el) el.innerText = value; }
 
 function actualizarDashboard() {
-    // KPIS MEJORADOS: SUMA REAL DE HARDWARE
     const disp = DB_ACTIVOS.filter(a=>a.estado==='Disponible').length;
     const mant = DB_ACTIVOS.filter(a=>a.estado==='Mantención').length;
     const asig = DB_ACTIVOS.filter(a=>a.estado==='Asignado').length;
     const baja = DB_ACTIVOS.filter(a=>a.estado==='Baja').length;
-    
     const cels = DB_ACTIVOS.filter(a => (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1)).length;
     const sims = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)).length;
     const pcs = DB_ACTIVOS.filter(a => a.marca && a.marca.length > 1).length;
-    
     const totalReal = pcs + cels + sims;
-    
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
     safeSetText('kpi-total', totalReal); safeSetText('kpi-dispo', disp); safeSetText('kpi-mant', mant); safeSetText('kpi-asig', asig); 
     safeSetText('kpi-baja', baja); safeSetText('kpi-pcs', pcs); safeSetText('kpi-cels', cels); safeSetText('kpi-sims', sims); safeSetText('kpi-cesados', ces);
 }
 
-// --- VALIDACIÓN REACTIVA ---
 function setupValidationListeners() {
     const fields = [
         { id: 'f_serie', key: 'serie', errorId: 'err_serie', msg: 'Serie ya existe' },
@@ -475,19 +464,12 @@ function setupValidationListeners() {
         { id: 'f_imei', key: 'imei_cel', errorId: 'err_imei', msg: 'IMEI Equipo en uso' },
         { id: 'f_imsi', key: 'imei_sim', errorId: 'err_imsi', msg: 'IMSI/SIM en uso' }
     ];
-
     fields.forEach(f => {
         const input = document.getElementById(f.id);
         const errDiv = document.getElementById(f.errorId);
-        
         input.addEventListener('input', () => {
             const val = input.value.trim();
-            if (val.length < 4) { 
-                input.classList.remove('input-error'); 
-                errDiv.innerText = ''; 
-                document.getElementById('btnSave').disabled = false;
-                return; 
-            }
+            if (val.length < 4) { input.classList.remove('input-error'); errDiv.innerText = ''; document.getElementById('btnSave').disabled = false; return; }
             const dup = DB_ACTIVOS.find(a => a[f.key] === val && a.serie !== currentEditingSerie);
             if (dup) {
                 const owner = DB_COLABS.find(c => c.rut === dup.rut_responsable)?.nombre || 'Otro usuario';
