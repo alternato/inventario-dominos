@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario TI - Domino's Pizza (v96.0 Platinum UI)</title>
+    <title>Inventario TI - Domino's Pizza (v96.1 Fixed)</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -16,7 +16,7 @@
         :root {
             /* --- COLORES CORPORATIVOS DOMINO'S --- */
             --dominos-blue-dark: #006491;
-            --dominos-blue-light: #0088cc; /* Para el degradado */
+            --dominos-blue-light: #0088cc;
             --dominos-red: #e31837;
             --bg-color: #f4f7f6;
             --text-color: #333;
@@ -37,7 +37,7 @@
             overflow: hidden;
         }
 
-        /* --- 1. SIDEBAR RETRÁCTIL (NUEVO) --- */
+        /* --- SIDEBAR --- */
         .sidebar {
             width: var(--sidebar-width);
             background-color: #fff;
@@ -92,6 +92,7 @@
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .sidebar-menu a:hover, .sidebar-menu a.active {
@@ -111,7 +112,7 @@
         .sidebar.collapsed .sidebar-menu a i { margin-right: 0; }
         .sidebar.collapsed .menu-text { display: none; }
 
-        /* --- 2. HEADER CON DEGRADADO (NUEVO) --- */
+        /* --- HEADER --- */
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -152,7 +153,7 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* --- 3. CONTENIDO PRINCIPAL (v95.0 LOGIC) --- */
+        /* --- CONTENIDO --- */
         .content-area {
             padding: 20px;
             overflow-y: auto;
@@ -192,58 +193,36 @@
             box-shadow: var(--card-shadow);
         }
 
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
+        .search-box { position: relative; width: 300px; }
         .search-box input {
-            width: 100%;
-            padding: 10px 10px 10px 35px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            width: 100%; padding: 10px 10px 10px 35px;
+            border: 1px solid #ddd; border-radius: 5px;
         }
         .search-box i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
+            position: absolute; left: 10px; top: 50%;
+            transform: translateY(-50%); color: #aaa;
         }
 
         .action-buttons button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 10px;
-            color: white;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
+            padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;
+            margin-left: 10px; color: white; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 5px;
         }
         .btn-add { background-color: var(--dominos-blue-dark); }
-        .btn-export { background-color: #217346; /* Excel Green */ }
+        .btn-export { background-color: #217346; }
         .btn-filter { background-color: #6c757d; position: relative; }
         
         .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--dominos-red);
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 50%;
-            display: none; /* Oculto por defecto */
+            position: absolute; top: -5px; right: -5px;
+            background: var(--dominos-red); color: white;
+            font-size: 0.7rem; padding: 2px 6px; border-radius: 50%;
+            display: none;
         }
 
         /* Tabla */
         .table-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: var(--card-shadow);
-            overflow: hidden;
+            background: white; border-radius: 8px;
+            box-shadow: var(--card-shadow); overflow: hidden;
         }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
@@ -251,29 +230,28 @@
         tbody tr:hover { background-color: #f1f7fb; }
 
         .status-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            padding: 5px 10px; border-radius: 15px;
+            font-size: 0.8rem; font-weight: bold;
         }
         .status-asignado { background-color: #e3f2fd; color: #1565c0; }
         .status-stock { background-color: #e8f5e9; color: #2e7d32; }
         .status-mantenimiento { background-color: #fff3e0; color: #ef6c00; }
         .status-baja { background-color: #ffebee; color: #c62828; }
 
-        /* Acciones en tabla */
+        /* Acciones */
         .btn-icon {
-            background: none; border: none; cursor: pointer; font-size: 1rem; margin-right: 8px;
-            transition: transform 0.2s;
+            background: none; border: none; cursor: pointer;
+            font-size: 1rem; margin-right: 8px; transition: transform 0.2s;
         }
         .btn-icon:hover { transform: scale(1.2); }
         .btn-edit { color: var(--dominos-blue-dark); }
         .btn-delete { color: var(--dominos-red); }
 
-        /* --- MODAL (Estilo v95) --- */
+        /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000;
+            background: rgba(0,0,0,0.5); display: none;
+            align-items: center; justify-content: center; z-index: 1000;
         }
         .modal {
             background: white; width: 500px; padding: 25px; border-radius: 8px;
@@ -298,12 +276,12 @@
             </div>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#" class="active"><i class="fa-solid fa-chart-line"></i><span class="menu-text">Dashboard</span></a></li>
-            <li><a href="#"><i class="fa-solid fa-box-open"></i><span class="menu-text">Inventario</span></a></li>
-            <li><a href="#"><i class="fa-solid fa-users"></i><span class="menu-text">Asignaciones</span></a></li>
-            <li><a href="#"><i class="fa-solid fa-file-invoice"></i><span class="menu-text">Reportes</span></a></li>
+            <li><a class="active menu-link" onclick="navigate(this, 'dashboard')"><i class="fa-solid fa-chart-line"></i><span class="menu-text">Dashboard</span></a></li>
+            <li><a class="menu-link" onclick="navigate(this, 'inventario')"><i class="fa-solid fa-box-open"></i><span class="menu-text">Inventario</span></a></li>
+            <li><a class="menu-link" onclick="navigate(this, 'asignaciones')"><i class="fa-solid fa-users"></i><span class="menu-text">Asignaciones</span></a></li>
+            <li><a class="menu-link" onclick="navigate(this, 'reportes')"><i class="fa-solid fa-file-invoice"></i><span class="menu-text">Reportes</span></a></li>
             <li style="margin-top: auto; border-top: 1px solid #eee;">
-                <a href="#" onclick="logout()" style="color: #d9534f;">
+                <a onclick="logout()" style="color: #d9534f; cursor: pointer;">
                     <i class="fa-solid fa-right-from-bracket"></i><span class="menu-text">Cerrar Sesión</span>
                 </a>
             </li>
@@ -378,7 +356,7 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr><td colspan="7" style="text-align:center;">Cargando...</td></tr>
+                        <tr><td colspan="7" style="text-align:center;">Iniciando sistema...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -447,47 +425,47 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURACIÓN SUPABASE ---
-        // IMPORTANTE: Pon tus credenciales reales aquí abajo
+        // --- 1. CONFIGURACIÓN E INICIALIZACIÓN ---
+        // Tus credenciales originales
         const SUPABASE_URL = 'https://ivjwxvhixrskraepqzse.supabase.co'; 
         const SUPABASE_KEY = 'AeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o'; 
         
-        // Inicialización segura
         let supabase;
         let isDemoMode = false;
 
-        try {
-            if (!SUPABASE_URL || SUPABASE_URL.includes('TU_SUPABASE_URL') || !SUPABASE_KEY) {
-                console.warn("⚠️ ALERTA: Faltan credenciales. Activando MODO DEMO.");
-                isDemoMode = true;
-            } else {
-                supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            }
-        } catch (err) {
-            console.error("Error iniciando Supabase:", err);
-            isDemoMode = true;
-        }
-
-        // --- 2. LÓGICA DE UI (Sidebar & Header) ---
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('sidebarToggle');
-        
-        if(toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-            });
-        }
-
-        // --- 3. LÓGICA DE NEGOCIO ---
-        let inventoryData = [];
-
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicialización de Supabase
+            try {
+                if (window.supabase) {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log("Supabase conectado.");
+                } else {
+                    throw new Error("Librería Supabase no cargada.");
+                }
+            } catch (err) {
+                console.warn("Error iniciando Supabase:", err);
+                isDemoMode = true;
+            }
+
+            // Inicialización UI - Sidebar
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            if(toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
+
+            // Cargar Datos
             fetchInventory();
         });
 
+        // --- 2. LOGICA DE NEGOCIO ---
+        let inventoryData = [];
+
         async function fetchInventory() {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando datos...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando inventario...</td></tr>';
 
             try {
                 if (!isDemoMode && supabase) {
@@ -499,12 +477,11 @@
                     if (error) throw error;
                     inventoryData = data || [];
                 } else {
-                    // DATOS DE PRUEBA (Para que no se vea vacío si faltan credenciales)
-                    console.log("Cargando datos DEMO...");
+                    // MODO DEMO (Solo si falla la conexión)
+                    console.log("Usando datos locales de prueba.");
                     inventoryData = [
                         { id: 1, type: 'Laptop', brand: 'Dell', model: 'Latitude 3420', serial: '8H2K92', status: 'Asignado', assigned_to: 'Emilio Droguett', location: 'Casa Matriz' },
-                        { id: 2, type: 'Celular', brand: 'Samsung', model: 'A54', serial: 'IMEI39201', status: 'Stock', assigned_to: null, location: 'Bodega TI' },
-                        { id: 3, type: 'POS', brand: 'Oracle', model: 'Micros', serial: 'POS-001', status: 'Mantenimiento', assigned_to: null, location: 'Tienda 101' }
+                        { id: 2, type: 'Celular', brand: 'Samsung', model: 'A54', serial: 'IMEI39201', status: 'Stock', assigned_to: null, location: 'Bodega TI' }
                     ];
                 }
 
@@ -513,18 +490,16 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error: ${error.message}</td></tr>`;
-                Swal.fire('Error', 'No se pudieron cargar los datos', 'error');
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error de conexión: ${error.message}</td></tr>`;
             }
         }
 
-        // Renderizar Tabla
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay registros.</td></tr>';
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay registros disponibles.</td></tr>';
                 return;
             }
 
@@ -539,7 +514,7 @@
                 tr.innerHTML = `
                     <td><i class="fa-solid fa-${getIconByType(item.type)}"></i> ${item.type}</td>
                     <td>${item.brand} ${item.model}</td>
-                    <td>${item.serial}</td>
+                    <td><strong>${item.serial}</strong></td>
                     <td><span class="status-badge ${statusClass}">${item.status}</span></td>
                     <td>${item.assigned_to || '-'}</td>
                     <td>${item.location || '-'}</td>
@@ -554,15 +529,14 @@
 
         function getIconByType(type) {
             if(!type) return 'box';
-            switch(type.toLowerCase()) {
-                case 'laptop': return 'laptop';
-                case 'celular': return 'mobile-screen';
-                case 'pos': return 'cash-register';
-                case 'desktop': return 'desktop';
-                case 'monitor': return 'tv';
-                case 'impresora': return 'print';
-                default: return 'box';
-            }
+            const t = type.toLowerCase();
+            if(t.includes('lap')) return 'laptop';
+            if(t.includes('cel') || t.includes('ph')) return 'mobile-screen';
+            if(t.includes('pos')) return 'cash-register';
+            if(t.includes('desk') || t.includes('pc')) return 'desktop';
+            if(t.includes('mon')) return 'tv';
+            if(t.includes('imp') || t.includes('print')) return 'print';
+            return 'box';
         }
 
         function updateKPIs(data) {
@@ -575,6 +549,14 @@
             document.getElementById('kpi-stock').innerText = stock;
             document.getElementById('kpi-assigned').innerText = assigned;
             document.getElementById('kpi-maintenance').innerText = maintenance;
+        }
+
+        // --- 3. UI EXTRAS (Navegación Sidebar) ---
+        window.navigate = function(element, section) {
+            document.querySelectorAll('.menu-link').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            console.log("Navegando a: " + section);
+            // Aquí podrías ocultar/mostrar secciones si tuvieras más contenido
         }
 
         // --- 4. MODALES & FORMULARIOS ---
@@ -595,7 +577,6 @@
             });
         }
 
-        // Funciones Globales (Window)
         window.openModal = function() {
             if(form) form.reset();
             document.getElementById('itemId').value = '';
@@ -609,6 +590,7 @@
         }
 
         window.editItem = function(id) {
+            // Aseguramos que el ID sea string para comparar
             const item = inventoryData.find(i => String(i.id) === String(id));
             if(item) {
                 document.getElementById('itemId').value = item.id;
@@ -631,11 +613,6 @@
             }
         }
 
-        window.toggleFilters = function() {
-            Swal.fire('Info', 'Filtros avanzados en construcción.', 'info');
-        }
-
-        // Guardar
         if(form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -665,7 +642,7 @@
                         closeModal();
                         fetchInventory();
                     } else {
-                        Swal.fire('Modo Demo', 'Datos simulados guardados (no persistentes).', 'success');
+                        Swal.fire('Modo Demo', 'Datos guardados localmente (no persistentes).', 'success');
                         closeModal();
                     }
                 } catch (err) {
@@ -676,8 +653,8 @@
 
         window.deleteItem = function(id) {
             Swal.fire({
-                title: '¿Estás seguro?',
-                text: "No podrás revertir esta acción",
+                title: '¿Borrar equipo?',
+                text: "Esta acción es irreversible",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e31837',
@@ -694,24 +671,14 @@
                             fetchInventory();
                         }
                     } else {
-                        Swal.fire('Borrado (Demo)', 'Registro simulado eliminado.', 'success');
+                        Swal.fire('Borrado (Demo)', 'Registro eliminado.', 'success');
                     }
                 }
             });
         }
 
-        // Buscador
-        const searchInput = document.getElementById('searchInput');
-        if(searchInput) {
-            searchInput.addEventListener('keyup', (e) => {
-                const term = e.target.value.toLowerCase();
-                const filtered = inventoryData.filter(item => 
-                    (item.serial && item.serial.toLowerCase().includes(term)) ||
-                    (item.model && item.model.toLowerCase().includes(term)) ||
-                    (item.assigned_to && item.assigned_to.toLowerCase().includes(term))
-                );
-                renderTable(filtered);
-            });
+        window.toggleFilters = function() {
+            Swal.fire('Filtros', 'Próximamente', 'info');
         }
 
         window.exportToExcel = function() {
@@ -726,8 +693,24 @@
         }
 
         window.logout = function() {
-            if(!isDemoMode && supabase) supabase.auth.signOut();
-            window.location.href = 'index.html';
+            if(confirm("¿Estás seguro de que deseas salir?")) {
+                if(!isDemoMode && supabase) supabase.auth.signOut();
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Buscador
+        const searchInput = document.getElementById('searchInput');
+        if(searchInput) {
+            searchInput.addEventListener('keyup', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = inventoryData.filter(item => 
+                    (item.serial && item.serial.toLowerCase().includes(term)) ||
+                    (item.model && item.model.toLowerCase().includes(term)) ||
+                    (item.assigned_to && item.assigned_to.toLowerCase().includes(term))
+                );
+                renderTable(filtered);
+            });
         }
     </script>
 </body>
