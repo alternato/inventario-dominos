@@ -10,7 +10,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.css"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
@@ -379,7 +378,8 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        </tbody>
+                        <tr><td colspan="7" style="text-align:center;">Cargando...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -448,43 +448,72 @@
 
     <script>
         // --- 1. CONFIGURACIÓN SUPABASE ---
-        const SUPABASE_URL = 'TU_URL_SUPABASE_AQUI'; // Reemplazar con tus credenciales reales
-        const SUPABASE_KEY = 'TU_KEY_SUPABASE_AQUI'; 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // IMPORTANTE: Pon tus credenciales reales aquí abajo
+        const SUPABASE_URL = 'https://ivjwxvhixrskraepqzse.supabase.co'; 
+        const SUPABASE_KEY = 'AeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o'; 
+        
+        // Inicialización segura
+        let supabase;
+        let isDemoMode = false;
+
+        try {
+            if (!SUPABASE_URL || SUPABASE_URL.includes('TU_SUPABASE_URL') || !SUPABASE_KEY) {
+                console.warn("⚠️ ALERTA: Faltan credenciales. Activando MODO DEMO.");
+                isDemoMode = true;
+            } else {
+                supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch (err) {
+            console.error("Error iniciando Supabase:", err);
+            isDemoMode = true;
+        }
 
         // --- 2. LÓGICA DE UI (Sidebar & Header) ---
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('sidebarToggle');
         
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
+        if(toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
 
-        // --- 3. LÓGICA DE NEGOCIO (v95 Platinum) ---
+        // --- 3. LÓGICA DE NEGOCIO ---
         let inventoryData = [];
 
-        // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
             fetchInventory();
         });
 
-        // Cargar Datos
         async function fetchInventory() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Cargando datos...</td></tr>';
+
             try {
-                // Simulación de carga (reemplazar con: const { data, error } = await supabase.from('inventory').select('*');)
-                // Para demo visual inmediata sin backend:
-                const data = [
-                    { id: 1, type: 'Laptop', brand: 'Dell', model: 'Latitude 3420', serial: '8H2K92', status: 'Asignado', assigned_to: 'Emilio Droguett', location: 'Casa Matriz' },
-                    { id: 2, type: 'Celular', brand: 'Samsung', model: 'A54', serial: 'IMEI39201', status: 'Stock', assigned_to: null, location: 'Bodega TI' },
-                    { id: 3, type: 'POS', brand: 'Oracle', model: 'Micros', serial: 'POS-001', status: 'Mantenimiento', assigned_to: null, location: 'Tienda 101' }
-                ];
-                
-                inventoryData = data; // Guardar en memoria
+                if (!isDemoMode && supabase) {
+                    const { data, error } = await supabase
+                        .from('inventory')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+                    inventoryData = data || [];
+                } else {
+                    // DATOS DE PRUEBA (Para que no se vea vacío si faltan credenciales)
+                    console.log("Cargando datos DEMO...");
+                    inventoryData = [
+                        { id: 1, type: 'Laptop', brand: 'Dell', model: 'Latitude 3420', serial: '8H2K92', status: 'Asignado', assigned_to: 'Emilio Droguett', location: 'Casa Matriz' },
+                        { id: 2, type: 'Celular', brand: 'Samsung', model: 'A54', serial: 'IMEI39201', status: 'Stock', assigned_to: null, location: 'Bodega TI' },
+                        { id: 3, type: 'POS', brand: 'Oracle', model: 'Micros', serial: 'POS-001', status: 'Mantenimiento', assigned_to: null, location: 'Tienda 101' }
+                    ];
+                }
+
                 renderTable(inventoryData);
                 updateKPIs(inventoryData);
 
             } catch (error) {
                 console.error('Error:', error);
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error: ${error.message}</td></tr>`;
                 Swal.fire('Error', 'No se pudieron cargar los datos', 'error');
             }
         }
@@ -494,9 +523,14 @@
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay registros.</td></tr>';
+                return;
+            }
+
             data.forEach(item => {
                 const tr = document.createElement('tr');
-                // Lógica de badge de estado
+                
                 let statusClass = 'status-stock';
                 if(item.status === 'Asignado') statusClass = 'status-asignado';
                 if(item.status === 'Mantenimiento') statusClass = 'status-mantenimiento';
@@ -510,8 +544,8 @@
                     <td>${item.assigned_to || '-'}</td>
                     <td>${item.location || '-'}</td>
                     <td>
-                        <button class="btn-icon btn-edit" onclick="editItem(${item.id})"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn-icon btn-delete" onclick="deleteItem(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                        <button class="btn-icon btn-edit" onclick="editItem('${item.id}')"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-icon btn-delete" onclick="deleteItem('${item.id}')"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -519,23 +553,24 @@
         }
 
         function getIconByType(type) {
+            if(!type) return 'box';
             switch(type.toLowerCase()) {
                 case 'laptop': return 'laptop';
                 case 'celular': return 'mobile-screen';
                 case 'pos': return 'cash-register';
                 case 'desktop': return 'desktop';
+                case 'monitor': return 'tv';
+                case 'impresora': return 'print';
                 default: return 'box';
             }
         }
 
-        // Actualizar KPIs (Lógica v95 mejorada)
         function updateKPIs(data) {
             const total = data.length;
             const stock = data.filter(i => i.status === 'Stock').length;
             const assigned = data.filter(i => i.status === 'Asignado').length;
             const maintenance = data.filter(i => i.status === 'Mantenimiento').length;
 
-            // Animación simple de conteo
             document.getElementById('kpi-total').innerText = total;
             document.getElementById('kpi-stock').innerText = stock;
             document.getElementById('kpi-assigned').innerText = assigned;
@@ -548,29 +583,33 @@
         const statusSelect = document.getElementById('itemStatus');
         const assignmentFields = document.getElementById('assignmentFields');
 
-        // Mostrar campos de asignación si no es Stock
-        statusSelect.addEventListener('change', (e) => {
-            if (e.target.value === 'Asignado') {
-                assignmentFields.style.display = 'block';
-            } else {
-                assignmentFields.style.display = 'none';
-            }
-        });
+        if(statusSelect) {
+            statusSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'Asignado') {
+                    assignmentFields.style.display = 'block';
+                } else {
+                    assignmentFields.style.display = 'none';
+                    document.getElementById('assignedTo').value = '';
+                    document.getElementById('location').value = '';
+                }
+            });
+        }
 
-        function openModal() {
-            form.reset();
+        // Funciones Globales (Window)
+        window.openModal = function() {
+            if(form) form.reset();
             document.getElementById('itemId').value = '';
             document.getElementById('modalTitle').innerText = 'Nuevo Equipo';
-            assignmentFields.style.display = 'none';
+            if(assignmentFields) assignmentFields.style.display = 'none';
             modalOverlay.style.display = 'flex';
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             modalOverlay.style.display = 'none';
         }
 
-        function editItem(id) {
-            const item = inventoryData.find(i => i.id === id);
+        window.editItem = function(id) {
+            const item = inventoryData.find(i => String(i.id) === String(id));
             if(item) {
                 document.getElementById('itemId').value = item.id;
                 document.getElementById('itemType').value = item.type;
@@ -592,65 +631,102 @@
             }
         }
 
-        // Guardar (Crear o Actualizar)
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            // Aquí iría la lógica de Supabase (Insert/Update)
-            // Validar duplicados (Lógica v95)
-            const serial = document.getElementById('itemSerial').value;
-            const id = document.getElementById('itemId').value;
-            
-            const isDuplicate = inventoryData.some(i => i.serial === serial && i.id != id);
-            if(isDuplicate) {
-                Swal.fire('Error', 'Ya existe un equipo con este Número de Serie/IMEI', 'warning');
-                return;
-            }
+        window.toggleFilters = function() {
+            Swal.fire('Info', 'Filtros avanzados en construcción.', 'info');
+        }
 
-            Swal.fire('Guardado', 'El equipo ha sido registrado correctamente', 'success');
-            closeModal();
-            // fetchInventory(); // Recargar datos
-        });
+        // Guardar
+        if(form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = {
+                    type: document.getElementById('itemType').value,
+                    brand: document.getElementById('itemBrand').value,
+                    model: document.getElementById('itemModel').value,
+                    serial: document.getElementById('itemSerial').value,
+                    status: document.getElementById('itemStatus').value,
+                    assigned_to: document.getElementById('assignedTo').value || null,
+                    location: document.getElementById('location').value || null
+                };
+                const itemId = document.getElementById('itemId').value;
 
-        // Borrar (Con SweetAlert v95)
-        function deleteItem(id) {
+                try {
+                    if(!isDemoMode && supabase) {
+                        let result;
+                        if (itemId) {
+                            result = await supabase.from('inventory').update(formData).eq('id', itemId);
+                        } else {
+                            result = await supabase.from('inventory').insert([formData]);
+                        }
+                        if (result.error) throw result.error;
+                        
+                        Swal.fire('Éxito', 'Registro guardado.', 'success');
+                        closeModal();
+                        fetchInventory();
+                    } else {
+                        Swal.fire('Modo Demo', 'Datos simulados guardados (no persistentes).', 'success');
+                        closeModal();
+                    }
+                } catch (err) {
+                    Swal.fire('Error', err.message, 'error');
+                }
+            });
+        }
+
+        window.deleteItem = function(id) {
             Swal.fire({
                 title: '¿Estás seguro?',
                 text: "No podrás revertir esta acción",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#e31837', // Rojo Domino's
+                confirmButtonColor: '#e31837',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, borrar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
+                confirmButtonText: 'Sí, borrar'
+            }).then(async (result) => {
                 if (result.isConfirmed) {
-                    // Lógica Supabase delete
-                    Swal.fire('Borrado', 'El registro ha sido eliminado.', 'success');
+                    if(!isDemoMode && supabase) {
+                        const { error } = await supabase.from('inventory').delete().eq('id', id);
+                        if(error) {
+                            Swal.fire('Error', error.message, 'error');
+                        } else {
+                            Swal.fire('Borrado', 'Registro eliminado.', 'success');
+                            fetchInventory();
+                        }
+                    } else {
+                        Swal.fire('Borrado (Demo)', 'Registro simulado eliminado.', 'success');
+                    }
                 }
             });
         }
 
-        // Buscador en tiempo real
-        document.getElementById('searchInput').addEventListener('keyup', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = inventoryData.filter(item => 
-                item.serial.toLowerCase().includes(term) ||
-                item.model.toLowerCase().includes(term) ||
-                (item.assigned_to && item.assigned_to.toLowerCase().includes(term))
-            );
-            renderTable(filtered);
-        });
+        // Buscador
+        const searchInput = document.getElementById('searchInput');
+        if(searchInput) {
+            searchInput.addEventListener('keyup', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = inventoryData.filter(item => 
+                    (item.serial && item.serial.toLowerCase().includes(term)) ||
+                    (item.model && item.model.toLowerCase().includes(term)) ||
+                    (item.assigned_to && item.assigned_to.toLowerCase().includes(term))
+                );
+                renderTable(filtered);
+            });
+        }
 
-        // Exportar a Excel (v95)
-        function exportToExcel() {
+        window.exportToExcel = function() {
+            if(typeof XLSX === 'undefined') {
+                Swal.fire('Error', 'Librería SheetJS no cargada.', 'error');
+                return;
+            }
             const ws = XLSX.utils.json_to_sheet(inventoryData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Inventario");
             XLSX.writeFile(wb, "Inventario_Dominos.xlsx");
         }
 
-        function logout() {
-            // supabase.auth.signOut();
+        window.logout = function() {
+            if(!isDemoMode && supabase) supabase.auth.signOut();
             window.location.href = 'index.html';
         }
     </script>
