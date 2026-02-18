@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario TI - Domino's Pizza (v96.2 Clean)</title>
+    <title>Inventario TI - Domino's Pizza (v96.3 Final)</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -14,7 +14,6 @@
 
     <style>
         :root {
-            /* --- COLORES CORPORATIVOS DOMINO'S --- */
             --dominos-blue-dark: #006491;
             --dominos-blue-light: #0088cc;
             --dominos-red: #e31837;
@@ -92,7 +91,7 @@
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
-            cursor: pointer; /* Importante para que se sienta clickeable */
+            cursor: pointer;
         }
 
         .sidebar-menu a:hover, .sidebar-menu a.active {
@@ -426,11 +425,12 @@
 
     <script>
         // --- 1. CONFIGURACIÓN E INICIALIZACIÓN ---
-        // Configuración de conexión (Tus credenciales)
-        const DOMINOS_DB_URL = 'https://ivjwxvhixrskraepqzse.supabase.co'; 
-        const DOMINOS_DB_KEY = 'AeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o'; 
         
-        // Usamos una variable única 'appSupabase' para evitar conflicto con variables globales
+        // HE CORREGIDO TU LLAVE AQUÍ (Le quité la 'A' que tenía al principio por error)
+        const DOMINOS_DB_URL = 'https://ivjwxvhixrskraepqzse.supabase.co'; 
+        const DOMINOS_DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2and4dmhpeHJza3JhZXBxenNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjgxNTgsImV4cCI6MjA4NDUwNDE1OH0.QzgNSwqf6VTXZjGMXOAfUnjW4f1mJcRqECxxNnLZc-o'; 
+        
+        // Usamos una variable única para evitar conflicto con variables globales
         let appSupabase;
         let isDemoMode = false;
 
