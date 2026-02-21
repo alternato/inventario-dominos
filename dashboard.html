@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v100.0 (Master Audit)</title>
+    <title>Dashboard - TI Maestro v101.0 (Actionable Audit)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -62,11 +62,12 @@
             padding: 0 30px; height: 64px; display: flex; justify-content: space-between; align-items: center; 
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); color: white; 
         }
-        #sidebarToggle { background: rgba(255,255,255,0.2); border: none; color: white; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; display:flex; align-items:center; justify-content:center; }
+        #sidebarToggle { background: rgba(255,255,255,0.2); border: none; color: white; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;}
+        #sidebarToggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
 
         .content-area { padding: 30px; overflow-y: auto; flex-grow: 1; }
         
-        /* --- ESTILO NUEVO: TILES (TARJETAS CUADRADAS) --- */
+        /* TILES */
         .kpi-section { margin-bottom: 30px; }
         .kpi-header { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
         
@@ -84,7 +85,6 @@
         .kpi-value { font-size: 28px; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 5px; }
         .kpi-label { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Colores específicos para los Tiles */
         .tile-purple .kpi-icon { color: var(--tile-purple); }
         .tile-blue .kpi-icon { color: var(--tile-blue); }
         .tile-green .kpi-icon { color: var(--tile-green); }
@@ -106,6 +106,16 @@
         .btn-action-outline { background: white; border: 1px solid #cbd5e1; color: #64748b; width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
         .btn-action-outline:hover { border-color: var(--dominos-blue); color: var(--dominos-blue); background: #f0f9ff; }
         .click-name { color: var(--dominos-blue); font-weight: 600; cursor: pointer; } 
+
+        /* BOTONES DE AUDITORÍA ESPECÍFICOS */
+        .btn-audit-action { background: white; border: 1px solid #cbd5e1; color: #475569; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-audit-action:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .audit-recover { color: #b45309; border-color: #fcd34d; background: #fffbeb; }
+        .audit-recover:hover { background: #fef3c7; }
+        .audit-assign { color: #059669; border-color: #6ee7b7; background: #ecfdf5; }
+        .audit-assign:hover { background: #d1fae5; }
+        .audit-review { color: #0369a1; border-color: #bae6fd; background: #f0f9ff; }
+        .audit-review:hover { background: #e0f2fe; }
 
         .hidden { display: none !important; } .admin-only { display: none !important; } body.role-admin .admin-only { display: flex !important; }
         
@@ -173,7 +183,7 @@
         </button>
 
         <div class="sidebar-footer">
-            <span style="font-size: 10px; color: #94a3b8;">Domino's TI v100.0</span>
+            <span style="font-size: 10px; color: #94a3b8;">Domino's TI v101.0</span>
         </div>
     </aside>
 
@@ -204,7 +214,6 @@
                             <div class="kpi-value" id="kpi-colabs">-</div>
                             <div class="kpi-label">Colaboradores</div>
                         </div>
-
                         <div class="kpi-card tile-blue active" onclick="filterDashboard(this, 'total')">
                             <div class="kpi-icon"><i class="fas fa-cubes"></i></div>
                             <div class="kpi-value" id="kpi-total">-</div>
@@ -249,7 +258,7 @@
                         <div class="kpi-card tile-blue" onclick="filterDashboard(this, 'sims')">
                             <div class="kpi-icon"><i class="fas fa-sim-card"></i></div>
                             <div class="kpi-value" id="kpi-sims">-</div>
-                            <div class="kpi-label">SIM Cards</div>
+                            <div class="kpi-label">Chips / SIMs</div>
                         </div>
                         <div class="kpi-card tile-red" onclick="filterDashboard(this, 'cesados')">
                             <div class="kpi-icon"><i class="fas fa-user-slash"></i></div>
@@ -275,7 +284,7 @@
 
             <div id="view-audit" class="hidden">
                 <div class="kpi-header" style="font-size: 18px; color: var(--dominos-blue);">
-                    <i class="fas fa-search-dollar"></i> Panel de Auditoría y Descuadres
+                    <i class="fas fa-balance-scale"></i> Auditoría y Resoluciones Rápidas
                 </div>
                 
                 <div class="kpi-grid" style="margin-bottom: 30px;">
@@ -303,7 +312,7 @@
 
                 <div class="table-wrapper">
                     <div class="home-table-header">
-                        <h4 style="color: var(--dominos-blue); margin: 0; font-weight:800;">Detalle de Anomalías Detectadas</h4>
+                        <h4 style="color: var(--dominos-blue); margin: 0; font-weight:800;">Lista de Anomalías a Resolver</h4>
                     </div>
                     <table style="width: 100%;">
                         <thead>
@@ -311,7 +320,7 @@
                                 <th>Tipo de Descuadre</th>
                                 <th>Responsable / RUT</th>
                                 <th>Detalle</th>
-                                <th>Acción</th>
+                                <th style="text-align:center;">Acción Rápida</th>
                             </tr>
                         </thead>
                         <tbody id="auditTableBody">
@@ -350,7 +359,7 @@
 
     <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:var(--dominos-blue); margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div><div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div><div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div><div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero"><div id="err_numero" class="error-msg"></div></div><div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div><div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div><div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:30px; text-align:right;"><button onclick="cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; margin-right:10px; cursor:pointer;">Cancelar</button><button onclick="guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--dominos-blue); color:white; font-weight:700; border-radius:8px; cursor:pointer;">GUARDAR</button></div></div></div>
 
-    <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:var(--tile-orange); margin-bottom:15px;">Devolución</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será reasignado.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field"><label>Observaciones</label><textarea id="dev_obs" rows="3"></textarea></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="procesarDevolucion()" style="padding:10px 20px; border:none; background:var(--tile-orange); color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
+    <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:var(--warning); margin-bottom:15px;">Devolución</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será reasignado.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field"><label>Observaciones</label><textarea id="dev_obs" rows="3"></textarea></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="procesarDevolucion()" style="padding:10px 20px; border:none; background:var(--warning); color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
     <div id="modalConfirm" class="modal hidden" style="z-index: 1500;"><div class="modal-content" style="max-width: 400px; text-align: center;"><i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--tile-red); margin-bottom: 20px;"></i><h3>¿Estás seguro?</h3><p>Eliminarás este registro permanentemente.</p><div style="display: flex; justify-content: center; gap: 15px; margin-top:20px;"><button onclick="document.getElementById('modalConfirm').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; cursor:pointer;">Cancelar</button><button id="btnConfirmDelete" style="padding:10px 20px; border:none; background:var(--tile-red); color:white; font-weight:700; border-radius:8px; cursor:pointer;">ELIMINAR</button></div></div></div>
     <div id="modalHistorial" class="modal hidden" style="z-index: 1300;"><div class="modal-content" style="max-width: 600px;"><h3>Historial</h3><div id="historialContent" style="max-height: 400px; overflow-y: auto; margin-top:15px;">Cargando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalHistorial').classList.add('hidden')" style="padding:8px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
     <div id="modalVerUsuario" class="modal hidden" style="z-index: 1100;"><div class="modal-content" style="max-width: 600px;"><div id="userProfileContent"></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalVerUsuario').classList.add('hidden')" style="background:#334155; color:white; padding:8px 20px; border:none; border-radius:6px; cursor:pointer;">Cerrar</button></div></div></div>
@@ -392,18 +401,17 @@ async function checkUserRole(email) {
 
 function loadApp(email, role) {
     currentUserEmail = email;
-    // Mostrar correo temporalmente hasta que cargue la BD de colaboradores
     document.getElementById('userDisplayName').innerText = email; 
     currentUserRole = role;
     const badge = document.getElementById('userRoleBadge');
     if(role === 'admin') {
         document.body.classList.add('role-admin');
-        badge.innerText = 'ADMINISTRADOR';
-        badge.style.background = 'var(--tile-green)';
+        badge.innerText = 'ADMIN';
+        badge.style.background = 'var(--success)';
         badge.style.color = 'white';
     } else {
         document.body.classList.remove('role-admin');
-        badge.innerText = 'VISUALIZADOR';
+        badge.innerText = 'VISOR';
     }
     cargarTiendas();
     setupSearchListeners();
@@ -438,16 +446,14 @@ async function cargarDatos() {
         DB_COLABS = resC.data || [];
         document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c=>`<option value="${c.nombre}">`).join('');
         
-        // --- LÓGICA DE NOMBRE DE USUARIO ---
         const myUser = DB_COLABS.find(c => c.correo === currentUserEmail);
-        if(myUser) document.getElementById('userDisplayName').innerText = "Hola, " + myUser.nombre;
-        // -----------------------------------
+        if(myUser) document.getElementById('userDisplayName').innerText = "Hola, " + myUser.nombre.split(' ')[0];
 
         renderTablaMaestra(); 
         renderPhoneTable(); 
         renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
         actualizarDashboard(); 
-        generarReporteDescuadres(); // LLAMADA A LA NUEVA AUDITORIA
+        generarReporteDescuadres(); 
         
         document.getElementById('chartsContainer').innerHTML = ''; 
         addChart('estado', 'doughnut');
@@ -468,22 +474,16 @@ function actualizarDashboard() {
     const totalReal = pcs + cels + sims;
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
-    // --- NUEVO: CALCULO DE COLABORADORES ---
     const totalColabs = DB_COLABS.length;
     safeSetText('kpi-colabs', totalColabs);
-    // ---------------------------------------
-
     safeSetText('kpi-total', totalReal); safeSetText('kpi-dispo', disp); safeSetText('kpi-mant', mant); safeSetText('kpi-asig', asig); 
     safeSetText('kpi-baja', baja); safeSetText('kpi-pcs', pcs); safeSetText('kpi-cels', cels); safeSetText('kpi-sims', sims); safeSetText('kpi-cesados', ces);
 }
 
-// --- NUEVA LÓGICA DE AUDITORIA ---
+// --- LOGICA DE AUDITORIA CON ACCIONES ---
 function generarReporteDescuadres() {
     let anomalias = [];
-    let cesadosCount = 0;
-    let multiPcCount = 0;
-    let orphanCount = 0;
-    let noEqCount = 0;
+    let cesadosCount = 0; let multiPcCount = 0; let orphanCount = 0; let noEqCount = 0;
 
     const activosAsignadosPorRut = {};
     DB_ACTIVOS.forEach(a => {
@@ -502,18 +502,33 @@ function generarReporteDescuadres() {
         if (!c && rut !== '9.999.999-9') {
             orphanCount += userAssets.total.length;
             userAssets.total.forEach(a => {
-                anomalias.push({ tipo: '<span class="status-badge status-red">RUT Huérfano</span>', persona: rut, detalle: `S/N: ${a.serie} (${a.marca || 'Celular'})`, serie: a.serie });
+                anomalias.push({ 
+                    tipo: '<span class="status-badge status-purple" style="background:#f3e8ff; color:#7e22ce;">RUT Huérfano</span>', 
+                    persona: rut, 
+                    detalle: `S/N: ${a.serie}`, 
+                    accion: `<button class="btn-audit-action audit-review" onclick="editar('${a.serie}')"><i class="fas fa-edit"></i> Reasignar</button>` 
+                });
             });
         } else if (c) {
             if (c.estado_contractual === 'Cesado') {
                 cesadosCount++;
                 userAssets.total.forEach(a => {
-                    anomalias.push({ tipo: '<span class="status-badge status-red">Usuario Cesado</span>', persona: c.nombre, detalle: `Posee: S/N ${a.serie}`, serie: a.serie });
+                    anomalias.push({ 
+                        tipo: '<span class="status-badge status-red">Usuario Cesado</span>', 
+                        persona: c.nombre, 
+                        detalle: `Posee: S/N ${a.serie}`, 
+                        accion: `<button class="btn-audit-action audit-recover" onclick="abrirDevolucion('${a.serie}')"><i class="fas fa-undo"></i> Recuperar</button>` 
+                    });
                 });
             }
             if (userAssets.pcs.length > 1) {
                 multiPcCount++;
-                anomalias.push({ tipo: '<span class="status-badge status-orange">Multi PC</span>', persona: c.nombre, detalle: `Tiene ${userAssets.pcs.length} Computadores.`, serie: userAssets.pcs[0].serie });
+                anomalias.push({ 
+                    tipo: '<span class="status-badge status-orange">Multi PC</span>', 
+                    persona: c.nombre, 
+                    detalle: `Tiene ${userAssets.pcs.length} Computadores.`, 
+                    accion: `<button class="btn-audit-action audit-review" onclick="editar('${userAssets.pcs[0].serie}')"><i class="fas fa-search"></i> Revisar</button>` 
+                });
             }
         }
     });
@@ -521,16 +536,35 @@ function generarReporteDescuadres() {
     DB_COLABS.forEach(c => {
         if(c.estado_contractual !== 'Cesado' && !activosAsignadosPorRut[c.rut]) {
             noEqCount++;
-            anomalias.push({ tipo: '<span class="status-badge" style="background:#94a3b8;color:white">Sin Equipo</span>', persona: c.nombre, detalle: `Vigente sin asignaciones`, serie: null });
+            anomalias.push({ 
+                tipo: '<span class="status-badge status-blue">Sin Equipo</span>', 
+                persona: c.nombre, 
+                detalle: `Vigente sin asignaciones`, 
+                accion: `<button class="btn-audit-action audit-assign" onclick="asignarNuevoA('${c.rut}')"><i class="fas fa-plus"></i> Asignar</button>` 
+            });
         }
     });
 
     safeSetText('audit-cesados', cesadosCount); safeSetText('audit-multipc', multiPcCount); safeSetText('audit-orphan', orphanCount); safeSetText('audit-noeq', noEqCount);
 
     const tbody = document.getElementById('auditTableBody');
-    if(anomalias.length === 0) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;">¡Todo cuadrado!</td></tr>';
-    else tbody.innerHTML = anomalias.map(an => `<tr><td>${an.tipo}</td><td>${an.persona}</td><td style="color:#64748b;">${an.detalle}</td><td style="text-align:center;">${an.serie ? `<button class="btn-action-outline" onclick="editar('${an.serie}')"><i class="fas fa-search"></i></button>` : '-'}</td></tr>`).join('');
+    if(anomalias.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;"><i class="fas fa-check-circle" style="color:var(--success); font-size:24px; display:block; margin-bottom:10px;"></i>¡Todo cuadrado! No se detectaron anomalías.</td></tr>';
+    } else {
+        tbody.innerHTML = anomalias.map(an => `<tr><td>${an.tipo}</td><td style="font-weight:600;">${an.persona}</td><td style="color:#64748b;">${an.detalle}</td><td style="text-align:center;">${an.accion}</td></tr>`).join('');
+    }
 }
+
+// FUNCION DE ASIGNACION RAPIDA DESDE AUDITORIA
+window.asignarNuevoA = function(rut) {
+    nuevoRegistro();
+    setTimeout(() => {
+        const rInput = document.getElementById('f_rut');
+        rInput.value = rut;
+        rInput.dispatchEvent(new Event('blur')); // Desencadena el auto-llenado
+    }, 100);
+}
+// ----------------------------------------------
 
 function setupValidationListeners() {
     const fields = [ { id: 'f_serie', key: 'serie', errorId: 'err_serie', msg: 'Serie ya existe' }, { id: 'f_numero', key: 'numero', errorId: 'err_numero', msg: 'Número en uso' }, { id: 'f_imei', key: 'imei_cel', errorId: 'err_imei', msg: 'IMEI Equipo en uso' }, { id: 'f_imsi', key: 'imei_sim', errorId: 'err_imsi', msg: 'IMSI/SIM en uso' } ];
@@ -581,7 +615,7 @@ function renderTablaHome(data, title) {
         return `<tr><td><div class="click-name" onclick="verUser('${a.rut_responsable}')">${c.nombre}</div><div style="font-size:11px; color:#64748b">${a.rut_responsable}</div></td><td>${getStatusBadge(a.estado)}</td><td><div style="font-weight:600;">${a.ubicacion||'-'}</div><code style="color:var(--dominos-blue)">${a.serie}</code></td></tr>`;
     }).join('');
 }
-function resetHomeTable() { document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); }
+function resetHomeTable() { document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); document.getElementById('homeTableTitle').innerHTML = "Últimos Movimientos"; }
 
 function getActionButtons(serie) {
     const histBtn = `<button class="btn-action-outline" title="Historial" onclick="verHistorial('${serie}')"><i class="fas fa-history"></i></button>`;
@@ -627,7 +661,7 @@ function exportarExcel() {
     XLSX.writeFile(wb, `Inventario_TI_${new Date().toISOString().split('T')[0]}.xlsx`); showToast("Descarga iniciada");
 }
 
-let chartCounter=0; function addChart(k='estado', t='bar'){ chartCounter++; const id=`chart_${chartCounter}`; document.getElementById('chartsContainer').innerHTML+=`<div class="chart-card"><div class="chart-header" style="display:flex; gap:10px; margin-bottom:15px;"><select class="chart-select" id="sel_key_${id}" onchange="updateDynamicChart('${id}')"><option value="estado" ${k==='estado'?'selected':''}>Por Estado</option><option value="tienda" ${k==='tienda'?'selected':''}>Por Tienda</option><option value="area" ${k==='area'?'selected':''}>Por Área</option><option value="marca" ${k==='marca'?'selected':''}>Por Marca</option></select><select class="chart-select" id="sel_type_${id}" onchange="updateDynamicChart('${id}')"><option value="bar" ${t==='bar'?'selected':''}>Barras</option><option value="doughnut" ${t==='doughnut'?'selected':''}>Dona</option><option value="line" ${t==='line'?'selected':''}>Línea</option></select><i class="fas fa-times btn-remove-chart" style="margin-left:auto; cursor:pointer; color:#94a3b8;" onclick="this.parentElement.parentElement.remove()"></i></div><div class="chart-canvas-container" style="position:relative; height:300px;"><canvas id="${id}"></canvas></div></div>`; setTimeout(()=>updateDynamicChart(id),100); }
+let chartCounter=0; function addChart(k='estado', t='bar'){ chartCounter++; const id=`chart_${chartCounter}`; document.getElementById('chartsContainer').innerHTML+=`<div class="chart-card" style="background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0;"><div class="chart-header" style="display:flex; gap:10px; margin-bottom:15px;"><select class="chart-select" id="sel_key_${id}" onchange="updateDynamicChart('${id}')" style="padding:5px; border-radius:4px;"><option value="estado" ${k==='estado'?'selected':''}>Por Estado</option><option value="tienda" ${k==='tienda'?'selected':''}>Por Tienda</option><option value="area" ${k==='area'?'selected':''}>Por Área</option><option value="marca" ${k==='marca'?'selected':''}>Por Marca</option></select><select class="chart-select" id="sel_type_${id}" onchange="updateDynamicChart('${id}')" style="padding:5px; border-radius:4px;"><option value="bar" ${t==='bar'?'selected':''}>Barras</option><option value="doughnut" ${t==='doughnut'?'selected':''}>Dona</option><option value="line" ${t==='line'?'selected':''}>Línea</option></select><i class="fas fa-times btn-remove-chart" style="margin-left:auto; cursor:pointer; color:#94a3b8;" onclick="this.parentElement.parentElement.remove()"></i></div><div class="chart-canvas-container" style="position:relative; height:300px;"><canvas id="${id}"></canvas></div></div>`; setTimeout(()=>updateDynamicChart(id),100); }
 function updateDynamicChart(id){ const ctx=document.getElementById(id).getContext('2d'), k=document.getElementById(`sel_key_${id}`).value, t=document.getElementById(`sel_type_${id}`).value; const ex=Chart.getChart(id); if(ex) ex.destroy(); const d={}; DB_ACTIVOS.forEach(a=>{ let key='N/A'; if(k==='estado') key=a.estado; else if(k==='tienda') key=a.ubicacion; else if(k==='marca') key=a.marca||a.marca_cel; else if(k==='area') { const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); key=c?c.area:'Sin Asignar'; } d[key]=(d[key]||0)+1; }); const c=['#006491','#E31837','#10b981','#f59e0b','#64748b']; new Chart(ctx,{type:t,data:{labels:Object.keys(d),datasets:[{label:'Total',data:Object.values(d),backgroundColor:t==='bar'?'#006491':c}]},options:{maintainAspectRatio:false,plugins:{legend:{display:t!=='bar',position:'right'}}}}); }
 
 function setupSearchListeners(){ 
