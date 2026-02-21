@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v101.0 (Actionable Audit)</title>
+    <title>Dashboard - TI Maestro v102.0 (Audit Fix & Delete)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -22,7 +22,6 @@
             --border-color: #e2e8f0;
             --success: #10b981; 
             --warning: #f59e0b; 
-            /* Colores para Tiles */
             --tile-purple: #8b5cf6;
             --tile-blue: #006491;
             --tile-green: #10b981;
@@ -116,6 +115,8 @@
         .audit-assign:hover { background: #d1fae5; }
         .audit-review { color: #0369a1; border-color: #bae6fd; background: #f0f9ff; }
         .audit-review:hover { background: #e0f2fe; }
+        .audit-delete-user { color: #ef4444; border-color: #fca5a5; background: #fef2f2; }
+        .audit-delete-user:hover { background: #fee2e2; }
 
         .hidden { display: none !important; } .admin-only { display: none !important; } body.role-admin .admin-only { display: flex !important; }
         
@@ -183,7 +184,7 @@
         </button>
 
         <div class="sidebar-footer">
-            <span style="font-size: 10px; color: #94a3b8;">Domino's TI v101.0</span>
+            <span style="font-size: 10px; color: #94a3b8;">Domino's TI v102.0</span>
         </div>
     </aside>
 
@@ -401,17 +402,16 @@ async function checkUserRole(email) {
 
 function loadApp(email, role) {
     currentUserEmail = email;
-    document.getElementById('userDisplayName').innerText = email; 
+    document.getElementById('userDisplayName').innerText = email.split('@')[0]; 
     currentUserRole = role;
     const badge = document.getElementById('userRoleBadge');
     if(role === 'admin') {
         document.body.classList.add('role-admin');
-        badge.innerText = 'ADMIN';
+        badge.innerText = 'ADMINISTRADOR';
         badge.style.background = 'var(--success)';
-        badge.style.color = 'white';
     } else {
         document.body.classList.remove('role-admin');
-        badge.innerText = 'VISOR';
+        badge.innerText = 'VISUALIZADOR';
     }
     cargarTiendas();
     setupSearchListeners();
@@ -446,7 +446,7 @@ async function cargarDatos() {
         DB_COLABS = resC.data || [];
         document.getElementById('listaNombres').innerHTML = DB_COLABS.map(c=>`<option value="${c.nombre}">`).join('');
         
-        const myUser = DB_COLABS.find(c => c.correo === currentUserEmail);
+        const myUser = DB_COLABS.find(c => c.correo && c.correo.toLowerCase() === currentUserEmail.toLowerCase());
         if(myUser) document.getElementById('userDisplayName').innerText = "Hola, " + myUser.nombre.split(' ')[0];
 
         renderTablaMaestra(); 
@@ -480,26 +480,30 @@ function actualizarDashboard() {
     safeSetText('kpi-baja', baja); safeSetText('kpi-pcs', pcs); safeSetText('kpi-cels', cels); safeSetText('kpi-sims', sims); safeSetText('kpi-cesados', ces);
 }
 
-// --- LOGICA DE AUDITORIA CON ACCIONES ---
+// --- LOGICA DE AUDITORIA CORREGIDA ---
 function generarReporteDescuadres() {
     let anomalias = [];
     let cesadosCount = 0; let multiPcCount = 0; let orphanCount = 0; let noEqCount = 0;
 
     const activosAsignadosPorRut = {};
+    
+    // CORRECCIÓN: Agrupar TODOS los equipos de un RUT, sin importar si dicen "Asignado" o no.
+    // Si están vinculados al RUT, se consideran de ese usuario (a menos que sea Bodega 9.999.999-9)
     DB_ACTIVOS.forEach(a => {
-        if(a.estado === 'Asignado') {
-            if(!activosAsignadosPorRut[a.rut_responsable]) activosAsignadosPorRut[a.rut_responsable] = { pcs: [], otros: [], total: [] };
-            activosAsignadosPorRut[a.rut_responsable].total.push(a);
-            if(a.marca && a.marca.length > 1) activosAsignadosPorRut[a.rut_responsable].pcs.push(a);
-            else activosAsignadosPorRut[a.rut_responsable].otros.push(a);
+        const rut = (a.rut_responsable || '').trim();
+        if(rut && rut !== '9.999.999-9') {
+            if(!activosAsignadosPorRut[rut]) activosAsignadosPorRut[rut] = { pcs: [], otros: [], total: [] };
+            activosAsignadosPorRut[rut].total.push(a);
+            if(a.marca && a.marca.length > 1) activosAsignadosPorRut[rut].pcs.push(a);
+            else activosAsignadosPorRut[rut].otros.push(a);
         }
     });
 
     Object.keys(activosAsignadosPorRut).forEach(rut => {
         const userAssets = activosAsignadosPorRut[rut];
-        const c = DB_COLABS.find(x => x.rut === rut);
+        const c = DB_COLABS.find(x => x.rut.trim() === rut);
 
-        if (!c && rut !== '9.999.999-9') {
+        if (!c) {
             orphanCount += userAssets.total.length;
             userAssets.total.forEach(a => {
                 anomalias.push({ 
@@ -509,7 +513,7 @@ function generarReporteDescuadres() {
                     accion: `<button class="btn-audit-action audit-review" onclick="editar('${a.serie}')"><i class="fas fa-edit"></i> Reasignar</button>` 
                 });
             });
-        } else if (c) {
+        } else {
             if (c.estado_contractual === 'Cesado') {
                 cesadosCount++;
                 userAssets.total.forEach(a => {
@@ -533,14 +537,19 @@ function generarReporteDescuadres() {
         }
     });
 
+    // CORRECCIÓN: Filtrar de forma más precisa
     DB_COLABS.forEach(c => {
-        if(c.estado_contractual !== 'Cesado' && !activosAsignadosPorRut[c.rut]) {
+        const rut = (c.rut || '').trim();
+        if(c.estado_contractual !== 'Cesado' && (!activosAsignadosPorRut[rut] || activosAsignadosPorRut[rut].total.length === 0)) {
             noEqCount++;
             anomalias.push({ 
                 tipo: '<span class="status-badge status-blue">Sin Equipo</span>', 
                 persona: c.nombre, 
                 detalle: `Vigente sin asignaciones`, 
-                accion: `<button class="btn-audit-action audit-assign" onclick="asignarNuevoA('${c.rut}')"><i class="fas fa-plus"></i> Asignar</button>` 
+                accion: `<div style="display:flex; gap:5px; justify-content:center;">
+                            <button class="btn-audit-action audit-assign" onclick="asignarNuevoA('${c.rut}')"><i class="fas fa-plus"></i> Asignar</button>
+                            <button class="btn-audit-action audit-delete-user" onclick="eliminarColaborador('${c.rut}')"><i class="fas fa-trash"></i> Eliminar</button>
+                         </div>` 
             });
         }
     });
@@ -555,13 +564,37 @@ function generarReporteDescuadres() {
     }
 }
 
+// NUEVA FUNCION: Eliminar Usuario desde la Auditoria
+window.eliminarColaborador = function(rut) {
+    Swal.fire({
+        title: '¿Eliminar colaborador?',
+        text: "Se borrará al usuario de la base de datos.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#E31837',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if(result.isConfirmed) {
+            try {
+                const { error } = await sb.from('colaboradores').delete().eq('rut', rut);
+                if (error) throw error;
+                showToast('Colaborador eliminado de la base de datos');
+                cargarDatos();
+            } catch(e) {
+                showToast('Error al eliminar colaborador', 'error');
+            }
+        }
+    });
+}
+
 // FUNCION DE ASIGNACION RAPIDA DESDE AUDITORIA
 window.asignarNuevoA = function(rut) {
     nuevoRegistro();
     setTimeout(() => {
         const rInput = document.getElementById('f_rut');
         rInput.value = rut;
-        rInput.dispatchEvent(new Event('blur')); // Desencadena el auto-llenado
+        rInput.dispatchEvent(new Event('blur')); 
     }, 100);
 }
 // ----------------------------------------------
