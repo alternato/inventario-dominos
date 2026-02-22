@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v102.0 (Audit Fix & Delete)</title>
+    <title>Dashboard - TI Maestro v103.0 (Audit Fixed)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
@@ -158,33 +159,33 @@
             <img src="https://logos-world.net/wp-content/uploads/2021/08/Dominos-Logo.png" class="logo-img" alt="Domino's Logo">
         </div>
         
-        <button class="nav-btn active" id="btn-home" onclick="showView('home')">
+        <button class="nav-btn active" id="btn-home" onclick="window.showView('home')">
             <i class="fas fa-home"></i> <span>Inicio</span>
         </button>
-        <button class="nav-btn" id="btn-inv" onclick="showView('inventory')">
+        <button class="nav-btn" id="btn-inv" onclick="window.showView('inventory')">
             <i class="fas fa-boxes"></i> <span>Inventario</span>
         </button>
-        <button class="nav-btn" id="btn-phone" onclick="showView('telephony')">
+        <button class="nav-btn" id="btn-phone" onclick="window.showView('telephony')">
             <i class="fas fa-mobile-alt"></i> <span>Telefonía</span>
         </button>
-        <button class="nav-btn" id="btn-metrics" onclick="showView('metrics')">
+        <button class="nav-btn" id="btn-metrics" onclick="window.showView('metrics')">
             <i class="fas fa-chart-pie"></i> <span>Reportes</span>
         </button>
-        <button class="nav-btn" id="btn-audit" onclick="showView('audit')">
+        <button class="nav-btn" id="btn-audit" onclick="window.showView('audit')">
             <i class="fas fa-balance-scale"></i> <span>Auditoría</span>
         </button>
         
         <hr style="margin: 20px 0; border-top: 1px solid #e2e8f0;">
         
-        <button class="nav-btn admin-only" onclick="nuevoRegistro()" style="color: var(--success);">
+        <button class="nav-btn admin-only" onclick="window.nuevoRegistro()" style="color: var(--success);">
             <i class="fas fa-plus-circle"></i> <span>NUEVO REGISTRO</span>
         </button>
-        <button class="nav-btn" onclick="cerrarSesion()" style="color: var(--dominos-red);">
+        <button class="nav-btn" onclick="window.cerrarSesion()" style="color: var(--dominos-red);">
             <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
         </button>
 
         <div class="sidebar-footer">
-            <span style="font-size: 10px; color: #94a3b8;">Domino's TI v102.0</span>
+            <span style="font-size: 10px; color: #94a3b8;">Domino's TI v103.0</span>
         </div>
     </aside>
 
@@ -215,27 +216,27 @@
                             <div class="kpi-value" id="kpi-colabs">-</div>
                             <div class="kpi-label">Colaboradores</div>
                         </div>
-                        <div class="kpi-card tile-blue active" onclick="filterDashboard(this, 'total')">
+                        <div class="kpi-card tile-blue active" onclick="window.filterDashboard(this, 'total')">
                             <div class="kpi-icon"><i class="fas fa-cubes"></i></div>
                             <div class="kpi-value" id="kpi-total">-</div>
                             <div class="kpi-label">Total Activos</div>
                         </div>
-                        <div class="kpi-card tile-green" onclick="filterDashboard(this, 'dispo')">
+                        <div class="kpi-card tile-green" onclick="window.filterDashboard(this, 'dispo')">
                             <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
                             <div class="kpi-value" id="kpi-dispo">-</div>
                             <div class="kpi-label">Disponible</div>
                         </div>
-                        <div class="kpi-card tile-blue" onclick="filterDashboard(this, 'asig')">
+                        <div class="kpi-card tile-blue" onclick="window.filterDashboard(this, 'asig')">
                             <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
                             <div class="kpi-value" id="kpi-asig">-</div>
                             <div class="kpi-label">Asignados</div>
                         </div>
-                        <div class="kpi-card tile-orange" onclick="filterDashboard(this, 'mant')">
+                        <div class="kpi-card tile-orange" onclick="window.filterDashboard(this, 'mant')">
                             <div class="kpi-icon"><i class="fas fa-tools"></i></div>
                             <div class="kpi-value" id="kpi-mant">-</div>
                             <div class="kpi-label">Mantención</div>
                         </div>
-                        <div class="kpi-card tile-red" onclick="filterDashboard(this, 'baja')">
+                        <div class="kpi-card tile-red" onclick="window.filterDashboard(this, 'baja')">
                             <div class="kpi-icon"><i class="fas fa-trash-alt"></i></div>
                             <div class="kpi-value" id="kpi-baja">-</div>
                             <div class="kpi-label">De Baja</div>
@@ -246,22 +247,22 @@
                 <div class="kpi-section">
                     <div class="kpi-header">Hardware y Alertas</div>
                     <div class="kpi-grid">
-                        <div class="kpi-card tile-blue" onclick="filterDashboard(this, 'pcs')">
+                        <div class="kpi-card tile-blue" onclick="window.filterDashboard(this, 'pcs')">
                             <div class="kpi-icon"><i class="fas fa-laptop"></i></div>
                             <div class="kpi-value" id="kpi-pcs">-</div>
                             <div class="kpi-label">Computadores</div>
                         </div>
-                        <div class="kpi-card tile-blue" onclick="filterDashboard(this, 'cels')">
+                        <div class="kpi-card tile-blue" onclick="window.filterDashboard(this, 'cels')">
                             <div class="kpi-icon"><i class="fas fa-mobile-alt"></i></div>
                             <div class="kpi-value" id="kpi-cels">-</div>
                             <div class="kpi-label">Celulares</div>
                         </div>
-                        <div class="kpi-card tile-blue" onclick="filterDashboard(this, 'sims')">
+                        <div class="kpi-card tile-blue" onclick="window.filterDashboard(this, 'sims')">
                             <div class="kpi-icon"><i class="fas fa-sim-card"></i></div>
                             <div class="kpi-value" id="kpi-sims">-</div>
                             <div class="kpi-label">Chips / SIMs</div>
                         </div>
-                        <div class="kpi-card tile-red" onclick="filterDashboard(this, 'cesados')">
+                        <div class="kpi-card tile-red" onclick="window.filterDashboard(this, 'cesados')">
                             <div class="kpi-icon"><i class="fas fa-user-slash"></i></div>
                             <div class="kpi-value" id="kpi-cesados">-</div>
                             <div class="kpi-label">Usuario Cesado</div>
@@ -272,7 +273,7 @@
                 <div class="table-wrapper">
                     <div class="home-table-header">
                         <h4 id="homeTableTitle" style="color: var(--dominos-blue); margin: 0; font-weight:800;">Últimos Movimientos</h4>
-                        <button onclick="resetHomeTable()" style="font-size: 12px; background: white; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight:600; color:#64748b;"><i class="fas fa-sync-alt"></i> Ver Recientes</button>
+                        <button onclick="window.resetHomeTable()" style="font-size: 12px; background: white; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight:600; color:#64748b;"><i class="fas fa-sync-alt"></i> Ver Recientes</button>
                     </div>
                     <div style="overflow-x:auto;">
                         <table style="width: 100%;">
@@ -338,8 +339,8 @@
                         <input type="file" id="csvFile" accept=".csv" style="width:100%;">
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="exportarExcel()" class="btn-action-outline" style="width:auto; padding:0 20px; font-weight:700;"><i class="fas fa-file-excel"></i> EXCEL</button>
-                        <button onclick="procesarCSV()" id="btnCsv" class="nav-btn" style="width:auto; background:var(--dominos-blue); color:white; justify-content:center;"><i class="fas fa-upload"></i> PROCESAR</button>
+                        <button onclick="window.exportarExcel()" class="btn-action-outline" style="width:auto; padding:0 20px; font-weight:700;"><i class="fas fa-file-excel"></i> EXCEL</button>
+                        <button onclick="window.procesarCSV()" id="btnCsv" class="nav-btn" style="width:auto; background:var(--dominos-blue); color:white; justify-content:center;"><i class="fas fa-upload"></i> PROCESAR</button>
                     </div>
                 </div>
                 <input type="search" id="mainSearch" placeholder="🔍 Buscar por RUT, Nombre, Serie, Tienda..." style="width: 100%; margin-bottom: 25px; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px;" autocomplete="off">
@@ -352,15 +353,15 @@
             </div>
 
             <div id="view-metrics" class="hidden">
-                <div style="margin-bottom: 20px; text-align: right;"><button style="padding: 10px 20px; background: var(--tile-green); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="addChart()"><i class="fas fa-plus"></i> Agregar Gráfico</button></div>
+                <div style="margin-bottom: 20px; text-align: right;"><button style="padding: 10px 20px; background: var(--tile-green); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="window.addChart()"><i class="fas fa-plus"></i> Agregar Gráfico</button></div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;" id="chartsContainer"></div>
             </div>
         </div>
     </main>
 
-    <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:var(--dominos-blue); margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div><div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div><div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div><div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero"><div id="err_numero" class="error-msg"></div></div><div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div><div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div><div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:30px; text-align:right;"><button onclick="cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; margin-right:10px; cursor:pointer;">Cancelar</button><button onclick="guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--dominos-blue); color:white; font-weight:700; border-radius:8px; cursor:pointer;">GUARDAR</button></div></div></div>
+    <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:var(--dominos-blue); margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div><div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div><div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div><div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="window.toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="window.toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero"><div id="err_numero" class="error-msg"></div></div><div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div><div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div><div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:30px; text-align:right;"><button onclick="window.cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; margin-right:10px; cursor:pointer;">Cancelar</button><button onclick="window.guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--dominos-blue); color:white; font-weight:700; border-radius:8px; cursor:pointer;">GUARDAR</button></div></div></div>
 
-    <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:var(--warning); margin-bottom:15px;">Devolución</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será reasignado.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field"><label>Observaciones</label><textarea id="dev_obs" rows="3"></textarea></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="procesarDevolucion()" style="padding:10px 20px; border:none; background:var(--warning); color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
+    <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:var(--warning); margin-bottom:15px;">Devolución</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será reasignado.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field"><label>Observaciones</label><textarea id="dev_obs" rows="3"></textarea></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="window.procesarDevolucion()" style="padding:10px 20px; border:none; background:var(--warning); color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
     <div id="modalConfirm" class="modal hidden" style="z-index: 1500;"><div class="modal-content" style="max-width: 400px; text-align: center;"><i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--tile-red); margin-bottom: 20px;"></i><h3>¿Estás seguro?</h3><p>Eliminarás este registro permanentemente.</p><div style="display: flex; justify-content: center; gap: 15px; margin-top:20px;"><button onclick="document.getElementById('modalConfirm').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; cursor:pointer;">Cancelar</button><button id="btnConfirmDelete" style="padding:10px 20px; border:none; background:var(--tile-red); color:white; font-weight:700; border-radius:8px; cursor:pointer;">ELIMINAR</button></div></div></div>
     <div id="modalHistorial" class="modal hidden" style="z-index: 1300;"><div class="modal-content" style="max-width: 600px;"><h3>Historial</h3><div id="historialContent" style="max-height: 400px; overflow-y: auto; margin-top:15px;">Cargando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalHistorial').classList.add('hidden')" style="padding:8px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
     <div id="modalVerUsuario" class="modal hidden" style="z-index: 1100;"><div class="modal-content" style="max-width: 600px;"><div id="userProfileContent"></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalVerUsuario').classList.add('hidden')" style="background:#334155; color:white; padding:8px 20px; border:none; border-radius:6px; cursor:pointer;">Cerrar</button></div></div></div>
@@ -376,7 +377,7 @@ let currentSerieDevolucion=null;
 let currentEditingSerie=null; 
 let deleteSerieTarget=null; 
 
-function showToast(msg, type='success') {
+window.showToast = function(msg, type='success') {
     const d = document.createElement('div'); d.className = `toast ${type}`;
     d.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
     document.getElementById('toast-container').appendChild(d);
@@ -413,19 +414,19 @@ function loadApp(email, role) {
         document.body.classList.remove('role-admin');
         badge.innerText = 'VISUALIZADOR';
     }
-    cargarTiendas();
-    setupSearchListeners();
-    setupValidationListeners();
-    cargarDatos();
+    window.cargarTiendas();
+    window.setupSearchListeners();
+    window.setupValidationListeners();
+    window.cargarDatos();
 }
 
-async function cerrarSesion() {
+window.cerrarSesion = async function() {
     localStorage.removeItem('manualAuth');
     await sb.auth.signOut();
     window.location.href = 'index.html';
 }
 
-async function cargarTiendas() {
+window.cargarTiendas = async function() {
     try {
         const { data } = await sb.from('tiendas').select('nombre').order('nombre');
         if (data) {
@@ -437,7 +438,7 @@ async function cargarTiendas() {
     } catch(e) {}
 }
 
-async function cargarDatos() {
+window.cargarDatos = async function() {
     try {
         const [resA, resC] = await Promise.all([sb.from('activos').select('*'), sb.from('colaboradores').select('*')]);
         if(resA.error || resC.error) throw new Error("Error en DB");
@@ -449,21 +450,21 @@ async function cargarDatos() {
         const myUser = DB_COLABS.find(c => c.correo && c.correo.toLowerCase() === currentUserEmail.toLowerCase());
         if(myUser) document.getElementById('userDisplayName').innerText = "Hola, " + myUser.nombre.split(' ')[0];
 
-        renderTablaMaestra(); 
-        renderPhoneTable(); 
-        renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
-        actualizarDashboard(); 
-        generarReporteDescuadres(); 
+        window.renderTablaMaestra(); 
+        window.renderPhoneTable(); 
+        window.renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos");
+        window.actualizarDashboard(); 
+        window.generarReporteDescuadres(); 
         
         document.getElementById('chartsContainer').innerHTML = ''; 
-        addChart('estado', 'doughnut');
-        addChart('tienda', 'bar');
+        window.addChart('estado', 'doughnut');
+        window.addChart('tienda', 'bar');
     } catch(e) { console.error(e); showToast("Error al cargar datos.", "error"); }
 }
 
-function safeSetText(id, value) { const el = document.getElementById(id); if (el) el.innerText = value; }
+window.safeSetText = function(id, value) { const el = document.getElementById(id); if (el) el.innerText = value; }
 
-function actualizarDashboard() {
+window.actualizarDashboard = function() {
     const disp = DB_ACTIVOS.filter(a=>a.estado==='Disponible').length;
     const mant = DB_ACTIVOS.filter(a=>a.estado==='Mantención').length;
     const asig = DB_ACTIVOS.filter(a=>a.estado==='Asignado').length;
@@ -475,20 +476,18 @@ function actualizarDashboard() {
     let ces = 0; DB_ACTIVOS.forEach(a=>{ const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); if(c && c.estado_contractual==='Cesado') ces++; });
 
     const totalColabs = DB_COLABS.length;
-    safeSetText('kpi-colabs', totalColabs);
-    safeSetText('kpi-total', totalReal); safeSetText('kpi-dispo', disp); safeSetText('kpi-mant', mant); safeSetText('kpi-asig', asig); 
-    safeSetText('kpi-baja', baja); safeSetText('kpi-pcs', pcs); safeSetText('kpi-cels', cels); safeSetText('kpi-sims', sims); safeSetText('kpi-cesados', ces);
+    window.safeSetText('kpi-colabs', totalColabs);
+    window.safeSetText('kpi-total', totalReal); window.safeSetText('kpi-dispo', disp); window.safeSetText('kpi-mant', mant); window.safeSetText('kpi-asig', asig); 
+    window.safeSetText('kpi-baja', baja); window.safeSetText('kpi-pcs', pcs); window.safeSetText('kpi-cels', cels); window.safeSetText('kpi-sims', sims); window.safeSetText('kpi-cesados', ces);
 }
 
-// --- LOGICA DE AUDITORIA CORREGIDA ---
-function generarReporteDescuadres() {
+// --- LOGICA DE AUDITORIA Y ACCIONES SEGURAS ---
+window.generarReporteDescuadres = function() {
     let anomalias = [];
     let cesadosCount = 0; let multiPcCount = 0; let orphanCount = 0; let noEqCount = 0;
 
     const activosAsignadosPorRut = {};
     
-    // CORRECCIÓN: Agrupar TODOS los equipos de un RUT, sin importar si dicen "Asignado" o no.
-    // Si están vinculados al RUT, se consideran de ese usuario (a menos que sea Bodega 9.999.999-9)
     DB_ACTIVOS.forEach(a => {
         const rut = (a.rut_responsable || '').trim();
         if(rut && rut !== '9.999.999-9') {
@@ -502,44 +501,48 @@ function generarReporteDescuadres() {
     Object.keys(activosAsignadosPorRut).forEach(rut => {
         const userAssets = activosAsignadosPorRut[rut];
         const c = DB_COLABS.find(x => x.rut.trim() === rut);
+        const safeRut = rut.replace(/'/g, "\\'"); // Evitar errores JS si el rut tiene comillas
 
         if (!c) {
             orphanCount += userAssets.total.length;
             userAssets.total.forEach(a => {
+                const safeSerie = a.serie.replace(/'/g, "\\'");
                 anomalias.push({ 
                     tipo: '<span class="status-badge status-purple" style="background:#f3e8ff; color:#7e22ce;">RUT Huérfano</span>', 
                     persona: rut, 
                     detalle: `S/N: ${a.serie}`, 
-                    accion: `<button class="btn-audit-action audit-review" onclick="editar('${a.serie}')"><i class="fas fa-edit"></i> Reasignar</button>` 
+                    accion: `<button class="btn-audit-action audit-review" onclick="window.editar('${safeSerie}')"><i class="fas fa-edit"></i> Reasignar</button>` 
                 });
             });
         } else {
             if (c.estado_contractual === 'Cesado') {
                 cesadosCount++;
                 userAssets.total.forEach(a => {
+                    const safeSerie = a.serie.replace(/'/g, "\\'");
                     anomalias.push({ 
                         tipo: '<span class="status-badge status-red">Usuario Cesado</span>', 
                         persona: c.nombre, 
                         detalle: `Posee: S/N ${a.serie}`, 
-                        accion: `<button class="btn-audit-action audit-recover" onclick="abrirDevolucion('${a.serie}')"><i class="fas fa-undo"></i> Recuperar</button>` 
+                        accion: `<button class="btn-audit-action audit-recover" onclick="window.abrirDevolucion('${safeSerie}')"><i class="fas fa-undo"></i> Recuperar</button>` 
                     });
                 });
             }
             if (userAssets.pcs.length > 1) {
                 multiPcCount++;
+                const safeSerie = userAssets.pcs[0].serie.replace(/'/g, "\\'");
                 anomalias.push({ 
                     tipo: '<span class="status-badge status-orange">Multi PC</span>', 
                     persona: c.nombre, 
                     detalle: `Tiene ${userAssets.pcs.length} Computadores.`, 
-                    accion: `<button class="btn-audit-action audit-review" onclick="editar('${userAssets.pcs[0].serie}')"><i class="fas fa-search"></i> Revisar</button>` 
+                    accion: `<button class="btn-audit-action audit-review" onclick="window.editar('${safeSerie}')"><i class="fas fa-search"></i> Revisar</button>` 
                 });
             }
         }
     });
 
-    // CORRECCIÓN: Filtrar de forma más precisa
     DB_COLABS.forEach(c => {
         const rut = (c.rut || '').trim();
+        const safeRut = rut.replace(/'/g, "\\'");
         if(c.estado_contractual !== 'Cesado' && (!activosAsignadosPorRut[rut] || activosAsignadosPorRut[rut].total.length === 0)) {
             noEqCount++;
             anomalias.push({ 
@@ -547,14 +550,14 @@ function generarReporteDescuadres() {
                 persona: c.nombre, 
                 detalle: `Vigente sin asignaciones`, 
                 accion: `<div style="display:flex; gap:5px; justify-content:center;">
-                            <button class="btn-audit-action audit-assign" onclick="asignarNuevoA('${c.rut}')"><i class="fas fa-plus"></i> Asignar</button>
-                            <button class="btn-audit-action audit-delete-user" onclick="eliminarColaborador('${c.rut}')"><i class="fas fa-trash"></i> Eliminar</button>
+                            <button class="btn-audit-action audit-assign" onclick="window.asignarNuevoA('${safeRut}')"><i class="fas fa-plus"></i> Asignar</button>
+                            <button class="btn-audit-action audit-delete-user" onclick="window.eliminarColaborador('${safeRut}')"><i class="fas fa-trash"></i> Eliminar</button>
                          </div>` 
             });
         }
     });
 
-    safeSetText('audit-cesados', cesadosCount); safeSetText('audit-multipc', multiPcCount); safeSetText('audit-orphan', orphanCount); safeSetText('audit-noeq', noEqCount);
+    window.safeSetText('audit-cesados', cesadosCount); window.safeSetText('audit-multipc', multiPcCount); window.safeSetText('audit-orphan', orphanCount); window.safeSetText('audit-noeq', noEqCount);
 
     const tbody = document.getElementById('auditTableBody');
     if(anomalias.length === 0) {
@@ -564,42 +567,35 @@ function generarReporteDescuadres() {
     }
 }
 
-// NUEVA FUNCION: Eliminar Usuario desde la Auditoria
 window.eliminarColaborador = function(rut) {
     Swal.fire({
-        title: '¿Eliminar colaborador?',
-        text: "Se borrará al usuario de la base de datos.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#E31837',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
+        title: '¿Eliminar colaborador?', text: "Se borrará al usuario permanentemente.", icon: 'warning',
+        showCancelButton: true, confirmButtonColor: '#E31837', confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
     }).then(async (result) => {
         if(result.isConfirmed) {
             try {
                 const { error } = await sb.from('colaboradores').delete().eq('rut', rut);
                 if (error) throw error;
-                showToast('Colaborador eliminado de la base de datos');
-                cargarDatos();
-            } catch(e) {
-                showToast('Error al eliminar colaborador', 'error');
-            }
+                showToast('Colaborador eliminado');
+                window.cargarDatos();
+            } catch(e) { showToast('Error al eliminar', 'error'); }
         }
     });
 }
 
-// FUNCION DE ASIGNACION RAPIDA DESDE AUDITORIA
 window.asignarNuevoA = function(rut) {
-    nuevoRegistro();
+    window.nuevoRegistro();
     setTimeout(() => {
         const rInput = document.getElementById('f_rut');
-        rInput.value = rut;
-        rInput.dispatchEvent(new Event('blur')); 
-    }, 100);
+        if(rInput) {
+            rInput.value = rut;
+            rInput.dispatchEvent(new Event('blur')); // Lanza autocompletado
+        }
+    }, 150);
 }
 // ----------------------------------------------
 
-function setupValidationListeners() {
+window.setupValidationListeners = function() {
     const fields = [ { id: 'f_serie', key: 'serie', errorId: 'err_serie', msg: 'Serie ya existe' }, { id: 'f_numero', key: 'numero', errorId: 'err_numero', msg: 'Número en uso' }, { id: 'f_imei', key: 'imei_cel', errorId: 'err_imei', msg: 'IMEI Equipo en uso' }, { id: 'f_imsi', key: 'imei_sim', errorId: 'err_imsi', msg: 'IMSI/SIM en uso' } ];
     fields.forEach(f => {
         const input = document.getElementById(f.id); const errDiv = document.getElementById(f.errorId);
@@ -617,7 +613,7 @@ function setupValidationListeners() {
     });
 }
 
-function filterDashboard(card, type) {
+window.filterDashboard = function(card, type) {
     document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); card.classList.add('active');
     let data = [], title = "";
     switch(type) {
@@ -631,32 +627,33 @@ function filterDashboard(card, type) {
         case 'sims': data = DB_ACTIVOS.filter(a => (a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)); title = "SIM Cards"; break;
         case 'cesados': data = DB_ACTIVOS.filter(a => { const c = DB_COLABS.find(u => u.rut === a.rut_responsable); return c && c.estado_contractual === 'Cesado'; }); title = "Equipos en manos de Cesados"; break;
     }
-    renderTablaHome(data, title);
+    window.renderTablaHome(data, title);
     document.getElementById('homeTableTitle').innerHTML = `Movimientos: ${title}`;
 }
 
-function getStatusBadge(estado) {
+window.getStatusBadge = function(estado) {
     let cls = 'status-green'; if(estado === 'Asignado') cls = 'status-blue'; if(estado === 'Mantención') cls = 'status-orange'; if(estado === 'Baja' || estado === 'Cesado') cls = 'status-red';
     return `<span class="status-badge ${cls}">${estado}</span>`;
 }
 
-function renderTablaHome(data, title) {
+window.renderTablaHome = function(data, title) {
     const b = document.getElementById('lastMovesTable'); if(!b) return;
     if(data.length === 0) { b.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b;">No hay datos</td></tr>'; return; }
     b.innerHTML = data.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
-        return `<tr><td><div class="click-name" onclick="verUser('${a.rut_responsable}')">${c.nombre}</div><div style="font-size:11px; color:#64748b">${a.rut_responsable}</div></td><td>${getStatusBadge(a.estado)}</td><td><div style="font-weight:600;">${a.ubicacion||'-'}</div><code style="color:var(--dominos-blue)">${a.serie}</code></td></tr>`;
+        return `<tr><td><div class="click-name" onclick="window.verUser('${a.rut_responsable}')">${c.nombre}</div><div style="font-size:11px; color:#64748b">${a.rut_responsable}</div></td><td>${window.getStatusBadge(a.estado)}</td><td><div style="font-weight:600;">${a.ubicacion||'-'}</div><code style="color:var(--dominos-blue)">${a.serie}</code></td></tr>`;
     }).join('');
 }
-function resetHomeTable() { document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); document.getElementById('homeTableTitle').innerHTML = "Últimos Movimientos"; }
+window.resetHomeTable = function() { document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active')); window.renderTablaHome(DB_ACTIVOS.slice(0,10), "Últimos Movimientos"); document.getElementById('homeTableTitle').innerHTML = "Últimos Movimientos"; }
 
-function getActionButtons(serie) {
-    const histBtn = `<button class="btn-action-outline" title="Historial" onclick="verHistorial('${serie}')"><i class="fas fa-history"></i></button>`;
+window.getActionButtons = function(serie) {
+    const safeSerie = serie.replace(/'/g, "\\'");
+    const histBtn = `<button class="btn-action-outline" title="Historial" onclick="window.verHistorial('${safeSerie}')"><i class="fas fa-history"></i></button>`;
     if (currentUserRole !== 'admin') return `<div class="action-group">${histBtn}</div>`;
-    return `<div class="action-group"><button class="btn-action-outline" title="Editar" onclick="editar('${serie}')"><i class="fas fa-pencil-alt"></i></button><button class="btn-action-outline btn-return" title="Devolver" onclick="abrirDevolucion('${serie}')"><i class="fas fa-undo"></i></button>${histBtn}<button class="btn-action-outline btn-delete" title="Borrar" onclick="prepararEliminar('${serie}')"><i class="fas fa-trash-alt"></i></button></div>`;
+    return `<div class="action-group"><button class="btn-action-outline" title="Editar" onclick="window.editar('${safeSerie}')"><i class="fas fa-pencil-alt"></i></button><button class="btn-action-outline btn-return" title="Devolver" onclick="window.abrirDevolucion('${safeSerie}')"><i class="fas fa-undo"></i></button>${histBtn}<button class="btn-action-outline btn-delete" title="Borrar" onclick="window.prepararEliminar('${safeSerie}')"><i class="fas fa-trash-alt"></i></button></div>`;
 }
 
-function renderTablaMaestra() {
+window.renderTablaMaestra = function() {
     const s = document.getElementById('mainSearch').value.toLowerCase();
     const b = document.getElementById('masterTableBody'); if(!b) return;
     const filtered = DB_ACTIVOS.filter(a => {
@@ -665,11 +662,11 @@ function renderTablaMaestra() {
     }).sort((a, b) => (a.rut_responsable || '').localeCompare(b.rut_responsable || ''));
     b.innerHTML = filtered.length ? filtered.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', estado_contractual: 'Vigente' };
-        return `<tr><td style="color:#64748b; font-weight:500;">${a.rut_responsable}</td><td><span class="click-name" onclick="verUser('${a.rut_responsable}')">${c.nombre}</span></td><td>${getStatusBadge(a.estado)}</td><td style="color:${c.estado_contractual==='Cesado'?'#ef4444':'#10b981'}; font-weight:700;">${c.estado_contractual||'Vigente'}</td><td>${c.area}</td><td>${a.ubicacion}</td><td>${a.marca} ${a.modelo}</td><td><code style="color:var(--dominos-blue); font-weight:600;">${a.serie}</code></td><td><div style="display:flex; justify-content:center;">${getActionButtons(a.serie)}</div></td></tr>`;
+        return `<tr><td style="color:#64748b; font-weight:500;">${a.rut_responsable}</td><td><span class="click-name" onclick="window.verUser('${a.rut_responsable}')">${c.nombre}</span></td><td>${window.getStatusBadge(a.estado)}</td><td style="color:${c.estado_contractual==='Cesado'?'#ef4444':'#10b981'}; font-weight:700;">${c.estado_contractual||'Vigente'}</td><td>${c.area}</td><td>${a.ubicacion}</td><td>${a.marca} ${a.modelo}</td><td><code style="color:var(--dominos-blue); font-weight:600;">${a.serie}</code></td><td><div style="display:flex; justify-content:center;">${window.getActionButtons(a.serie)}</div></td></tr>`;
     }).join('') : '<tr><td colspan="9" style="text-align:center; padding:30px;">No se encontraron resultados</td></tr>';
 }
 
-function renderPhoneTable() {
+window.renderPhoneTable = function() {
     const inputVal = document.getElementById('phoneSearch').value.toLowerCase();
     const b = document.getElementById('phoneTableBody'); if(!b) return;
     const filtered = DB_ACTIVOS.filter(a => {
@@ -681,11 +678,11 @@ function renderPhoneTable() {
     b.innerHTML = filtered.length ? filtered.map(a => {
         const c = DB_COLABS.find(col => col.rut === a.rut_responsable) || { nombre: 'N/A', area: '-' };
         const marcaMostrar = a.marca_cel || '-'; 
-        return `<tr><td><div style="font-weight:700;">${c.nombre}</div><small style="color:#64748b">${c.area}</small></td><td><span style="font-weight:700; color:var(--dominos-blue);">${a.numero || '-'}</span></td><td>${marcaMostrar} ${a.modelo_cel||''}</td><td>${a.imei_cel || '-'}</td><td>${a.imei_sim || '-'}</td><td><div style="font-size:11px; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.observaciones || ''}</div></td><td><div style="display:flex; justify-content:center;">${getActionButtons(a.serie)}</div></td></tr>`;
+        return `<tr><td><div style="font-weight:700;">${c.nombre}</div><small style="color:#64748b">${c.area}</small></td><td><span style="font-weight:700; color:var(--dominos-blue);">${a.numero || '-'}</span></td><td>${marcaMostrar} ${a.modelo_cel||''}</td><td>${a.imei_cel || '-'}</td><td>${a.imei_sim || '-'}</td><td><div style="font-size:11px; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.observaciones || ''}</div></td><td><div style="display:flex; justify-content:center;">${window.getActionButtons(a.serie)}</div></td></tr>`;
     }).join('') : '<tr><td colspan="7" style="text-align:center; padding:30px;">No hay registros</td></tr>';
 }
 
-function exportarExcel() {
+window.exportarExcel = function() {
     const dataExport = DB_ACTIVOS.map(a => {
         const c = DB_COLABS.find(x => x.rut === a.rut_responsable) || { nombre: 'N/A' };
         return { "RUT": a.rut_responsable, "Nombre": c.nombre, "Estado": a.estado, "Ubicación": a.ubicacion, "Tipo": a.marca ? 'PC' : (a.marca_cel ? 'Celular' : 'SIM'), "Marca": a.marca || a.marca_cel || '-', "Modelo": a.modelo || a.modelo_cel || '-', "Serie/IMEI": a.serie || a.imei_cel || '-', "Número": a.numero || '-', "Observaciones": a.observaciones };
@@ -694,85 +691,86 @@ function exportarExcel() {
     XLSX.writeFile(wb, `Inventario_TI_${new Date().toISOString().split('T')[0]}.xlsx`); showToast("Descarga iniciada");
 }
 
-let chartCounter=0; function addChart(k='estado', t='bar'){ chartCounter++; const id=`chart_${chartCounter}`; document.getElementById('chartsContainer').innerHTML+=`<div class="chart-card" style="background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0;"><div class="chart-header" style="display:flex; gap:10px; margin-bottom:15px;"><select class="chart-select" id="sel_key_${id}" onchange="updateDynamicChart('${id}')" style="padding:5px; border-radius:4px;"><option value="estado" ${k==='estado'?'selected':''}>Por Estado</option><option value="tienda" ${k==='tienda'?'selected':''}>Por Tienda</option><option value="area" ${k==='area'?'selected':''}>Por Área</option><option value="marca" ${k==='marca'?'selected':''}>Por Marca</option></select><select class="chart-select" id="sel_type_${id}" onchange="updateDynamicChart('${id}')" style="padding:5px; border-radius:4px;"><option value="bar" ${t==='bar'?'selected':''}>Barras</option><option value="doughnut" ${t==='doughnut'?'selected':''}>Dona</option><option value="line" ${t==='line'?'selected':''}>Línea</option></select><i class="fas fa-times btn-remove-chart" style="margin-left:auto; cursor:pointer; color:#94a3b8;" onclick="this.parentElement.parentElement.remove()"></i></div><div class="chart-canvas-container" style="position:relative; height:300px;"><canvas id="${id}"></canvas></div></div>`; setTimeout(()=>updateDynamicChart(id),100); }
-function updateDynamicChart(id){ const ctx=document.getElementById(id).getContext('2d'), k=document.getElementById(`sel_key_${id}`).value, t=document.getElementById(`sel_type_${id}`).value; const ex=Chart.getChart(id); if(ex) ex.destroy(); const d={}; DB_ACTIVOS.forEach(a=>{ let key='N/A'; if(k==='estado') key=a.estado; else if(k==='tienda') key=a.ubicacion; else if(k==='marca') key=a.marca||a.marca_cel; else if(k==='area') { const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); key=c?c.area:'Sin Asignar'; } d[key]=(d[key]||0)+1; }); const c=['#006491','#E31837','#10b981','#f59e0b','#64748b']; new Chart(ctx,{type:t,data:{labels:Object.keys(d),datasets:[{label:'Total',data:Object.values(d),backgroundColor:t==='bar'?'#006491':c}]},options:{maintainAspectRatio:false,plugins:{legend:{display:t!=='bar',position:'right'}}}}); }
+let chartCounter=0; window.addChart = function(k='estado', t='bar'){ chartCounter++; const id=`chart_${chartCounter}`; document.getElementById('chartsContainer').innerHTML+=`<div class="chart-card" style="background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0;"><div class="chart-header" style="display:flex; gap:10px; margin-bottom:15px;"><select class="chart-select" id="sel_key_${id}" onchange="window.updateDynamicChart('${id}')" style="padding:5px; border-radius:4px;"><option value="estado" ${k==='estado'?'selected':''}>Por Estado</option><option value="tienda" ${k==='tienda'?'selected':''}>Por Tienda</option><option value="area" ${k==='area'?'selected':''}>Por Área</option><option value="marca" ${k==='marca'?'selected':''}>Por Marca</option></select><select class="chart-select" id="sel_type_${id}" onchange="window.updateDynamicChart('${id}')" style="padding:5px; border-radius:4px;"><option value="bar" ${t==='bar'?'selected':''}>Barras</option><option value="doughnut" ${t==='doughnut'?'selected':''}>Dona</option><option value="line" ${t==='line'?'selected':''}>Línea</option></select><i class="fas fa-times btn-remove-chart" style="margin-left:auto; cursor:pointer; color:#94a3b8;" onclick="this.parentElement.parentElement.remove()"></i></div><div class="chart-canvas-container" style="position:relative; height:300px;"><canvas id="${id}"></canvas></div></div>`; setTimeout(()=>window.updateDynamicChart(id),100); }
+window.updateDynamicChart = function(id){ const ctx=document.getElementById(id).getContext('2d'), k=document.getElementById(`sel_key_${id}`).value, t=document.getElementById(`sel_type_${id}`).value; const ex=Chart.getChart(id); if(ex) ex.destroy(); const d={}; DB_ACTIVOS.forEach(a=>{ let key='N/A'; if(k==='estado') key=a.estado; else if(k==='tienda') key=a.ubicacion; else if(k==='marca') key=a.marca||a.marca_cel; else if(k==='area') { const c=DB_COLABS.find(x=>x.rut===a.rut_responsable); key=c?c.area:'Sin Asignar'; } d[key]=(d[key]||0)+1; }); const c=['#006491','#E31837','#10b981','#f59e0b','#64748b']; new Chart(ctx,{type:t,data:{labels:Object.keys(d),datasets:[{label:'Total',data:Object.values(d),backgroundColor:t==='bar'?'#006491':c}]},options:{maintainAspectRatio:false,plugins:{legend:{display:t!=='bar',position:'right'}}}}); }
 
-function setupSearchListeners(){ 
+window.setupSearchListeners = function(){ 
     const m=document.getElementById('mainSearch'), p=document.getElementById('phoneSearch'), n=document.getElementById('f_nombre'), r=document.getElementById('f_rut'); 
-    if(m) m.addEventListener('input', renderTablaMaestra); 
-    if(p) p.addEventListener('input', renderPhoneTable); 
+    if(m) m.addEventListener('input', window.renderTablaMaestra); 
+    if(p) p.addEventListener('input', window.renderPhoneTable); 
     if(n) n.addEventListener('input',()=>{ 
         const c=DB_COLABS.find(x=>x.nombre===n.value); 
-        if(c){ document.getElementById('f_rut').value=c.rut; document.getElementById('f_correo').value=c.correo; setSelect('f_area',c.area); } 
+        if(c){ document.getElementById('f_rut').value=c.rut; document.getElementById('f_correo').value=c.correo; window.setSelect('f_area',c.area); } 
         else if (currentEditingSerie === null || document.getElementById('f_correo').value === '') { 
             const p=n.value.trim().toLowerCase().split(/\s+/); 
             if(p.length>=2) document.getElementById('f_correo').value=`${p[0].replace(/[^a-z0-9]/g,'')}.${p[1].replace(/[^a-z0-9]/g,'')}@dominospizza.cl`; 
         } 
     }); 
-    if(r) r.addEventListener('blur',()=>{ r.value=formatearRut(r.value); const c=DB_COLABS.find(x=>x.rut===r.value); if(c){ document.getElementById('f_nombre').value=c.nombre; document.getElementById('f_correo').value=c.correo; setSelect('f_area',c.area); } }); 
+    if(r) r.addEventListener('blur',()=>{ r.value=window.formatearRut(r.value); const c=DB_COLABS.find(x=>x.rut===r.value); if(c){ document.getElementById('f_nombre').value=c.nombre; document.getElementById('f_correo').value=c.correo; window.setSelect('f_area',c.area); } }); 
 }
 
-async function registrarMovimiento(s,a,d){ try{ await sb.from('historial_activos').insert({serie:s,accion:a,descripcion:d,usuario_editor:currentUserEmail}); }catch(e){} }
-async function verHistorial(s){ document.getElementById('modalHistorial').classList.remove('hidden'); document.getElementById('historialContent').innerHTML='Cargando...'; const {data}=await sb.from('historial_activos').select('*').eq('serie',s).order('created_at',{ascending:false}); if(!data||!data.length){ document.getElementById('historialContent').innerHTML='<p style="text-align:center;">Sin historial.</p>'; return; } document.getElementById('historialContent').innerHTML=`<ul style="list-style:none; padding:0;">${data.map(h=>`<li style="padding:10px 0; border-bottom:1px solid #f1f5f9;"><div style="font-size:11px; color:#94a3b8;">${new Date(h.created_at).toLocaleString()}</div><div style="font-weight:700; color:var(--dominos-blue); margin:3px 0;">${h.accion}</div><div style="font-size:12px;">${h.descripcion}</div><div style="font-size:10px; color:#94a3b8; margin-top:4px;">Por: ${h.usuario_editor||'Sistema'}</div></li>`).join('')}</ul>`; }
-function verificarDuplicados(){ const n={}, e={}, s={}; DB_ACTIVOS.forEach(a=>{ if(a.numero&&a.numero.length>5) n[a.numero]=(n[a.numero]||0)+1; if(a.imei_cel&&a.imei_cel.length>5) e[a.imei_cel]=(e[a.imei_cel]||0)+1; if(a.imei_sim&&a.imei_sim.length>5) s[a.imei_sim]=(s[a.imei_sim]||0)+1; }); const dn=Object.keys(n).filter(k=>n[k]>1), de=Object.keys(e).filter(k=>e[k]>1), ds=Object.keys(s).filter(k=>s[k]>1); let h=''; if(!dn.length&&!de.length&&!ds.length) h='<div style="text-align:center; padding:20px; color:#10b981;"><b>¡Todo limpio!</b></div>'; else { h='<ul style="list-style:none;">'; if(dn.length) h+=`<li><strong>Números Repetidos:</strong> ${dn.join(', ')}</li>`; if(de.length) h+=`<li><strong>IMEIs Repetidos:</strong> ${de.join(', ')}</li>`; if(ds.length) h+=`<li><strong>SIMs Repetidas:</strong> ${ds.join(', ')}</li>`; h+='</ul>'; } document.getElementById('auditContent').innerHTML=h; document.getElementById('modalAudit').classList.remove('hidden'); }
-function abrirDevolucion(s){ currentSerieDevolucion=s; document.getElementById('dev_serie').innerText=s; document.getElementById('dev_obs').value=''; document.getElementById('modalDevolucion').classList.remove('hidden'); }
-async function procesarDevolucion(){ if(!currentSerieDevolucion) return; const ne=document.getElementById('dev_estado').value, nu=document.getElementById('dev_ubicacion').value, obs=document.getElementById('dev_obs').value; try{ const prev=DB_ACTIVOS.find(a=>a.serie===currentSerieDevolucion); const nm=prev?(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Desconocido'):'Desconocido'; const {error}=await sb.from('activos').update({rut_responsable:'9.999.999-9',estado:ne,ubicacion:nu,observaciones:obs?`DEVOLUCIÓN: ${obs}`:'Devuelto'}).eq('serie',currentSerieDevolucion); if(error) throw error; registrarMovimiento(currentSerieDevolucion,'Devolución',`De: ${nm} -> ${nu}`); showToast("Devolución exitosa"); document.getElementById('modalDevolucion').classList.add('hidden'); cargarDatos(); }catch(e){ showToast("Error","error"); } }
+window.registrarMovimiento = async function(s,a,d){ try{ await sb.from('historial_activos').insert({serie:s,accion:a,descripcion:d,usuario_editor:currentUserEmail}); }catch(e){} }
+window.verHistorial = async function(s){ document.getElementById('modalHistorial').classList.remove('hidden'); document.getElementById('historialContent').innerHTML='Cargando...'; const {data}=await sb.from('historial_activos').select('*').eq('serie',s).order('created_at',{ascending:false}); if(!data||!data.length){ document.getElementById('historialContent').innerHTML='<p style="text-align:center;">Sin historial.</p>'; return; } document.getElementById('historialContent').innerHTML=`<ul style="list-style:none; padding:0;">${data.map(h=>`<li style="padding:10px 0; border-bottom:1px solid #f1f5f9;"><div style="font-size:11px; color:#94a3b8;">${new Date(h.created_at).toLocaleString()}</div><div style="font-weight:700; color:var(--dominos-blue); margin:3px 0;">${h.accion}</div><div style="font-size:12px;">${h.descripcion}</div><div style="font-size:10px; color:#94a3b8; margin-top:4px;">Por: ${h.usuario_editor||'Sistema'}</div></li>`).join('')}</ul>`; }
 
-function prepararEliminar(s) { deleteSerieTarget = s; document.getElementById('modalConfirm').classList.remove('hidden'); }
+window.verificarDuplicados = function(){ const n={}, e={}, s={}; DB_ACTIVOS.forEach(a=>{ if(a.numero&&a.numero.length>5) n[a.numero]=(n[a.numero]||0)+1; if(a.imei_cel&&a.imei_cel.length>5) e[a.imei_cel]=(e[a.imei_cel]||0)+1; if(a.imei_sim&&a.imei_sim.length>5) s[a.imei_sim]=(s[a.imei_sim]||0)+1; }); const dn=Object.keys(n).filter(k=>n[k]>1), de=Object.keys(e).filter(k=>e[k]>1), ds=Object.keys(s).filter(k=>s[k]>1); let h=''; if(!dn.length&&!de.length&&!ds.length) h='<div style="text-align:center; padding:20px; color:#10b981;"><b>¡Todo limpio!</b></div>'; else { h='<ul style="list-style:none;">'; if(dn.length) h+=`<li><strong>Números Repetidos:</strong> ${dn.join(', ')}</li>`; if(de.length) h+=`<li><strong>IMEIs Repetidos:</strong> ${de.join(', ')}</li>`; if(ds.length) h+=`<li><strong>SIMs Repetidas:</strong> ${ds.join(', ')}</li>`; h+='</ul>'; } document.getElementById('auditContent').innerHTML=h; document.getElementById('modalAudit').classList.remove('hidden'); }
+window.abrirDevolucion = function(s){ currentSerieDevolucion=s; document.getElementById('dev_serie').innerText=s; document.getElementById('dev_obs').value=''; document.getElementById('modalDevolucion').classList.remove('hidden'); }
+window.procesarDevolucion = async function(){ if(!currentSerieDevolucion) return; const ne=document.getElementById('dev_estado').value, nu=document.getElementById('dev_ubicacion').value, obs=document.getElementById('dev_obs').value; try{ const prev=DB_ACTIVOS.find(a=>a.serie===currentSerieDevolucion); const nm=prev?(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Desconocido'):'Desconocido'; const {error}=await sb.from('activos').update({rut_responsable:'9.999.999-9',estado:ne,ubicacion:nu,observaciones:obs?`DEVOLUCIÓN: ${obs}`:'Devuelto'}).eq('serie',currentSerieDevolucion); if(error) throw error; window.registrarMovimiento(currentSerieDevolucion,'Devolución',`De: ${nm} -> ${nu}`); showToast("Devolución exitosa"); document.getElementById('modalDevolucion').classList.add('hidden'); window.cargarDatos(); }catch(e){ showToast("Error","error"); } }
+
+window.prepararEliminar = function(s) { deleteSerieTarget = s; document.getElementById('modalConfirm').classList.remove('hidden'); }
 document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
     if(!deleteSerieTarget) return;
     try { 
         await sb.from('activos').delete().eq('serie', deleteSerieTarget); 
-        registrarMovimiento(deleteSerieTarget, 'Eliminación', 'Borrado permanente'); 
+        window.registrarMovimiento(deleteSerieTarget, 'Eliminación', 'Borrado permanente'); 
         showToast("Eliminado correctamente"); 
         document.getElementById('modalConfirm').classList.add('hidden');
-        cargarDatos(); 
+        window.cargarDatos(); 
     } catch(e) { showToast("Error al eliminar", "error"); }
 });
 
-function nuevoRegistro(){ 
+window.nuevoRegistro = function(){ 
     currentEditingSerie = null; 
     document.querySelectorAll('#modalFicha input').forEach(i=>{i.value='';i.classList.remove('error-input')}); 
     document.querySelectorAll('#modalFicha select').forEach(s=>s.selectedIndex=0); 
     document.querySelectorAll('.error-msg').forEach(e=>e.innerText=''); 
     document.getElementById('sw_equipo').checked=false; 
     document.getElementById('sw_sim').checked=false; 
-    toggleTelefonia(); 
+    window.toggleTelefonia(); 
     document.getElementById('modalFicha').classList.remove('hidden'); 
 }
-function editar(s){ 
+window.editar = function(s){ 
     currentEditingSerie = s; 
     const a=DB_ACTIVOS.find(x=>x.serie===s); if(!a) return; 
     const c=DB_COLABS.find(x=>x.rut===a.rut_responsable)||{}; 
     document.getElementById('f_rut').value=a.rut_responsable; document.getElementById('f_nombre').value=c.nombre||''; document.getElementById('f_correo').value=c.correo||''; 
-    setSelect('f_area',c.area); setSelect('f_tienda',a.ubicacion); setSelect('f_contractual',c.estado_contractual); setSelect('f_estado',a.estado); 
+    window.setSelect('f_area',c.area); window.setSelect('f_tienda',a.ubicacion); window.setSelect('f_contractual',c.estado_contractual); window.setSelect('f_estado',a.estado); 
     document.getElementById('f_marca').value=a.marca; document.getElementById('f_modelo').value=a.modelo; document.getElementById('f_serie').value=a.serie; 
     document.getElementById('f_fecha_ent').value=a.fecha_entrega; document.getElementById('f_ent_it').value=a.entrega_it||''; document.getElementById('f_obs').value=a.observaciones||''; 
     const hasCel = (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1);
     const hasSim = (a.imei_sim && a.imei_sim.length > 1);
     document.getElementById('sw_equipo').checked = hasCel; document.getElementById('sw_sim').checked = hasSim; 
     document.getElementById('f_numero').value=a.numero||''; document.getElementById('f_mar_cel').value=a.marca_cel||''; document.getElementById('f_mod_cel').value=a.modelo_cel||''; document.getElementById('f_imei').value=a.imei_cel||''; document.getElementById('f_imsi').value=a.imei_sim||''; 
-    toggleTelefonia(); 
+    window.toggleTelefonia(); 
     document.getElementById('modalFicha').classList.remove('hidden'); 
 }
-async function guardarTodoSincronizado(){ const btn=document.getElementById('btnSave'), rut=document.getElementById('f_rut').value.trim(), serie=document.getElementById('f_serie').value.trim(), nom=document.getElementById('f_nombre').value; if(!rut||!serie) return showToast("Faltan datos","error"); const exist=DB_ACTIVOS.find(a=>a.serie===serie); if(exist&&exist.rut_responsable&&exist.rut_responsable!==rut) return showToast(`Asignado a otro usuario.`,"error"); btn.innerText="PROCESANDO..."; btn.disabled=true; const prev=DB_ACTIVOS.find(a=>a.serie===serie); let acc='Edición', desc=`Actualizado por ${currentUserEmail}`; if(!prev){ acc='Alta'; desc=`Nuevo ingreso. Asignado a: ${nom}`; } else if(prev.rut_responsable!==rut){ const nm=(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Bodega'); acc='Transferencia'; desc=`De ${nm} -> A ${nom}`; } const colab={rut,nombre:nom,correo:document.getElementById('f_correo').value,area:document.getElementById('f_area').value,estado_contractual:document.getElementById('f_contractual').value}; const activo={serie,rut_responsable:rut,marca:document.getElementById('f_marca').value,modelo:document.getElementById('f_modelo').value,estado:document.getElementById('f_estado').value,ubicacion:document.getElementById('f_tienda').value,fecha_entrega:document.getElementById('f_fecha_ent').value,entrega_it:document.getElementById('f_ent_it').value,observaciones:document.getElementById('f_obs').value,numero:document.getElementById('f_numero').value,marca_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mar_cel').value:null,modelo_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mod_cel').value:null,imei_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_imei').value:null,imei_sim:document.getElementById('sw_sim').checked?document.getElementById('f_imsi').value:null}; try{ await sb.from('colaboradores').upsert(colab,{onConflict:'rut'}); await sb.from('activos').upsert(activo,{onConflict:'serie'}); registrarMovimiento(serie,acc,desc); showToast("Guardado"); cerrarFicha(); cargarDatos(); }catch(e){ showToast("Error","error"); } finally{ btn.innerText="GUARDAR"; btn.disabled=false; } }
+window.guardarTodoSincronizado = async function(){ const btn=document.getElementById('btnSave'), rut=document.getElementById('f_rut').value.trim(), serie=document.getElementById('f_serie').value.trim(), nom=document.getElementById('f_nombre').value; if(!rut||!serie) return showToast("Faltan datos","error"); const exist=DB_ACTIVOS.find(a=>a.serie===serie); if(exist&&exist.rut_responsable&&exist.rut_responsable!==rut) return showToast(`Asignado a otro usuario.`,"error"); btn.innerText="PROCESANDO..."; btn.disabled=true; const prev=DB_ACTIVOS.find(a=>a.serie===serie); let acc='Edición', desc=`Actualizado por ${currentUserEmail}`; if(!prev){ acc='Alta'; desc=`Nuevo ingreso. Asignado a: ${nom}`; } else if(prev.rut_responsable!==rut){ const nm=(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Bodega'); acc='Transferencia'; desc=`De ${nm} -> A ${nom}`; } const colab={rut,nombre:nom,correo:document.getElementById('f_correo').value,area:document.getElementById('f_area').value,estado_contractual:document.getElementById('f_contractual').value}; const activo={serie,rut_responsable:rut,marca:document.getElementById('f_marca').value,modelo:document.getElementById('f_modelo').value,estado:document.getElementById('f_estado').value,ubicacion:document.getElementById('f_tienda').value,fecha_entrega:document.getElementById('f_fecha_ent').value,entrega_it:document.getElementById('f_ent_it').value,observaciones:document.getElementById('f_obs').value,numero:document.getElementById('f_numero').value,marca_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mar_cel').value:null,modelo_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mod_cel').value:null,imei_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_imei').value:null,imei_sim:document.getElementById('sw_sim').checked?document.getElementById('f_imsi').value:null}; try{ await sb.from('colaboradores').upsert(colab,{onConflict:'rut'}); await sb.from('activos').upsert(activo,{onConflict:'serie'}); window.registrarMovimiento(serie,acc,desc); showToast("Guardado"); window.cerrarFicha(); window.cargarDatos(); }catch(e){ showToast("Error","error"); } finally{ btn.innerText="GUARDAR"; btn.disabled=false; } }
 
-function verUser(rut){
+window.verUser = function(rut){
     const c = DB_COLABS.find(x => x.rut === rut); if(!c) return;
     const activos = DB_ACTIVOS.filter(x => x.rut_responsable === rut);
-    const html = `<div class="user-header"><div class="user-avatar">${c.nombre.charAt(0)}</div><div><h3 style="margin:0;font-size:20px;">${c.nombre}</h3><p style="color:#64748b;">${c.rut} | ${c.area}</p></div></div><h4 style="color:var(--dominos-blue); margin-bottom:15px;">Equipos Asignados (${activos.length})</h4><ul class="asset-list">${activos.map(a => { let content = ''; if(a.marca && a.marca.length > 1) { content += `<div class="asset-block"><div class="asset-icon-box icon-pc"><i class="fas fa-laptop"></i></div><div class="asset-info"><h5>${a.marca} ${a.modelo}</h5><p>Serie: ${a.serie}</p></div></div>`; } if((a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1)) { content += `<div class="asset-block"><div class="asset-icon-box icon-phone"><i class="fas fa-mobile-alt"></i></div><div class="asset-info"><h5>${a.marca_cel || 'Celular'} ${a.modelo_cel||''}</h5><p>IMEI: ${a.imei_cel || 'N/A'}</p></div></div>`; } if((a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)) { content += `<div class="asset-block"><div class="asset-icon-box icon-sim"><i class="fas fa-sim-card"></i></div><div class="asset-info"><h5>SIM / Chip</h5><p>Nº: ${a.numero || 'N/A'} | IMSI: ${a.imei_sim || 'N/A'}</p></div></div>`; } if(content === '') { content = `<div class="asset-block"><div style="color:#94a3b8; font-style:italic;">Registro sin detalle específico</div><div style="font-size:11px;">S/N: ${a.serie}</div></div>`; } return `<li class="asset-item">${content}<div style="text-align:right; margin-top:5px;">${getStatusBadge(a.estado)}</div></li>`; }).join('')}</ul>`;
+    const html = `<div class="user-header"><div class="user-avatar">${c.nombre.charAt(0)}</div><div><h3 style="margin:0;font-size:20px;">${c.nombre}</h3><p style="color:#64748b;">${c.rut} | ${c.area}</p></div></div><h4 style="color:var(--dominos-blue); margin-bottom:15px;">Equipos Asignados (${activos.length})</h4><ul class="asset-list">${activos.map(a => { let content = ''; if(a.marca && a.marca.length > 1) { content += `<div class="asset-block"><div class="asset-icon-box icon-pc"><i class="fas fa-laptop"></i></div><div class="asset-info"><h5>${a.marca} ${a.modelo}</h5><p>Serie: ${a.serie}</p></div></div>`; } if((a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1)) { content += `<div class="asset-block"><div class="asset-icon-box icon-phone"><i class="fas fa-mobile-alt"></i></div><div class="asset-info"><h5>${a.marca_cel || 'Celular'} ${a.modelo_cel||''}</h5><p>IMEI: ${a.imei_cel || 'N/A'}</p></div></div>`; } if((a.imei_sim && a.imei_sim.length > 1) || (a.numero && a.numero.length > 1)) { content += `<div class="asset-block"><div class="asset-icon-box icon-sim"><i class="fas fa-sim-card"></i></div><div class="asset-info"><h5>SIM / Chip</h5><p>Nº: ${a.numero || 'N/A'} | IMSI: ${a.imei_sim || 'N/A'}</p></div></div>`; } if(content === '') { content = `<div class="asset-block"><div style="color:#94a3b8; font-style:italic;">Registro sin detalle específico</div><div style="font-size:11px;">S/N: ${a.serie}</div></div>`; } return `<li class="asset-item">${content}<div style="text-align:right; margin-top:5px;">${window.getStatusBadge(a.estado)}</div></li>`; }).join('')}</ul>`;
     document.getElementById('userProfileContent').innerHTML = html;
     document.getElementById('modalVerUsuario').classList.remove('hidden');
 }
 
-function procesarCSV(){ const f=document.getElementById('csvFile').files[0]; if(!f) return showToast("Sin archivo","error"); const r=new FileReader(); r.readAsText(f); r.onload=(e)=>{ showToast("Carga CSV iniciada"); cargarDatos(); }; }
-function setSelect(id,v){ const e=document.getElementById(id); if(e) e.value=v; }
-function toggleTelefonia(){ const eq=document.getElementById('sw_equipo').checked, sim=document.getElementById('sw_sim').checked; ['f_mar_cel','f_mod_cel','f_imei'].forEach(id=>{const el=document.getElementById(id);el.disabled=!eq;el.classList.toggle('disabled-field',!eq);if(!eq)el.value=''}); const el=document.getElementById('f_imsi');el.disabled=!sim;el.classList.toggle('disabled-field',!sim);if(!sim)el.value=''; }
-function formatearRut(r){ if(!r) return ''; let v=r.replace(/\./g,'').replace(/-/g,'').toLowerCase().trim(); if(v.length<2) return v; return v.slice(0,-1).replace(/\B(?=(\d{3})+(?!\d))/g,".")+"-"+v.slice(-1); }
-function formatearFechaCSV(s){ if(!s) return null; const p=s.split(/[\/-]/); return (p.length===3&&p[2].length===4)?`${p[2]}-${p[1]}-${p[0]}`:s; }
-function showView(v){ document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='telephony') document.getElementById('btn-phone').classList.add('active'); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); if(v==='audit') document.getElementById('btn-audit').classList.add('active'); }
-function abrirFicha(){ document.getElementById('modalFicha').classList.remove('hidden'); }
-function cerrarFicha(){ document.getElementById('modalFicha').classList.add('hidden'); }
+window.procesarCSV = function(){ const f=document.getElementById('csvFile').files[0]; if(!f) return showToast("Sin archivo","error"); const r=new FileReader(); r.readAsText(f); r.onload=(e)=>{ showToast("Carga CSV iniciada"); window.cargarDatos(); }; }
+window.setSelect = function(id,v){ const e=document.getElementById(id); if(e) e.value=v; }
+window.toggleTelefonia = function(){ const eq=document.getElementById('sw_equipo').checked, sim=document.getElementById('sw_sim').checked; ['f_mar_cel','f_mod_cel','f_imei'].forEach(id=>{const el=document.getElementById(id);el.disabled=!eq;el.classList.toggle('disabled-field',!eq);if(!eq)el.value=''}); const el=document.getElementById('f_imsi');el.disabled=!sim;el.classList.toggle('disabled-field',!sim);if(!sim)el.value=''; }
+window.formatearRut = function(r){ if(!r) return ''; let v=r.replace(/\./g,'').replace(/-/g,'').toLowerCase().trim(); if(v.length<2) return v; return v.slice(0,-1).replace(/\B(?=(\d{3})+(?!\d))/g,".")+"-"+v.slice(-1); }
+window.formatearFechaCSV = function(s){ if(!s) return null; const p=s.split(/[\/-]/); return (p.length===3&&p[2].length===4)?`${p[2]}-${p[1]}-${p[0]}`:s; }
+window.showView = function(v){ document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='telephony') document.getElementById('btn-phone').classList.add('active'); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); if(v==='audit') document.getElementById('btn-audit').classList.add('active'); }
+window.abrirFicha = function(){ document.getElementById('modalFicha').classList.remove('hidden'); }
+window.cerrarFicha = function(){ document.getElementById('modalFicha').classList.add('hidden'); }
 
 initSystem();
 </script>
