@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - TI Maestro v103.0 (Audit Fixed)</title>
+    <title>Dashboard - TI Maestro v104.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -185,7 +185,7 @@
         </button>
 
         <div class="sidebar-footer">
-            <span style="font-size: 10px; color: #94a3b8;">Domino's TI v103.0</span>
+            <span style="font-size: 10px; color: #94a3b8;">Domino's TI v104.0</span>
         </div>
     </aside>
 
@@ -359,7 +359,13 @@
         </div>
     </main>
 
-    <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:var(--dominos-blue); margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div><div class="field"><label>Marca PC</label><input type="text" id="f_marca"></div><div class="field"><label>Modelo PC</label><input type="text" id="f_modelo"></div><div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="window.toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="window.toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero"><div id="err_numero" class="error-msg"></div></div><div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled></div><div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled></div><div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:30px; text-align:right;"><button onclick="window.cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; margin-right:10px; cursor:pointer;">Cancelar</button><button onclick="window.guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--dominos-blue); color:white; font-weight:700; border-radius:8px; cursor:pointer;">GUARDAR</button></div></div></div>
+    <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:var(--dominos-blue); margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div>
+    <div class="field"><label>Marca PC</label><input type="text" id="f_marca" style="text-transform: uppercase;"></div>
+    <div class="field"><label>Modelo PC</label><input type="text" id="f_modelo" style="text-transform: uppercase;"></div>
+    <div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="window.toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="window.toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero"><div id="err_numero" class="error-msg"></div></div>
+    <div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled style="text-transform: uppercase;"></div>
+    <div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled style="text-transform: uppercase;"></div>
+    <div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:30px; text-align:right;"><button onclick="window.cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; margin-right:10px; cursor:pointer;">Cancelar</button><button onclick="window.guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--dominos-blue); color:white; font-weight:700; border-radius:8px; cursor:pointer;">GUARDAR</button></div></div></div>
 
     <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:var(--warning); margin-bottom:15px;">Devolución</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será reasignado.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field"><label>Observaciones</label><textarea id="dev_obs" rows="3"></textarea></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="window.procesarDevolucion()" style="padding:10px 20px; border:none; background:var(--warning); color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
     <div id="modalConfirm" class="modal hidden" style="z-index: 1500;"><div class="modal-content" style="max-width: 400px; text-align: center;"><i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--tile-red); margin-bottom: 20px;"></i><h3>¿Estás seguro?</h3><p>Eliminarás este registro permanentemente.</p><div style="display: flex; justify-content: center; gap: 15px; margin-top:20px;"><button onclick="document.getElementById('modalConfirm').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; cursor:pointer;">Cancelar</button><button id="btnConfirmDelete" style="padding:10px 20px; border:none; background:var(--tile-red); color:white; font-weight:700; border-radius:8px; cursor:pointer;">ELIMINAR</button></div></div></div>
@@ -481,7 +487,6 @@ window.actualizarDashboard = function() {
     window.safeSetText('kpi-baja', baja); window.safeSetText('kpi-pcs', pcs); window.safeSetText('kpi-cels', cels); window.safeSetText('kpi-sims', sims); window.safeSetText('kpi-cesados', ces);
 }
 
-// --- LOGICA DE AUDITORIA Y ACCIONES SEGURAS ---
 window.generarReporteDescuadres = function() {
     let anomalias = [];
     let cesadosCount = 0; let multiPcCount = 0; let orphanCount = 0; let noEqCount = 0;
@@ -501,7 +506,7 @@ window.generarReporteDescuadres = function() {
     Object.keys(activosAsignadosPorRut).forEach(rut => {
         const userAssets = activosAsignadosPorRut[rut];
         const c = DB_COLABS.find(x => x.rut.trim() === rut);
-        const safeRut = rut.replace(/'/g, "\\'"); // Evitar errores JS si el rut tiene comillas
+        const safeRut = rut.replace(/'/g, "\\'"); 
 
         if (!c) {
             orphanCount += userAssets.total.length;
@@ -589,11 +594,10 @@ window.asignarNuevoA = function(rut) {
         const rInput = document.getElementById('f_rut');
         if(rInput) {
             rInput.value = rut;
-            rInput.dispatchEvent(new Event('blur')); // Lanza autocompletado
+            rInput.dispatchEvent(new Event('blur')); 
         }
     }, 150);
 }
-// ----------------------------------------------
 
 window.setupValidationListeners = function() {
     const fields = [ { id: 'f_serie', key: 'serie', errorId: 'err_serie', msg: 'Serie ya existe' }, { id: 'f_numero', key: 'numero', errorId: 'err_numero', msg: 'Número en uso' }, { id: 'f_imei', key: 'imei_cel', errorId: 'err_imei', msg: 'IMEI Equipo en uso' }, { id: 'f_imsi', key: 'imei_sim', errorId: 'err_imsi', msg: 'IMSI/SIM en uso' } ];
@@ -713,8 +717,44 @@ window.registrarMovimiento = async function(s,a,d){ try{ await sb.from('historia
 window.verHistorial = async function(s){ document.getElementById('modalHistorial').classList.remove('hidden'); document.getElementById('historialContent').innerHTML='Cargando...'; const {data}=await sb.from('historial_activos').select('*').eq('serie',s).order('created_at',{ascending:false}); if(!data||!data.length){ document.getElementById('historialContent').innerHTML='<p style="text-align:center;">Sin historial.</p>'; return; } document.getElementById('historialContent').innerHTML=`<ul style="list-style:none; padding:0;">${data.map(h=>`<li style="padding:10px 0; border-bottom:1px solid #f1f5f9;"><div style="font-size:11px; color:#94a3b8;">${new Date(h.created_at).toLocaleString()}</div><div style="font-weight:700; color:var(--dominos-blue); margin:3px 0;">${h.accion}</div><div style="font-size:12px;">${h.descripcion}</div><div style="font-size:10px; color:#94a3b8; margin-top:4px;">Por: ${h.usuario_editor||'Sistema'}</div></li>`).join('')}</ul>`; }
 
 window.verificarDuplicados = function(){ const n={}, e={}, s={}; DB_ACTIVOS.forEach(a=>{ if(a.numero&&a.numero.length>5) n[a.numero]=(n[a.numero]||0)+1; if(a.imei_cel&&a.imei_cel.length>5) e[a.imei_cel]=(e[a.imei_cel]||0)+1; if(a.imei_sim&&a.imei_sim.length>5) s[a.imei_sim]=(s[a.imei_sim]||0)+1; }); const dn=Object.keys(n).filter(k=>n[k]>1), de=Object.keys(e).filter(k=>e[k]>1), ds=Object.keys(s).filter(k=>s[k]>1); let h=''; if(!dn.length&&!de.length&&!ds.length) h='<div style="text-align:center; padding:20px; color:#10b981;"><b>¡Todo limpio!</b></div>'; else { h='<ul style="list-style:none;">'; if(dn.length) h+=`<li><strong>Números Repetidos:</strong> ${dn.join(', ')}</li>`; if(de.length) h+=`<li><strong>IMEIs Repetidos:</strong> ${de.join(', ')}</li>`; if(ds.length) h+=`<li><strong>SIMs Repetidas:</strong> ${ds.join(', ')}</li>`; h+='</ul>'; } document.getElementById('auditContent').innerHTML=h; document.getElementById('modalAudit').classList.remove('hidden'); }
+
+// --- SOLUCION ERROR 409 (CREAR BODEGA ANTES DE DEVOLVER) ---
 window.abrirDevolucion = function(s){ currentSerieDevolucion=s; document.getElementById('dev_serie').innerText=s; document.getElementById('dev_obs').value=''; document.getElementById('modalDevolucion').classList.remove('hidden'); }
-window.procesarDevolucion = async function(){ if(!currentSerieDevolucion) return; const ne=document.getElementById('dev_estado').value, nu=document.getElementById('dev_ubicacion').value, obs=document.getElementById('dev_obs').value; try{ const prev=DB_ACTIVOS.find(a=>a.serie===currentSerieDevolucion); const nm=prev?(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Desconocido'):'Desconocido'; const {error}=await sb.from('activos').update({rut_responsable:'9.999.999-9',estado:ne,ubicacion:nu,observaciones:obs?`DEVOLUCIÓN: ${obs}`:'Devuelto'}).eq('serie',currentSerieDevolucion); if(error) throw error; window.registrarMovimiento(currentSerieDevolucion,'Devolución',`De: ${nm} -> ${nu}`); showToast("Devolución exitosa"); document.getElementById('modalDevolucion').classList.add('hidden'); window.cargarDatos(); }catch(e){ showToast("Error","error"); } }
+window.procesarDevolucion = async function(){ 
+    if(!currentSerieDevolucion) return; 
+    const ne = document.getElementById('dev_estado').value;
+    const nu = document.getElementById('dev_ubicacion').value;
+    const obs = document.getElementById('dev_obs').value; 
+    try { 
+        const prev = DB_ACTIVOS.find(a => a.serie === currentSerieDevolucion); 
+        const nm = prev ? (DB_COLABS.find(c => c.rut === prev.rut_responsable)?.nombre || 'Desconocido') : 'Desconocido'; 
+        
+        await sb.from('colaboradores').upsert({
+            rut: '9.999.999-9',
+            nombre: 'Bodega Central / Informática',
+            correo: 'bodega.ti@dominospizza.cl',
+            area: 'Informática',
+            estado_contractual: 'Vigente'
+        }, { onConflict: 'rut' });
+
+        const {error} = await sb.from('activos').update({
+            rut_responsable: '9.999.999-9',
+            estado: ne,
+            ubicacion: nu,
+            observaciones: obs ? `DEVOLUCIÓN: ${obs}` : 'Devuelto'
+        }).eq('serie', currentSerieDevolucion); 
+        
+        if(error) throw error; 
+        
+        window.registrarMovimiento(currentSerieDevolucion, 'Devolución', `De: ${nm} -> ${nu}`); 
+        showToast("Devolución exitosa"); 
+        document.getElementById('modalDevolucion').classList.add('hidden'); 
+        window.cargarDatos(); 
+    } catch(e) { 
+        console.error(e);
+        showToast("Error al procesar", "error"); 
+    } 
+}
 
 window.prepararEliminar = function(s) { deleteSerieTarget = s; document.getElementById('modalConfirm').classList.remove('hidden'); }
 document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
@@ -753,7 +793,52 @@ window.editar = function(s){
     window.toggleTelefonia(); 
     document.getElementById('modalFicha').classList.remove('hidden'); 
 }
-window.guardarTodoSincronizado = async function(){ const btn=document.getElementById('btnSave'), rut=document.getElementById('f_rut').value.trim(), serie=document.getElementById('f_serie').value.trim(), nom=document.getElementById('f_nombre').value; if(!rut||!serie) return showToast("Faltan datos","error"); const exist=DB_ACTIVOS.find(a=>a.serie===serie); if(exist&&exist.rut_responsable&&exist.rut_responsable!==rut) return showToast(`Asignado a otro usuario.`,"error"); btn.innerText="PROCESANDO..."; btn.disabled=true; const prev=DB_ACTIVOS.find(a=>a.serie===serie); let acc='Edición', desc=`Actualizado por ${currentUserEmail}`; if(!prev){ acc='Alta'; desc=`Nuevo ingreso. Asignado a: ${nom}`; } else if(prev.rut_responsable!==rut){ const nm=(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Bodega'); acc='Transferencia'; desc=`De ${nm} -> A ${nom}`; } const colab={rut,nombre:nom,correo:document.getElementById('f_correo').value,area:document.getElementById('f_area').value,estado_contractual:document.getElementById('f_contractual').value}; const activo={serie,rut_responsable:rut,marca:document.getElementById('f_marca').value,modelo:document.getElementById('f_modelo').value,estado:document.getElementById('f_estado').value,ubicacion:document.getElementById('f_tienda').value,fecha_entrega:document.getElementById('f_fecha_ent').value,entrega_it:document.getElementById('f_ent_it').value,observaciones:document.getElementById('f_obs').value,numero:document.getElementById('f_numero').value,marca_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mar_cel').value:null,modelo_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mod_cel').value:null,imei_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_imei').value:null,imei_sim:document.getElementById('sw_sim').checked?document.getElementById('f_imsi').value:null}; try{ await sb.from('colaboradores').upsert(colab,{onConflict:'rut'}); await sb.from('activos').upsert(activo,{onConflict:'serie'}); window.registrarMovimiento(serie,acc,desc); showToast("Guardado"); window.cerrarFicha(); window.cargarDatos(); }catch(e){ showToast("Error","error"); } finally{ btn.innerText="GUARDAR"; btn.disabled=false; } }
+
+// --- FORZAR MAYUSCULAS AL GUARDAR ---
+window.guardarTodoSincronizado = async function(){ 
+    const btn=document.getElementById('btnSave'), 
+          rut=document.getElementById('f_rut').value.trim(), 
+          serie=document.getElementById('f_serie').value.trim(), 
+          nom=document.getElementById('f_nombre').value; 
+          
+    if(!rut||!serie) return showToast("Faltan datos","error"); 
+    const exist=DB_ACTIVOS.find(a=>a.serie===serie); 
+    if(exist&&exist.rut_responsable&&exist.rut_responsable!==rut) return showToast(`Asignado a otro usuario.`,"error"); 
+    
+    btn.innerText="PROCESANDO..."; btn.disabled=true; 
+    const prev=DB_ACTIVOS.find(a=>a.serie===serie); 
+    let acc='Edición', desc=`Actualizado por ${currentUserEmail}`; 
+    if(!prev){ acc='Alta'; desc=`Nuevo ingreso. Asignado a: ${nom}`; } 
+    else if(prev.rut_responsable!==rut){ const nm=(DB_COLABS.find(c=>c.rut===prev.rut_responsable)?.nombre||'Bodega'); acc='Transferencia'; desc=`De ${nm} -> A ${nom}`; } 
+    
+    const colab={rut,nombre:nom,correo:document.getElementById('f_correo').value,area:document.getElementById('f_area').value,estado_contractual:document.getElementById('f_contractual').value}; 
+    
+    const activo={
+        serie,
+        rut_responsable:rut,
+        marca:document.getElementById('f_marca').value.toUpperCase(),
+        modelo:document.getElementById('f_modelo').value.toUpperCase(),
+        estado:document.getElementById('f_estado').value,
+        ubicacion:document.getElementById('f_tienda').value,
+        fecha_entrega:document.getElementById('f_fecha_ent').value,
+        entrega_it:document.getElementById('f_ent_it').value,
+        observaciones:document.getElementById('f_obs').value,
+        numero:document.getElementById('f_numero').value,
+        marca_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mar_cel').value.toUpperCase():null,
+        modelo_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_mod_cel').value.toUpperCase():null,
+        imei_cel:document.getElementById('sw_equipo').checked?document.getElementById('f_imei').value:null,
+        imei_sim:document.getElementById('sw_sim').checked?document.getElementById('f_imsi').value:null
+    }; 
+    
+    try{ 
+        await sb.from('colaboradores').upsert(colab,{onConflict:'rut'}); 
+        await sb.from('activos').upsert(activo,{onConflict:'serie'}); 
+        window.registrarMovimiento(serie,acc,desc); 
+        showToast("Guardado"); 
+        window.cerrarFicha(); 
+        window.cargarDatos(); 
+    }catch(e){ showToast("Error","error"); } finally{ btn.innerText="GUARDAR"; btn.disabled=false; } 
+}
 
 window.verUser = function(rut){
     const c = DB_COLABS.find(x => x.rut === rut); if(!c) return;
