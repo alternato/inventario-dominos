@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
+// En producción usamos ruta relativa (/api) para que Nginx haga el proxy al backend.
+// En desarrollo usamos localhost:8081 directamente.
+const API_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? '/api' : 'http://localhost:8081/api');
 
 const apiClient = axios.create({
   baseURL: API_URL,
