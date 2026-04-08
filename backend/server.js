@@ -52,6 +52,15 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Deshabilitar caché del navegador para todas las rutas de API
+// Esto evita que el browser retorne 304 con datos obsoletos tras un DELETE/POST/PUT
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 // Middleware de autenticación
 const authenticate = (req, res, next) => {
   try {
