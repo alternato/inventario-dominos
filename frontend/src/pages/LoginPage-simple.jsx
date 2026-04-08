@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../api';
 import { getMsalInstance } from '../msalInstance';
 import { loginRequest } from '../authConfig';
+import { useAuthStore } from '../store/authStore';
 
 // Teclado numérico en pantalla
 const NumericKeypad = ({ onPress, onDelete, onClear }) => {
@@ -65,6 +66,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { setUsuario } = useAuthStore();
 
   const PIN_MAX = 6;
 
@@ -85,6 +87,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
           const { usuario } = res.data;
 
           localStorage.setItem('usuario', JSON.stringify(usuario));
+          setUsuario(usuario); // 👈 Sincronizar Zustand store
           if (onLoginSuccess) onLoginSuccess();
           navigate('/');
         }
@@ -130,6 +133,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
       const response = await authAPI.pinLogin(fullPin);
       const { usuario } = response.data;
       localStorage.setItem('usuario', JSON.stringify(usuario));
+      setUsuario(usuario); // 👈 Sincronizar Zustand store
       if (onLoginSuccess) onLoginSuccess();
       navigate('/');
     } catch (err) {
@@ -173,6 +177,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
       const response = await authAPI.login(email, password);
       const { usuario } = response.data;
       localStorage.setItem('usuario', JSON.stringify(usuario));
+      setUsuario(usuario); // 👈 Sincronizar Zustand store
       if (onLoginSuccess) onLoginSuccess();
       navigate('/');
     } catch (err) {
