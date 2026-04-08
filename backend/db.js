@@ -222,7 +222,15 @@ const deleteActivo = async (serie, usuarioId = null) => {
   // Guardar snapshot antes de borrar para el historial
   const activo = await getActivoBySerie(serie);
 
-  await query('DELETE FROM activos WHERE serie = $1', [serie]);
+  console.log(`[deleteActivo] Intentando borrar serie="${serie}" | Encontrado en BD: ${!!activo}`);
+
+  const result = await query('DELETE FROM activos WHERE serie = $1', [serie]);
+
+  console.log(`[deleteActivo] Filas eliminadas: ${result.rowCount}`);
+
+  if (result.rowCount === 0) {
+    throw new Error(`No se encontró activo con serie: "${serie}" (0 filas eliminadas)`);
+  }
 
   // Registrar baja en historial (persiste aunque el activo ya no exista)
   if (activo) {
@@ -234,7 +242,7 @@ const deleteActivo = async (serie, usuarioId = null) => {
       estado_nuevo: 'Baja',
       tipo_movimiento: 'baja',
       usuario_id: usuarioId,
-      observaciones: `Activo dado de baja: ${activo.marca} ${activo.modelo}`,
+      notas: `Activo dado de baja: ${activo.marca} ${activo.modelo}`,
     });
   }
 };
