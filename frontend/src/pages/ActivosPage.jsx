@@ -30,8 +30,14 @@ export const ActivosPage = () => {
   });
 
   const handleEliminar = async (serie) => {
-    if (confirm(`¿Eliminar activo ${serie}?`)) {
-      await eliminarActivo(serie);
+    if (confirm(`¿Eliminar activo ${serie}? Esta acción no se puede deshacer.`)) {
+      const result = await eliminarActivo(serie);
+      if (!result.ok) {
+        alert(`Error al eliminar: ${result.error || 'Error desconocido'}`);
+      } else {
+        // Re-fetch para confirmar que la BD también eliminó el activo
+        await cargarActivos();
+      }
     }
   };
 
