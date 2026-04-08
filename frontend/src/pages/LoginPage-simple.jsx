@@ -72,9 +72,10 @@ export const LoginPage = ({ onLoginSuccess }) => {
   useEffect(() => {
     const handleRedirect = async () => {
       try {
+        if (typeof getMsalInstance !== 'function') return; // Seguridad si MSAL no cargó
         const instance = await getMsalInstance();
         const response = await instance.handleRedirectPromise();
-        
+
         if (response && response.account) {
           setLoading(true);
           const email = response.account.username.toLowerCase();
@@ -102,6 +103,10 @@ export const LoginPage = ({ onLoginSuccess }) => {
     setError('');
     setLoading(true);
     try {
+      if (typeof getMsalInstance !== 'function') {
+        setError('SSO no disponible. Recarga la página.');
+        return;
+      }
       const instance = await getMsalInstance();
       await instance.loginRedirect(loginRequest);
     } catch (err) {
