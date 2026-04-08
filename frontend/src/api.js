@@ -42,11 +42,11 @@ export const authAPI = {
 // ─── ACTIVOS ────────────────────────────────────────────────
 export const activosAPI = {
   listar:     ()           => apiClient.get('/activos'),
-  obtener:    (serie)      => apiClient.get(`/activos/${serie}`),
+  obtener:    (serie)      => apiClient.get(`/activos/${encodeURIComponent(serie)}`),
   crear:      (data)       => apiClient.post('/activos', data),
-  actualizar: (serie, data)=> apiClient.put(`/activos/${serie}`, data),
-  eliminar:   (serie)      => apiClient.delete(`/activos/${serie}`),
-  historial:  (serie)      => apiClient.get(`/activos/${serie}/historial`),
+  actualizar: (serie, data)=> apiClient.put(`/activos/${encodeURIComponent(serie)}`, data),
+  eliminar:   (serie)      => apiClient.delete(`/activos/${encodeURIComponent(serie)}`),
+  historial:  (serie)      => apiClient.get(`/activos/${encodeURIComponent(serie)}/historial`),
 };
 
 // ─── COLABORADORES ──────────────────────────────────────────
