@@ -1,17 +1,24 @@
 const { z } = require('zod');
 
+// Helper: política de contraseñas robusta (M5)
+const passwordSchema = z.string()
+  .min(8, 'Contraseña debe tener mínimo 8 caracteres')
+  .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
+  .regex(/[0-9]/, 'Debe contener al menos un número')
+  .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial');
+
 // ─── Auth ────────────────────────────────────────────────────
 const loginSchema = z.object({
   email: z.string().email('Email inválido').refine(
     (email) => email.endsWith('@dominospizza.cl'),
     'Solo emails corporativos @dominospizza.cl permitidos'
   ),
-  password: z.string().min(6, 'Contraseña debe tener mínimo 6 caracteres')
+  password: passwordSchema
 });
 
 const resetPasswordSchema = z.object({
   token: z.string(),
-  newPassword: z.string().min(6, 'Contraseña debe tener mínimo 6 caracteres')
+  newPassword: passwordSchema
 });
 
 // ─── Activos ─────────────────────────────────────────────────
@@ -58,7 +65,7 @@ const createUsuarioSchema = z.object({
     'Solo emails corporativos @dominospizza.cl'
   ),
   nombre:   z.string().min(1, 'Nombre requerido'),
-  password: z.string().min(6, 'Contraseña mínimo 6 caracteres'),
+  password: passwordSchema,
   rol:      z.enum(['admin', 'viewer', 'superadministrador']),
 });
 
@@ -67,7 +74,7 @@ const updateUsuarioSchema = z.object({
   email:    z.string().email().optional(),
   rol:      z.enum(['admin', 'viewer', 'superadministrador']).optional(),
   activo:   z.boolean().optional(),
-  password: z.string().min(6).optional(),
+  password: passwordSchema.optional(),
 });
 
 // ─── Middleware helper ───────────────────────────────────────

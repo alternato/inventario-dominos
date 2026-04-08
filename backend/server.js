@@ -97,9 +97,9 @@ const requireSuperAdmin = (req, res, next) => {
 // ===== RUTAS DE AUTENTICACIÓN =====
 
 // Login
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   try {
-    const { email, password } = schemas.loginSchema.parse(req.body);
+    const { email, password } = loginSchema.parse(req.body);
     
     const usuario = await db.getUsuarioByEmail(email);
     if (!usuario) {
@@ -310,27 +310,10 @@ app.post('/api/usuarios/:id/set-pin', authenticate, requireSuperAdmin, async (re
   }
 });
 
-// Logout
-app.post('/api/auth/logout', (req, res) => {
-  res.clearCookie('authToken', { path: '/' });
-  res.json({ message: 'Logout exitoso' });
-});
+// [ELIMINADO] Rutas duplicadas de logout y verify (A3)
 
-// Verificar autenticación
-app.get('/api/auth/verify', authenticate, (req, res) => {
-  res.json({
-    authenticated: true,
-    usuario: {
-      id: req.user.id,
-      email: req.user.email,
-      nombre: req.user.nombre,
-      rol: req.user.rol
-    }
-  });
-});
-
-// Forgot Password
-app.post('/api/auth/forgot-password', async (req, res) => {
+// Forgot Password (con rate limiter — A4)
+app.post('/api/auth/forgot-password', loginLimiter, async (req, res) => {
   try {
     const { email } = req.body;
     
@@ -355,8 +338,8 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   }
 });
 
-// Reset Password
-app.post('/api/auth/reset-password', async (req, res) => {
+// Reset Password (con rate limiter — A4)
+app.post('/api/auth/reset-password', loginLimiter, async (req, res) => {
   try {
     const { token, newPassword } = req.body;
     
@@ -596,8 +579,8 @@ app.get('/health', (req, res) => {
 
 // ===== ERROR HANDLING =====
 
-// ===== EXPORT TEMPORAL (borrar tras migrar) =====
-app.get('/api/export-sql', async (req, res) => {
+// ===== EXPORT TEMPORAL (protegido — C2) =====
+app.get('/api/export-sql', authenticate, requireSuperAdmin, async (req, res) => {
   const escape = (val) => {
     if (val === null || val === undefined) return 'NULL';
     if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE';

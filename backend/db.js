@@ -304,7 +304,21 @@ const updateColaborador = async (rut, colaboradorData) => {
   return rows[0];
 };
 
-const deleteColaborador = async (rut) => {
+const deleteColaborador = async (rut, usuarioId = null) => {
+  // M3: Registrar desasignación de todos los activos antes de eliminar
+  const activos = await getActivosByColaborador(rut);
+  for (const activo of activos) {
+    await registrarHistorial({
+      serie: activo.serie,
+      rut_anterior: rut,
+      rut_nuevo: null,
+      estado_anterior: activo.estado,
+      estado_nuevo: activo.estado,
+      tipo_movimiento: 'devolucion',
+      usuario_id: usuarioId,
+      notas: `Desasignación automática por eliminación de colaborador`,
+    });
+  }
   await query('DELETE FROM colaboradores WHERE rut = $1', [rut]);
 };
 
