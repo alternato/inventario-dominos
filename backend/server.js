@@ -1,25 +1,61 @@
-    require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 
 const db = require('./db');
 const mail = require('./mail');
-const schemas = require('./schemas');
+const {
+  loginSchema, resetPasswordSchema,
+  createActivoSchema, updateActivoSchema,
+  createColaboradorSchema, updateColaboradorSchema,
+  createUsuarioSchema, updateUsuarioSchema,
+  validate,
+} = require('./schemas');
+const { verifyMsToken } = require('./msValidator');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
+
+// Confiar en el proxy reverso (Nginx/Apache) — arregla req.ip, cookies secure y rate limiting
+app.set('trust proxy', 1);
+
+// ===== RATE LIMITERS =====
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiados intentos. Espera 15 minutos.' },
+});
+
+const pinLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minuto
+  max: 5,
+  message: { error: 'Demasiados intentos de PIN. Espera 1 minuto.' },
+});
 
 // ===== MIDDLEWARE =====
-app.use(cors());
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
+app.use(cookieParser());
 
 // Middleware de autenticación
 const authenticate = (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.cookies.authToken || req.headers.authorization?.split(' ')[1];
     
     if (!token) {
       return res.status(401).json({ error: 'Token requerido' });
@@ -35,8 +71,16 @@ const authenticate = (req, res, next) => {
 
 // Middleware para verificar rol admin
 const requireAdmin = (req, res, next) => {
-  if (req.user.rol !== 'admin') {
-    return res.status(403).json({ error: 'Permisos insuficientes. Se requiere rol admin' });
+  if (req.user.rol !== 'admin' && req.user.rol !== 'superadministrador') {
+    return res.status(403).json({ error: 'Permisos insuficientes. Se requiere rol admin o superadministrador' });
+  }
+  next();
+};
+
+// Middleware para verificar rol superadministrador
+const requireSuperAdmin = (req, res, next) => {
+  if (req.user.rol !== 'superadministrador') {
+    return res.status(403).json({ error: 'Permisos insuficientes. Se requiere rol superadministrador' });
   }
   next();
 };
@@ -73,9 +117,17 @@ app.post('/api/auth/login', async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
     );
     
+    // Guardar token en httpOnly cookie
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 8 * 60 * 60 * 1000,
+      path: '/'
+    });
+    
     res.json({
       message: 'Login exitoso',
-      token,
       usuario: {
         id: usuario.id,
         email: usuario.email,
@@ -84,11 +136,188 @@ app.post('/api/auth/login', async (req, res) => {
       }
     });
   } catch (error) {
-    if (error instanceof schemas.z.ZodError) {
-      return res.status(400).json({ error: error.errors[0].message });
+    // Manejo simple de errores
+    if (error.name === 'ZodError') {
+      return res.status(400).json({ error: 'Datos inválidos' });
     }
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al procesar login' });
   }
+});
+
+// SSO Login (Microsoft Entra ID)
+app.post('/api/auth/sso-login', loginLimiter, async (req, res) => {
+  try {
+    const { email, msToken } = req.body;
+
+    if (!email || !msToken) {
+      return res.status(400).json({ error: 'Email y token de Microsoft requeridos' });
+    }
+
+    // Validar criptográficamente el id_token contra las JWKs de Azure
+    let payload;
+    try {
+      payload = await verifyMsToken(msToken);
+    } catch (verifyErr) {
+      console.error('SSO token inválido:', verifyErr.message);
+      return res.status(401).json({ error: 'Token de Microsoft inválido o expirado' });
+    }
+
+    // El email validado proviene del token, no del body (previene impersonación)
+    const emailVerificado = (payload.preferred_username || payload.email || '').toLowerCase();
+    if (emailVerificado !== email.toLowerCase()) {
+      return res.status(401).json({ error: 'Email no coincide con el token de Microsoft' });
+    }
+    if (!emailVerificado.endsWith('@dominospizza.cl')) {
+      return res.status(403).json({ error: 'Solo correos @dominospizza.cl permitidos' });
+    }
+
+    // Auto-provisioning: si el usuario no existe, crearlo como 'viewer'
+    let usuario = await db.getUsuarioByEmail(emailVerificado);
+    if (!usuario) {
+      // El nombre viene del token de Azure AD (campo 'name' o 'given_name')
+      const nombreAzure = payload.name || payload.given_name || emailVerificado.split('@')[0];
+      console.log(`[SSO] Auto-provisioning nuevo usuario: ${emailVerificado} (${nombreAzure})`);
+      usuario = await db.createUsuario({
+        email: emailVerificado,
+        nombre: nombreAzure,
+        password: require('crypto').randomBytes(32).toString('hex'), // Contraseña aleatoria (no usable sin SSO)
+        rol: 'viewer'
+      });
+    }
+
+    if (!usuario.activo) {
+      return res.status(401).json({ error: 'Usuario inactivo. Contacta a administrador' });
+    }
+
+    // Sincronizar nombre desde Azure AD en cada login (por si cambió en el directorio)
+    const nombreActualizado = payload.name || payload.given_name || usuario.nombre;
+    if (nombreActualizado && nombreActualizado !== usuario.nombre) {
+      await db.query(
+        'UPDATE usuarios SET nombre = $1, updated_at = NOW() WHERE id = $2',
+        [nombreActualizado, usuario.id]
+      );
+      usuario.nombre = nombreActualizado;
+    }
+
+    // Si Entra ID ya lo validó, emitimos el token
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        email: usuario.email,
+        nombre: usuario.nombre,
+        rol: usuario.rol
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
+    );
+
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 8 * 60 * 60 * 1000,
+      path: '/'
+    });
+
+    res.json({
+      message: 'SSO Login exitoso',
+      usuario: {
+        id: usuario.id,
+        email: usuario.email,
+        nombre: usuario.nombre,
+        rol: usuario.rol
+      }
+    });
+  } catch (error) {
+    console.error('SSO Error:', error);
+    res.status(500).json({ error: 'Error al procesar SSO login' });
+  }
+});
+
+// PIN Login
+app.post('/api/auth/pin-login', pinLimiter, async (req, res) => {
+  try {
+    const { pin } = req.body;
+    if (!pin || pin.length < 4) {
+      return res.status(400).json({ error: 'PIN debe tener al menos 4 dígitos' });
+    }
+    const usuario = await db.getUsuarioByPin(pin);
+    if (!usuario) {
+      return res.status(401).json({ error: 'PIN incorrecto' });
+    }
+    if (!usuario.activo) {
+      return res.status(401).json({ error: 'Usuario inactivo' });
+    }
+    const token = jwt.sign(
+      { id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+    res.cookie('authToken', token, {
+      httpOnly: true, secure: true,
+      sameSite: 'strict', maxAge: 8 * 60 * 60 * 1000, path: '/'
+    });
+    res.json({
+      message: 'Login por PIN exitoso',
+      usuario: { id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol }
+    });
+  } catch (error) {
+    console.error('PIN Login Error:', error);
+    res.status(500).json({ error: 'Error al procesar PIN login' });
+  }
+});
+// Verificar sesión activa
+app.get('/api/auth/verify', authenticate, (req, res) => {
+  res.json({ usuario: req.user });
+});
+
+// Logout
+app.post('/api/auth/logout', (req, res) => {
+  res.clearCookie('authToken', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    path: '/'
+  });
+  res.json({ message: 'Sesión cerrada' });
+});
+
+// Asignar PIN a usuario (solo superadmin)
+app.post('/api/usuarios/:id/set-pin', authenticate, requireSuperAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { pin } = req.body;
+    // Si pin es null, se elimina el PIN del usuario
+    if (pin !== null && pin !== undefined && !/^\d{4,8}$/.test(pin)) {
+      return res.status(400).json({ error: 'El PIN debe ser numérico y tener entre 4 y 8 dígitos' });
+    }
+    const usuario = await db.setUsuarioPin(parseInt(id), pin);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    res.json({ message: 'PIN configurado exitosamente', usuario });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al configurar PIN' });
+  }
+});
+
+// Logout
+app.post('/api/auth/logout', (req, res) => {
+  res.clearCookie('authToken', { path: '/' });
+  res.json({ message: 'Logout exitoso' });
+});
+
+// Verificar autenticación
+app.get('/api/auth/verify', authenticate, (req, res) => {
+  res.json({
+    authenticated: true,
+    usuario: {
+      id: req.user.id,
+      email: req.user.email,
+      nombre: req.user.nombre,
+      rol: req.user.rol
+    }
+  });
 });
 
 // Forgot Password
@@ -105,23 +334,26 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       return res.json({ message: 'Si el email existe, recibirás instrucciones de recuperación' });
     }
     
-    // Generar token de reset
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
     
     await db.updatePasswordReset(email, resetToken, expiresAt);
     await mail.sendPasswordResetEmail(email, resetToken, usuario.nombre);
     
     res.json({ message: 'Instrucciones de recuperación enviadas al email' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al procesar solicitud' });
   }
 });
 
 // Reset Password
 app.post('/api/auth/reset-password', async (req, res) => {
   try {
-    const { token, newPassword } = schemas.resetPasswordSchema.parse(req.body);
+    const { token, newPassword } = req.body;
+    
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Token y contraseña requeridos' });
+    }
     
     const usuario = await db.resetPassword(token, newPassword);
     
@@ -131,236 +363,284 @@ app.post('/api/auth/reset-password', async (req, res) => {
     
     res.json({ message: 'Contraseña actualizada exitosamente' });
   } catch (error) {
-    if (error instanceof schemas.z.ZodError) {
-      return res.status(400).json({ error: error.errors[0].message });
-    }
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al resetear contraseña' });
   }
 });
 
 // ===== RUTAS DE ACTIVOS =====
 
-// GET activos (requiere autenticación)
 app.get('/api/activos', authenticate, async (req, res) => {
   try {
     const activos = await db.getActivos();
     res.json(activos);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener activos' });
   }
 });
 
-// POST crear activo (admin)
-app.post('/api/activos', authenticate, requireAdmin, async (req, res) => {
-  try {
-    const activoData = schemas.createActivoSchema.parse(req.body);
-    
-    // Verificar que serie no exista
-    const existe = await db.getActivoBySerie(activoData.serie);
-    if (existe) {
-      return res.status(400).json({ error: 'Activo con esta serie ya existe' });
-    }
-    
-    const activo = await db.createActivo(activoData);
-    res.status(201).json({ message: 'Activo creado exitosamente', data: activo });
-  } catch (error) {
-    if (error instanceof schemas.z.ZodError) {
-      return res.status(400).json({ error: error.errors[0].message });
-    }
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// PUT actualizar activo (admin)
-app.put('/api/activos/:serie', authenticate, requireAdmin, async (req, res) => {
+app.get('/api/activos/:serie', authenticate, async (req, res) => {
   try {
     const { serie } = req.params;
-    const activoData = schemas.createActivoSchema.partial().parse(req.body);
-    
-    const activo = await db.updateActivo(serie, activoData);
+    const activo = await db.getActivoBySerie(serie);
     
     if (!activo) {
       return res.status(404).json({ error: 'Activo no encontrado' });
     }
     
-    res.json({ message: 'Activo actualizado exitosamente', data: activo });
+    res.json(activo);
   } catch (error) {
-    if (error instanceof schemas.z.ZodError) {
-      return res.status(400).json({ error: error.errors[0].message });
-    }
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener activo' });
   }
 });
 
-// DELETE eliminar activo (admin)
+app.post('/api/activos', authenticate, validate(createActivoSchema), async (req, res) => {
+  try {
+    const activo = await db.createActivo(req.body, req.user.id);
+    res.status(201).json(activo);
+  } catch (error) {
+    console.error('createActivo:', error);
+    if (error.code === '23505') return res.status(409).json({ error: 'Ya existe un activo con esa serie' });
+    res.status(500).json({ error: 'Error al crear activo' });
+  }
+});
+
+app.put('/api/activos/:serie', authenticate, validate(updateActivoSchema), async (req, res) => {
+  try {
+    const { serie } = req.params;
+    const activo = await db.updateActivo(serie, req.body, req.user.id);
+    res.json(activo);
+  } catch (error) {
+    console.error('updateActivo:', error);
+    res.status(500).json({ error: 'Error al actualizar activo' });
+  }
+});
+
+
 app.delete('/api/activos/:serie', authenticate, requireAdmin, async (req, res) => {
   try {
     const { serie } = req.params;
-    
-    await db.deleteActivo(serie);
-    res.json({ message: 'Activo eliminado exitosamente' });
+    await db.deleteActivo(serie, req.user.id);
+    res.json({ message: 'Activo eliminado' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('deleteActivo:', error);
+    res.status(500).json({ error: 'Error al eliminar activo' });
   }
 });
 
 // ===== RUTAS DE COLABORADORES =====
 
-// GET colaboradores (requiere autenticación)
 app.get('/api/colaboradores', authenticate, async (req, res) => {
   try {
     const colaboradores = await db.getColaboradores();
     res.json(colaboradores);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener colaboradores' });
   }
 });
 
-// POST crear colaborador (admin)
-app.post('/api/colaboradores', authenticate, requireAdmin, async (req, res) => {
-  try {
-    const colaboradorData = schemas.createColaboradorSchema.parse(req.body);
-    
-    // Verificar que RUT no exista
-    const existe = await db.getColaboradorByRut(colaboradorData.rut);
-    if (existe) {
-      return res.status(400).json({ error: 'Colaborador con este RUT ya existe' });
-    }
-    
-    const colaborador = await db.createColaborador(colaboradorData);
-    res.status(201).json({ message: 'Colaborador creado exitosamente', data: colaborador });
-  } catch (error) {
-    if (error instanceof schemas.z.ZodError) {
-      return res.status(400).json({ error: error.errors[0].message });
-    }
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// PUT actualizar colaborador (admin)
-app.put('/api/colaboradores/:rut', authenticate, requireAdmin, async (req, res) => {
+app.get('/api/colaboradores/:rut', authenticate, async (req, res) => {
   try {
     const { rut } = req.params;
-    const colaboradorData = schemas.createColaboradorSchema.partial().parse(req.body);
-    
-    const colaborador = await db.updateColaborador(rut, colaboradorData);
+    const colaborador = await db.getColaboradorByRut(rut);
     
     if (!colaborador) {
       return res.status(404).json({ error: 'Colaborador no encontrado' });
     }
     
-    res.json({ message: 'Colaborador actualizado exitosamente', data: colaborador });
+    res.json(colaborador);
   } catch (error) {
-    if (error instanceof schemas.z.ZodError) {
-      return res.status(400).json({ error: error.errors[0].message });
-    }
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener colaborador' });
   }
 });
 
-// ===== RUTAS DE USUARIOS (ADMIN) =====
-
-// GET usuarios (solo admin)
-app.get('/api/usuarios', authenticate, requireAdmin, async (req, res) => {
+app.post('/api/colaboradores', authenticate, validate(createColaboradorSchema), async (req, res) => {
   try {
-    const { data, error } = await db.supabase
-      .from('usuarios')
-      .select('id, email, nombre, rol, activo, created_at')
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    res.json(data);
+    const colaborador = await db.createColaborador(req.body);
+    res.status(201).json(colaborador);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('createColaborador:', error);
+    if (error.code === '23505') return res.status(409).json({ error: 'Ya existe un colaborador con ese RUT' });
+    res.status(500).json({ error: 'Error al crear colaborador' });
   }
 });
 
-// POST crear usuario (solo admin)
-app.post('/api/usuarios', authenticate, requireAdmin, async (req, res) => {
+app.put('/api/colaboradores/:rut', authenticate, validate(updateColaboradorSchema), async (req, res) => {
   try {
-    const userData = schemas.createUsuarioSchema.parse(req.body);
-    
-    // Verificar que email no exista
-    const existe = await db.getUsuarioByEmail(userData.email);
-    if (existe) {
-      return res.status(400).json({ error: 'Email ya registrado' });
-    }
-    
-    const usuario = await db.createUsuario(
-      userData.email,
-      userData.nombre,
-      userData.password,
-      userData.rol
-    );
-    
-    res.status(201).json({
-      message: 'Usuario creado exitosamente',
-      data: {
-        id: usuario.id,
-        email: usuario.email,
-        nombre: usuario.nombre,
-        rol: usuario.rol
-      }
-    });
+    const { rut } = req.params;
+    const colaborador = await db.updateColaborador(rut, req.body);
+    res.json(colaborador);
   } catch (error) {
-    if (error instanceof schemas.z.ZodError) {
-      return res.status(400).json({ error: error.errors[0].message });
-    }
-    res.status(500).json({ error: error.message });
+    console.error('updateColaborador:', error);
+    res.status(500).json({ error: 'Error al actualizar colaborador' });
   }
 });
 
-// ===== RUTAS DE SALUD =====
+app.delete('/api/colaboradores/:rut', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { rut } = req.params;
+    await db.deleteColaborador(rut);
+    res.json({ message: 'Colaborador eliminado' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar colaborador' });
+  }
+});
+
+app.get('/api/colaboradores/:rut/activos', authenticate, async (req, res) => {
+  try {
+    const { rut } = req.params;
+    const activos = await db.getActivosByColaborador(rut);
+    res.json(activos);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener activos del colaborador' });
+  }
+});
+
+// ===== RUTAS DE USUARIOS (SUPERADMIN ONLY) =====
+
+app.get('/api/usuarios', authenticate, requireSuperAdmin, async (req, res) => {
+  try {
+    const usuarios = await db.getUsuarios();
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener usuarios' });
+  }
+});
+
+app.post('/api/usuarios', authenticate, requireSuperAdmin, validate(createUsuarioSchema), async (req, res) => {
+  try {
+    const usuario = await db.createUsuario(req.body);
+    res.status(201).json(usuario);
+  } catch (error) {
+    console.error('createUsuario:', error);
+    if (error.code === '23505') return res.status(409).json({ error: 'Ya existe un usuario con ese email' });
+    res.status(500).json({ error: 'Error al crear usuario' });
+  }
+});
+
+app.put('/api/usuarios/:id', authenticate, requireSuperAdmin, validate(updateUsuarioSchema), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuario = await db.updateUsuario(parseInt(id), req.body);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    res.json(usuario);
+  } catch (error) {
+    console.error('updateUsuario:', error);
+    res.status(500).json({ error: 'Error al actualizar usuario' });
+  }
+});
+
+// ===== HISTORIAL / TRAZABILIDAD =====
+
+app.get('/api/historial', authenticate, async (req, res) => {
+  try {
+    const { serie, rut, desde, hasta, limit } = req.query;
+    const historial = await db.getHistorial({ serie, rut, desde, hasta, limit: limit ? parseInt(limit) : 100 });
+    res.json(historial);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener historial' });
+  }
+});
+
+app.get('/api/activos/:serie/historial', authenticate, async (req, res) => {
+  try {
+    const { serie } = req.params;
+    const historial = await db.getHistorial({ serie });
+    res.json(historial);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener historial del activo' });
+  }
+});
+
+// ===== BÚSQUEDA GLOBAL =====
+
+app.get('/api/buscar', authenticate, async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim().length < 2) {
+      return res.status(400).json({ error: 'El término de búsqueda debe tener al menos 2 caracteres' });
+    }
+    const resultados = await db.buscarGlobal(q.trim());
+    res.json(resultados);
+  } catch (error) {
+    res.status(500).json({ error: 'Error en búsqueda' });
+  }
+});
+
+// ===== KPIs PARA DASHBOARD =====
+
+app.get('/api/kpis', authenticate, async (req, res) => {
+  try {
+    const kpis = await db.getKPIs();
+    res.json(kpis);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener KPIs' });
+  }
+});
+
+// ===== HEALTH CHECK =====
 
 app.get('/health', (req, res) => {
-  res.json({
-    status: 'Backend ejecutándose correctamente ✓',
-    timestamp: new Date(),
-    version: '1.0.0'
-  });
+  res.json({ status: 'ok' });
 });
 
-// ===== MANEJO DE ERRORES =====
+// ===== ERROR HANDLING =====
+
+// ===== EXPORT TEMPORAL (borrar tras migrar) =====
+app.get('/api/export-sql', async (req, res) => {
+  const escape = (val) => {
+    if (val === null || val === undefined) return 'NULL';
+    if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE';
+    if (typeof val === 'number') return val;
+    if (val instanceof Date) return `'${val.toISOString()}'`;
+    return `'${String(val).replace(/'/g, "''")}'`;
+  };
+  try {
+    let sql = `-- BACKUP IT COMPASS ${new Date().toISOString()}\nSET session_replication_role = replica;\n\n`;
+    for (const table of ['usuarios','colaboradores','activos','historial_activos']) {
+      const { rows } = await db.pool.query(`SELECT * FROM ${table} ORDER BY id`);
+      if (rows.length > 0) {
+        const cols = Object.keys(rows[0]).join(', ');
+        sql += `-- ${table} (${rows.length} registros)\n`;
+        sql += rows.map(r => `INSERT INTO ${table} (${cols}) VALUES (${Object.values(r).map(escape).join(', ')}) ON CONFLICT DO NOTHING;`).join('\n');
+        sql += '\n\n';
+      }
+    }
+    sql += 'SET session_replication_role = DEFAULT;\n';
+    res.setHeader('Content-Disposition', 'attachment; filename="backup_inventario.sql"');
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(sql);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: 'Error interno del servidor' });
+  console.error('Error:', err);
+  
+  const message = process.env.NODE_ENV === 'production' 
+    ? 'Error interno del servidor'
+    : err.message;
+  
+  const status = err.status || 500;
+  
+  res.status(status).json({ 
+    error: message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+  });
 });
 
 // ===== INICIAR SERVIDOR =====
 
 app.listen(PORT, () => {
-  console.log(`
-  ╔═══════════════════════════════════════════════════════════╗
-  ║                                                           ║
-  ║  🚀 Inventario TI Domino's - Backend                      ║
-  ║  ✓ Servidor ejecutándose en puerto ${PORT}                  ║
-  ║  ✓ Base de datos: Supabase PostgreSQL                    ║
-  ║  ✓ Autenticación: JWT con login corporativo              ║
-  ║                                                           ║
-  ║  Endpoints disponibles:                                   ║
-  ║  POST   /api/auth/login                                   ║
-  ║  POST   /api/auth/forgot-password                         ║
-  ║  POST   /api/auth/reset-password                          ║
-  ║  GET    /api/activos                                      ║
-  ║  POST   /api/activos (admin)                              ║
-  ║  PUT    /api/activos/:serie (admin)                       ║
-  ║  DELETE /api/activos/:serie (admin)                       ║
-  ║  GET    /api/colaboradores                                ║
-  ║  POST   /api/colaboradores (admin)                        ║
-  ║  PUT    /api/colaboradores/:rut (admin)                   ║
-  ║  GET    /api/usuarios (admin)                             ║
-  ║  POST   /api/usuarios (admin)                             ║
-  ║  GET    /health                                            ║
-  ║                                                           ║
-  ║  Documentación: http://localhost:${PORT}/health           ║
-  ║                                                           ║
-  ╚═══════════════════════════════════════════════════════════╝
-  `);
+  console.log(`✅ Servidor ejecutándose en puerto ${PORT}`);
+  console.log(`🔒 CORS configurado para: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+  console.log(`🍪 httpOnly cookies habilitadas`);
 });
 
 module.exports = app;

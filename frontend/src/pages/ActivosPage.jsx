@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useActivosStore } from '../store/activosStore';
 import { useAuthStore } from '../store/authStore';
-import { Edit2, Trash2, Plus, Search } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search, Laptop, Smartphone, Wifi, HardDrive, Package } from 'lucide-react';
 import { ModalFormulario } from '../components/ModalFormulario';
 
 export const ActivosPage = () => {
@@ -20,7 +20,9 @@ export const ActivosPage = () => {
     const coincideBusqueda =
       a.serie.toLowerCase().includes(busqueda.toLowerCase()) ||
       a.marca.toLowerCase().includes(busqueda.toLowerCase()) ||
-      a.modelo.toLowerCase().includes(busqueda.toLowerCase());
+      a.modelo.toLowerCase().includes(busqueda.toLowerCase()) ||
+      (a.imei && a.imei.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (a.numero_sim && a.numero_sim.toLowerCase().includes(busqueda.toLowerCase()));
     
     const coincideEstado = !filtroEstado || a.estado === filtroEstado;
     
@@ -130,9 +132,20 @@ export const ActivosPage = () => {
                     {activo.serie}
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    <div>
-                      <p className="font-medium text-gray-800">{activo.marca}</p>
-                      <p className="text-gray-600 text-xs">{activo.modelo}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center flex-shrink-0">
+                        {activo.tipo_dispositivo === 'Laptop' && <Laptop className="w-4 h-4" />}
+                        {activo.tipo_dispositivo === 'Smartphone' && <Smartphone className="w-4 h-4" />}
+                        {activo.tipo_dispositivo === 'SIM Card' && <Wifi className="w-4 h-4" />}
+                        {activo.tipo_dispositivo === 'Desktop' && <HardDrive className="w-4 h-4" />}
+                        {!['Laptop', 'Smartphone', 'SIM Card', 'Desktop'].includes(activo.tipo_dispositivo) && <Package className="w-4 h-4" />}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">{activo.marca}</p>
+                        <p className="text-gray-600 text-xs">{activo.modelo}</p>
+                        {activo.imei && <p className="text-[10px] text-blue-600 font-mono mt-1">IMEI: {activo.imei}</p>}
+                        {activo.numero_sim && <p className="text-[10px] text-green-600 font-bold mt-0.5">SIM: {activo.numero_sim}</p>}
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700">
@@ -204,4 +217,4 @@ const EstadoBadge = ({ estado }) => {
   );
 };
 
-import { Package } from 'lucide-react';
+

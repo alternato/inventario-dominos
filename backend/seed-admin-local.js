@@ -1,0 +1,5 @@
+﻿require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const { Pool } = require('pg');
+const pool = new Pool({ host: process.env.DB_HOST||'localhost', port: parseInt(process.env.DB_PORT)||5432, database: process.env.DB_NAME||'inventario_db', user: process.env.DB_USER||'inventario_user', password: process.env.DB_PASSWORD||'', ssl: false });
+(async()=>{try{const email='admin@dominospizza.cl';const password='AdminDominos2026';const hashed=await bcrypt.hash(password,10);const{rows}=await pool.query('SELECT id FROM usuarios WHERE email=',[email]);if(rows.length>0){await pool.query('UPDATE usuarios SET password=,activo=true,updated_at=NOW() WHERE email=',[hashed,email]);console.log('Admin password reset OK');}else{await pool.query('INSERT INTO usuarios(email,nombre,password,rol,activo,created_at,updated_at) VALUES(,,,,true,NOW(),NOW())',[email,'Administrador Sistema',hashed,'admin']);console.log('Admin created OK');}console.log(email+' / '+password);}catch(e){console.error(e.message);}finally{await pool.end();}})();

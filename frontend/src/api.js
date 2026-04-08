@@ -1,82 +1,82 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
 
 const apiClient = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
-// Interceptor para agregar token JWT automáticamente
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Las cookies httpOnly son enviadas automáticamente por axios con withCredentials: true
+// No se inyecta Authorization header — el backend lee req.cookies.authToken
 
-// Interceptor para manejar errores de autenticación
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Solo limpiar la sesión local. 
+      // El redireccionamiento lo maneja React Router (Navigate to="/login") en App.jsx
+      // para evitar recargas completas (loops) del navegador de forma garantizada.
       localStorage.removeItem('authToken');
       localStorage.removeItem('usuario');
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-// Autenticación
+// ─── AUTH ───────────────────────────────────────────────────
 export const authAPI = {
-  login: (email, password) =>
-    apiClient.post('/auth/login', { email, password }),
-  
-  forgotPassword: (email) =>
-    apiClient.post('/auth/forgot-password', { email }),
-  
-  resetPassword: (token, newPassword) =>
-    apiClient.post('/auth/reset-password', { token, newPassword }),
+  login:         (email, password) => apiClient.post('/auth/login', { email, password }),
+  ssoLogin:      (email, msToken)  => apiClient.post('/auth/sso-login', { email, msToken }),
+  pinLogin:      (pin)             => apiClient.post('/auth/pin-login', { pin }),
+  logout:        ()                => apiClient.post('/auth/logout'),
+  verify:        ()                => apiClient.get('/auth/verify'),
+  forgotPassword:(email)           => apiClient.post('/auth/forgot-password', { email }),
+  resetPassword: (token, newPassword) => apiClient.post('/auth/reset-password', { token, newPassword }),
 };
 
-// Activos
+// ─── ACTIVOS ────────────────────────────────────────────────
 export const activosAPI = {
-  listar: () => apiClient.get('/activos'),
-  
-  obtener: (serie) => apiClient.get(`/activos/${serie}`),
-  
-  crear: (data) => apiClient.post('/activos', data),
-  
-  actualizar: (serie, data) => apiClient.put(`/activos/${serie}`, data),
-  
-  eliminar: (serie) => apiClient.delete(`/activos/${serie}`),
+  listar:     ()           => apiClient.get('/activos'),
+  obtener:    (serie)      => apiClient.get(`/activos/${serie}`),
+  crear:      (data)       => apiClient.post('/activos', data),
+  actualizar: (serie, data)=> apiClient.put(`/activos/${serie}`, data),
+  eliminar:   (serie)      => apiClient.delete(`/activos/${serie}`),
+  historial:  (serie)      => apiClient.get(`/activos/${serie}/historial`),
 };
 
-// Colaboradores
+// ─── COLABORADORES ──────────────────────────────────────────
 export const colaboradoresAPI = {
-  listar: () => apiClient.get('/colaboradores'),
-  
-  obtener: (rut) => apiClient.get(`/colaboradores/${rut}`),
-  
-  crear: (data) => apiClient.post('/colaboradores', data),
-  
+  listar:     ()          => apiClient.get('/colaboradores'),
+  obtener:    (rut)       => apiClient.get(`/colaboradores/${rut}`),
+  crear:      (data)      => apiClient.post('/colaboradores', data),
   actualizar: (rut, data) => apiClient.put(`/colaboradores/${rut}`, data),
+  eliminar:   (rut)       => apiClient.delete(`/colaboradores/${rut}`),
+  activos:    (rut)       => apiClient.get(`/colaboradores/${rut}/activos`),
 };
 
-// Usuarios (solo admin)
+// ─── HISTORIAL ──────────────────────────────────────────────
+export const historialAPI = {
+  listar: (params = {}) => apiClient.get('/historial', { params }),
+};
+
+// ─── BÚSQUEDA ───────────────────────────────────────────────
+export const buscarAPI = {
+  buscar: (q) => apiClient.get('/buscar', { params: { q } }),
+};
+
+// ─── KPIs ───────────────────────────────────────────────────
+export const kpisAPI = {
+  obtener: () => apiClient.get('/kpis'),
+};
+
+// ─── USUARIOS (ADMIN) ───────────────────────────────────────
 export const usuariosAPI = {
-  listar: () => apiClient.get('/usuarios'),
-  
-  crear: (data) => apiClient.post('/usuarios', data),
+  listar:     ()           => apiClient.get('/usuarios'),
+  crear:      (data)       => apiClient.post('/usuarios', data),
+  actualizar: (id, data)   => apiClient.put(`/usuarios/${id}`, data),
+  setPin:     (id, pin)    => apiClient.post(`/usuarios/${id}/set-pin`, { pin }),
 };
 
 export default apiClient;

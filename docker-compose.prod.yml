@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # =============================================
+  # BASE DE DATOS: PostgreSQL (Producción)
+  # =============================================
+  db:
+    image: postgres:15-alpine
+    container_name: inventario_db_prod
+    restart: always # Autoarranque ante caídas del servidor
+    environment:
+      POSTGRES_DB: ${DB_NAME:-inventario_db}
+      POSTGRES_USER: ${DB_USER:-inventario_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secreto_super_fuerte_prod_2026}
+    # ports:
+    #   - "5432:5432" # Comentado para evitar chocar con otro Postgres en el servidor. El backend sigue conectándose por la red interna usando 'db:5432'.
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-inventario_user} -d ${DB_NAME:-inventario_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================
+  # BACKEND: Node.js + Express (Producción)
+  # =============================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: inventario_backend_prod
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 8081
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-inventario_db}
+      DB_USER: ${DB_USER:-inventario_user}
+      DB_PASSWORD: ${DB_PASSWORD:-secreto_super_fuerte_prod_2026}
+      DB_SSL: "false"
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_EXPIRES_IN: 12h
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # =============================================
+  # FRONTEND: Nginx estático hiper-rápido (Producción)
+  # =============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: inventario_frontend_prod
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data_prod:
+    name: inventario_postgres_data_prod

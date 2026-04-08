@@ -1,13 +1,11 @@
-import { Sidebar } from './Sidebar';
+import { Navbar } from './Navbar';
 
-export const Layout = ({ children }) => {
+export const Layout = ({ children, onLogout }) => {
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <main className="flex-1 overflow-auto ml-0 md:ml-64">
-        <div className="p-4 md:p-8">
-          {children}
-        </div>
+    <div className="flex flex-col min-h-screen bg-[#f4f6f8]">
+      <Navbar onLogout={onLogout} />
+      <main className="flex-1 overflow-auto w-full max-w-[1600px] mx-auto px-4 md:px-6 py-6 border-t-[8px] border-[#f4f6f8]" style={{marginTop: '-2px'}}>
+        {children}
       </main>
     </div>
   );

@@ -9,14 +9,16 @@ const activoSchema = z.object({
   serie: z.string().min(1, 'Serie requerida'),
   marca: z.string().min(1, 'Marca requerida'),
   modelo: z.string().min(1, 'Modelo requerido'),
-  tipo_dispositivo: z.enum(['Laptop', 'Desktop', 'Smartphone', 'Tablet', 'Impresora', 'Otro']),
+  tipo_dispositivo: z.enum(['Laptop', 'Desktop', 'Smartphone', 'Tablet', 'Impresora', 'SIM Card', 'Servidor', 'Monitor', 'Otro']),
   estado: z.enum(['Asignado', 'Disponible', 'Mantenimiento', 'Descartado']),
-  rut_responsable: z.string().min(1, 'RUT requerido'),
+  rut_responsable: z.string().optional().nullable(),
   ubicacion: z.string().min(1, 'Ubicación requerida'),
-  observaciones: z.string().optional(),
-  fecha_compra: z.string().optional(),
-  valor: z.string().optional(),
-  numero_factura: z.string().optional(),
+  observaciones: z.string().optional().nullable(),
+  fecha_compra: z.string().optional().nullable(),
+  valor: z.union([z.string(), z.number()]).optional().nullable(),
+  numero_factura: z.string().optional().nullable(),
+  imei: z.string().optional().nullable(),
+  numero_sim: z.string().optional().nullable(),
 });
 
 export const ModalFormulario = ({ isOpen, onClose, activo }) => {
@@ -25,11 +27,14 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(activoSchema),
     defaultValues: activo || {},
   });
+
+  const tipo = watch('tipo_dispositivo'); // Para mostrar campos condicionales
 
   useEffect(() => {
     cargarColaboradores();
@@ -94,11 +99,30 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
                 <option value="Desktop">Desktop</option>
                 <option value="Smartphone">Smartphone</option>
                 <option value="Tablet">Tablet</option>
+                <option value="SIM Card">SIM Card</option>
+                <option value="Monitor">Monitor</option>
+                <option value="Servidor">Servidor</option>
                 <option value="Impresora">Impresora</option>
                 <option value="Otro">Otro</option>
               </select>
               {errors.tipo_dispositivo && <p className="text-red-500 text-xs mt-1">{errors.tipo_dispositivo.message}</p>}
             </div>
+
+            {/* IMEI (Solo Smartphone) */}
+            {tipo === 'Smartphone' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">IMEI *</label>
+                <input {...register('imei')} placeholder="15 dígitos" className="w-full px-3 py-2 border border-blue-200 bg-blue-50/30 rounded-lg outline-none focus:ring-2 focus:ring-blue-400" />
+              </div>
+            )}
+
+            {/* Número SIM (Smartphone y SIM Card) */}
+            {(tipo === 'Smartphone' || tipo === 'SIM Card') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Número de SIM / Línea</label>
+                <input {...register('numero_sim')} placeholder="+569..." className="w-full px-3 py-2 border border-blue-200 bg-blue-50/30 rounded-lg outline-none focus:ring-2 focus:ring-blue-400" />
+              </div>
+            )}
 
             {/* Marca */}
             <div>

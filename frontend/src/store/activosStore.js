@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { activosAPI, colaboradoresAPI } from '../api';
 
-export const useActivosStore = create((set) => ({
+export const useActivosStore = create((set, get) => ({
   activos: [],
   colaboradores: [],
   loading: false,
   error: null,
 
+  // ─── ACTIVOS ────────────────────────────────────────────
   cargarActivos: async () => {
     set({ loading: true, error: null });
     try {
@@ -17,6 +18,47 @@ export const useActivosStore = create((set) => ({
     }
   },
 
+  crearActivo: async (data) => {
+    try {
+      const response = await activosAPI.crear(data);
+      const nuevo = response.data?.data || response.data;
+      set((state) => ({ activos: [nuevo, ...state.activos] }));
+      return { ok: true };
+    } catch (error) {
+      const msg = error.response?.data?.error || error.message;
+      set({ error: msg });
+      return { ok: false, error: msg };
+    }
+  },
+
+  actualizarActivo: async (serie, data) => {
+    try {
+      const response = await activosAPI.actualizar(serie, data);
+      const actualizado = response.data?.data || response.data;
+      set((state) => ({
+        activos: state.activos.map((a) => a.serie === serie ? { ...a, ...actualizado } : a),
+      }));
+      return { ok: true };
+    } catch (error) {
+      const msg = error.response?.data?.error || error.message;
+      set({ error: msg });
+      return { ok: false, error: msg };
+    }
+  },
+
+  eliminarActivo: async (serie) => {
+    try {
+      await activosAPI.eliminar(serie);
+      set((state) => ({ activos: state.activos.filter((a) => a.serie !== serie) }));
+      return { ok: true };
+    } catch (error) {
+      const msg = error.response?.data?.error || error.message;
+      set({ error: msg });
+      return { ok: false, error: msg };
+    }
+  },
+
+  // ─── COLABORADORES ──────────────────────────────────────
   cargarColaboradores: async () => {
     set({ loading: true, error: null });
     try {
@@ -27,57 +69,47 @@ export const useActivosStore = create((set) => ({
     }
   },
 
-  crearActivo: async (data) => {
-    try {
-      const response = await activosAPI.crear(data);
-      set((state) => ({
-        activos: [response.data.data, ...state.activos],
-      }));
-      return true;
-    } catch (error) {
-      set({ error: error.response?.data?.error || error.message });
-      return false;
-    }
-  },
-
-  actualizarActivo: async (serie, data) => {
-    try {
-      const response = await activosAPI.actualizar(serie, data);
-      set((state) => ({
-        activos: state.activos.map((a) =>
-          a.serie === serie ? response.data.data : a
-        ),
-      }));
-      return true;
-    } catch (error) {
-      set({ error: error.response?.data?.error || error.message });
-      return false;
-    }
-  },
-
-  eliminarActivo: async (serie) => {
-    try {
-      await activosAPI.eliminar(serie);
-      set((state) => ({
-        activos: state.activos.filter((a) => a.serie !== serie),
-      }));
-      return true;
-    } catch (error) {
-      set({ error: error.response?.data?.error || error.message });
-      return false;
-    }
-  },
-
   crearColaborador: async (data) => {
     try {
       const response = await colaboradoresAPI.crear(data);
-      set((state) => ({
-        colaboradores: [response.data.data, ...state.colaboradores],
-      }));
-      return true;
+      const nuevo = response.data?.data || response.data;
+      set((state) => ({ colaboradores: [nuevo, ...state.colaboradores] }));
+      return { ok: true };
     } catch (error) {
-      set({ error: error.response?.data?.error || error.message });
-      return false;
+      const msg = error.response?.data?.error || error.message;
+      set({ error: msg });
+      return { ok: false, error: msg };
     }
   },
+
+  actualizarColaborador: async (rut, data) => {
+    try {
+      const response = await colaboradoresAPI.actualizar(rut, data);
+      const actualizado = response.data?.data || response.data;
+      set((state) => ({
+        colaboradores: state.colaboradores.map((c) =>
+          c.rut === rut ? { ...c, ...actualizado } : c
+        ),
+      }));
+      return { ok: true };
+    } catch (error) {
+      const msg = error.response?.data?.error || error.message;
+      set({ error: msg });
+      return { ok: false, error: msg };
+    }
+  },
+
+  eliminarColaborador: async (rut) => {
+    try {
+      await colaboradoresAPI.eliminar(rut);
+      set((state) => ({ colaboradores: state.colaboradores.filter((c) => c.rut !== rut) }));
+      return { ok: true };
+    } catch (error) {
+      const msg = error.response?.data?.error || error.message;
+      set({ error: msg });
+      return { ok: false, error: msg };
+    }
+  },
+
+  clearError: () => set({ error: null }),
 }));

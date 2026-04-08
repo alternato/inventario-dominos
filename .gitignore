@@ -1,7 +1,14 @@
-# Archivos de entorno
+# Archivos de entorno — NUNCA subir al repo
 .env
 .env.local
 .env.*.local
+**/.env
+**/.env.local
+**/.env.*
+backend/.env
+frontend/.env.local
+backup_inventario.sql
+export-data.js
 
 # Dependencias
 node_modules/

@@ -21,7 +21,7 @@ const sendPasswordResetEmail = async (email, resetToken, nombre) => {
       </head>
       <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px;">
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-          <h2 style="color: #0066CC; text-align: center;">TI Maestro - Domino's Pizza Chile</h2>
+          <h2 style="color: #0066CC; text-align: center;">IT COMPASS - Domino's Pizza Chile</h2>
           <h3>Recuperación de Contraseña</h3>
           <p>Hola ${nombre},</p>
           <p>Recibimos una solicitud para recuperar tu contraseña. Haz clic en el siguiente enlace para restablecerla:</p>
