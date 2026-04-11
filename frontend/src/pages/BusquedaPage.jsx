@@ -89,7 +89,7 @@ export const BusquedaPage = () => {
               ['🪪 RUT', '12.345.678-9'],
               ['🔢 N° de Serie', 'SN123456'],
               ['📱 IMEI', '358240051111110'],
-              ['📶 N° SIM', '+56912345678'],
+              ['📶 N° SIM / IMSI', '+56912345678, ...'],
               ['💻 Modelo / Marca', 'ThinkPad, iPhone'],
             ].map(([label, ej]) => (
               <div key={label} className="bg-white rounded-lg p-2.5 border border-gray-100">
@@ -140,6 +140,7 @@ export const BusquedaPage = () => {
                         <span>Serie: <span className="font-mono">{a.serie}</span></span>
                         {a.imei && <span>IMEI: <span className="font-mono">{a.imei}</span></span>}
                         {a.numero_sim && <span>SIM: <span className="font-mono">{a.numero_sim}</span></span>}
+                        {a.imsi && <span>IMSI: <span className="font-mono">{a.imsi}</span></span>}
                         {a.colaborador_nombre && <span>👤 {a.colaborador_nombre}</span>}
                       </div>
                     </div>

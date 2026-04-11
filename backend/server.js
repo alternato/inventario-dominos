@@ -6,6 +6,13 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
+const multer = require('multer');
+
+// Configuración de multer (en memoria para procesar directamente)
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // Límite de 10MB
+});
 
 const db = require('./db');
 const mail = require('./mail');
@@ -17,6 +24,7 @@ const {
   validate,
 } = require('./schemas');
 const { verifyMsToken } = require('./msValidator');
+const { processImportFile } = require('./importController');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -419,6 +427,31 @@ app.delete('/api/activos/:serie', authenticate, requireAdmin, async (req, res) =
   }
 });
 
+// Importar activos desde archivo
+app.post('/api/import', authenticate, requireAdmin, upload.single('archivo'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se subió ningún archivo' });
+    }
+    
+    // Validar tipo de archivo
+    const acceptedMimes = [
+      'application/json',
+      'text/csv',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    
+    // Solo advierte de mime pero intentamos igual porque algunos OS suben con mimetype application/octet-stream
+    
+    const results = await processImportFile(req.file.buffer, req.file.mimetype, req.user.id);
+    res.json({ message: 'Importación completada', ...results });
+  } catch (error) {
+    console.error('Error importando:', error);
+    res.status(500).json({ error: error.message || 'Error al procesar el archivo importado' });
+  }
+});
+
 // ===== RUTAS DE COLABORADORES =====
 
 app.get('/api/colaboradores', authenticate, async (req, res) => {
@@ -603,8 +636,19 @@ app.get('/api/export-sql', authenticate, requireSuperAdmin, async (req, res) => 
     res.setHeader('Content-Disposition', 'attachment; filename="backup_inventario.sql"');
     res.setHeader('Content-Type', 'text/plain');
     res.send(sql);
+  } catch (err) {
+    res.status(500).json({ error: 'Error exportando respaldo' });
+  }
+});
+
+// ===== MIGRACIÓN AUTOMÁTICA (MANTENIMIENTO) =====
+app.get('/api/migrate', authenticate, requireSuperAdmin, async (req, res) => {
+  try {
+    await db.query('ALTER TABLE activos ADD COLUMN IF NOT EXISTS imsi VARCHAR(20);');
+    res.json({ message: 'Base de Datos actualizada exitosamente. El campo IMSI ha sido añadido.' });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    console.error('Error en migración:', e);
+    res.status(500).json({ error: 'Error al actualizar la base de datos: ' + e.message });
   }
 });
 

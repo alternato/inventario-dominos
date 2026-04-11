@@ -32,13 +32,14 @@ const createActivoSchema = z.object({
   estado:           z.enum(ESTADOS_ACTIVO, { errorMap: () => ({ message: `Estado debe ser uno de: ${ESTADOS_ACTIVO.join(', ')}` }) }),
   tipo_dispositivo: z.enum(TIPOS_DISPOSITIVO, { errorMap: () => ({ message: `Tipo debe ser uno de: ${TIPOS_DISPOSITIVO.join(', ')}` }) }),
   rut_responsable:  z.string().optional().nullable(),
-  ubicacion:        z.string().min(1, 'Ubicación requerida'),
+  ubicacion:        z.string().optional().nullable(),
   observaciones:    z.string().optional().nullable(),
   fecha_compra:     z.string().optional().nullable(),
   valor:            z.union([z.string(), z.number()]).optional().nullable(),
   numero_factura:   z.string().optional().nullable(),
   imei:             z.string().optional().nullable(),
   numero_sim:       z.string().optional().nullable(),
+  imsi:             z.string().optional().nullable(),
 });
 
 // Para actualizaciones: todos los campos son opcionales

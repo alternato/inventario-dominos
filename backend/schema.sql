@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS activos (
   -- Campos nuevos para teléfonos y SIM
   imei VARCHAR(20),
   numero_sim VARCHAR(20),
+  imsi VARCHAR(20),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );

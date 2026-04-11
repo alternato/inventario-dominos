@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useActivosStore } from '../store/activosStore';
 import { useAuthStore } from '../store/authStore';
-import { Edit2, Trash2, Plus, Search, Laptop, Smartphone, Wifi, HardDrive, Package } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search, Laptop, Smartphone, Wifi, HardDrive, Package, Upload } from 'lucide-react';
 import { ModalFormulario } from '../components/ModalFormulario';
+import ImportDataModal from '../components/ImportDataModal';
 
 export const ActivosPage = () => {
   const { activos, cargarActivos, eliminarActivo } = useActivosStore();
@@ -10,6 +11,7 @@ export const ActivosPage = () => {
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [activoSeleccionado, setActivoSeleccionado] = useState(null);
 
   useEffect(() => {
@@ -22,7 +24,8 @@ export const ActivosPage = () => {
       a.marca.toLowerCase().includes(busqueda.toLowerCase()) ||
       a.modelo.toLowerCase().includes(busqueda.toLowerCase()) ||
       (a.imei && a.imei.toLowerCase().includes(busqueda.toLowerCase())) ||
-      (a.numero_sim && a.numero_sim.toLowerCase().includes(busqueda.toLowerCase()));
+      (a.numero_sim && a.numero_sim.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (a.imsi && a.imsi.toLowerCase().includes(busqueda.toLowerCase()));
     
     const coincideEstado = !filtroEstado || a.estado === filtroEstado;
     
@@ -55,16 +58,25 @@ export const ActivosPage = () => {
           <p className="text-gray-600">Gestión del inventario de TI</p>
         </div>
         {isAdmin() && (
-          <button
-            onClick={() => {
-              setActivoSeleccionado(null);
-              setModalOpen(true);
-            }}
-            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            <Plus className="w-5 h-5" />
-            Nuevo Activo
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setImportModalOpen(true)}
+              className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+            >
+              <Upload className="w-5 h-5" />
+              Importar Datos
+            </button>
+            <button
+              onClick={() => {
+                setActivoSeleccionado(null);
+                setModalOpen(true);
+              }}
+              className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              <Plus className="w-5 h-5" />
+              Nuevo Activo
+            </button>
+          </div>
         )}
       </div>
 
@@ -151,6 +163,7 @@ export const ActivosPage = () => {
                         <p className="text-gray-600 text-xs">{activo.modelo}</p>
                         {activo.imei && <p className="text-[10px] text-blue-600 font-mono mt-1">IMEI: {activo.imei}</p>}
                         {activo.numero_sim && <p className="text-[10px] text-green-600 font-bold mt-0.5">SIM: {activo.numero_sim}</p>}
+                        {activo.imsi && <p className="text-[10px] text-purple-600 font-mono mt-0.5">IMSI: {activo.imsi}</p>}
                       </div>
                     </div>
                   </td>
@@ -203,6 +216,14 @@ export const ActivosPage = () => {
           setActivoSeleccionado(null);
         }}
         activo={activoSeleccionado}
+      />
+      {/* Modal Importar Datos */}
+      <ImportDataModal 
+        isOpen={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onImportSuccess={() => {
+          cargarActivos();
+        }}
       />
     </div>
   );
