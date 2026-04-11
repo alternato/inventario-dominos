@@ -57,7 +57,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 
 // Deshabilitar caché del navegador para todas las rutas de API
@@ -427,28 +427,35 @@ app.delete('/api/activos/:serie', authenticate, requireAdmin, async (req, res) =
   }
 });
 
-// Importar activos desde archivo
-app.post('/api/import', authenticate, requireAdmin, upload.single('archivo'), async (req, res) => {
+// Importar activos desde archivo (Dry-Run Preview)
+app.post('/api/import/preview', authenticate, requireAdmin, async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No se subió ningún archivo' });
+    const rows = req.body.rows;
+    if (!rows || !Array.isArray(rows) || rows.length === 0) {
+      return res.status(400).json({ error: 'No se enviaron datos para previsualizar' });
     }
-    
-    // Validar tipo de archivo
-    const acceptedMimes = [
-      'application/json',
-      'text/csv',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    ];
-    
-    // Solo advierte de mime pero intentamos igual porque algunos OS suben con mimetype application/octet-stream
-    
-    const results = await processImportFile(req.file.buffer, req.file.mimetype, req.user.id);
+    const { previewImportRows } = require('./importController');
+    const results = await previewImportRows(rows);
+    res.json(results);
+  } catch (error) {
+    console.error('Error en preview:', error);
+    res.status(500).json({ error: 'Error procesando la vista previa: ' + error.message });
+  }
+});
+
+// Importar activos desde archivo (Confirmar)
+app.post('/api/import/commit', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const rows = req.body.rows;
+    if (!rows || !Array.isArray(rows) || rows.length === 0) {
+      return res.status(400).json({ error: 'No se enviaron datos para importar' });
+    }
+    const { processImportRows } = require('./importController');
+    const results = await processImportRows(rows, req.user.id);
     res.json({ message: 'Importación completada', ...results });
   } catch (error) {
     console.error('Error importando:', error);
-    res.status(500).json({ error: error.message || 'Error al procesar el archivo importado' });
+    res.status(500).json({ error: 'Error importando datos: ' + error.message });
   }
 });
 

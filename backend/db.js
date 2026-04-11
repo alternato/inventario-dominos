@@ -419,7 +419,7 @@ const buscarGlobal = async (q) => {
 // =============================================
 
 const getKPIs = async () => {
-  const [totales, porTipo, porEstado, topColaboradores, actividadMensual] = await Promise.all([
+  const [totales, porTipo, porEstado, topColaboradores, actividadMensual, duplicadosImeis, duplicadosSims] = await Promise.all([
     query(`
       SELECT
         COUNT(*) AS total,
@@ -461,6 +461,20 @@ const getKPIs = async () => {
       GROUP BY mes
       ORDER BY mes ASC
     `),
+    query(`
+      SELECT imei, COUNT(*) AS cantidad, array_agg(serie) AS series
+      FROM activos
+      WHERE imei IS NOT NULL AND imei != ''
+      GROUP BY imei
+      HAVING COUNT(*) > 1
+    `),
+    query(`
+      SELECT numero_sim, COUNT(*) AS cantidad, array_agg(serie) AS series
+      FROM activos
+      WHERE numero_sim IS NOT NULL AND numero_sim != ''
+      GROUP BY numero_sim
+      HAVING COUNT(*) > 1
+    `),
   ]);
 
   return {
@@ -469,6 +483,10 @@ const getKPIs = async () => {
     porEstado: porEstado.rows,
     topColaboradores: topColaboradores.rows,
     actividadMensual: actividadMensual.rows,
+    duplicados: {
+      imeis: duplicadosImeis.rows,
+      sims: duplicadosSims.rows,
+    }
   };
 };
 

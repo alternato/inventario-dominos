@@ -5,11 +5,14 @@ import { Edit2, Trash2, Plus, Search, Laptop, Smartphone, Wifi, HardDrive, Packa
 import { ModalFormulario } from '../components/ModalFormulario';
 import ImportDataModal from '../components/ImportDataModal';
 
+import { useLocation } from 'react-router-dom';
+
 export const ActivosPage = () => {
   const { activos, cargarActivos, eliminarActivo } = useActivosStore();
   const { isAdmin } = useAuthStore();
-  const [busqueda, setBusqueda] = useState('');
-  const [filtroEstado, setFiltroEstado] = useState('');
+  const location = useLocation();
+  const [busqueda, setBusqueda] = useState(location.state?.busqueda || '');
+  const [filtroEstado, setFiltroEstado] = useState(location.state?.filtroEstado || '');
   const [modalOpen, setModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [activoSeleccionado, setActivoSeleccionado] = useState(null);
@@ -19,13 +22,17 @@ export const ActivosPage = () => {
   }, []);
 
   const activosFiltrados = activos.filter((a) => {
+    const term = busqueda.toLowerCase();
     const coincideBusqueda =
-      a.serie.toLowerCase().includes(busqueda.toLowerCase()) ||
-      a.marca.toLowerCase().includes(busqueda.toLowerCase()) ||
-      a.modelo.toLowerCase().includes(busqueda.toLowerCase()) ||
-      (a.imei && a.imei.toLowerCase().includes(busqueda.toLowerCase())) ||
-      (a.numero_sim && a.numero_sim.toLowerCase().includes(busqueda.toLowerCase())) ||
-      (a.imsi && a.imsi.toLowerCase().includes(busqueda.toLowerCase()));
+      a.serie?.toLowerCase().includes(term) ||
+      a.marca?.toLowerCase().includes(term) ||
+      a.modelo?.toLowerCase().includes(term) ||
+      (a.tipo_dispositivo && a.tipo_dispositivo.toLowerCase().includes(term)) ||
+      (a.responsable_nombre && a.responsable_nombre.toLowerCase().includes(term)) ||
+      (a.ubicacion && a.ubicacion.toLowerCase().includes(term)) ||
+      (a.imei && a.imei.toLowerCase().includes(term)) ||
+      (a.numero_sim && a.numero_sim.toLowerCase().includes(term)) ||
+      (a.imsi && a.imsi.toLowerCase().includes(term));
     
     const coincideEstado = !filtroEstado || a.estado === filtroEstado;
     

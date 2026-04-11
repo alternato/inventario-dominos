@@ -92,130 +92,105 @@ const parseDateFromExcel = (excelDate) => {
   return null;
 };
 
-const processImportFile = async (buffer, mimetype, usuarioId) => {
-  let dataRows = [];
+const previewImportRows = async (dataRows) => {
+  const results = {
+    totalLeidos: dataRows.length,
+    duplicadosActivos: [], // {serie, marca}
+    nuevosActivos: [],     // {serie, marca}
+    duplicadosUsuarios: [], // {rut}
+    nuevosUsuarios: []      // {rut}
+  };
+
+  const procesarRuts = new Set();
   
-  try {
-    if (mimetype === 'application/json') {
-      const jsonStr = buffer.toString('utf-8');
-      dataRows = JSON.parse(jsonStr);
+  for (const row of dataRows) {
+    if (!row.serie) continue;
+
+    // Detectar Activo
+    const activoExistente = await db.getActivoBySerie(row.serie);
+    if (activoExistente) {
+      results.duplicadosActivos.push({ serie: row.serie, marca: row.marca || activoExistente.marca || 'Desconocida' });
     } else {
-      // Excel o CSV
-      const workbook = xlsx.read(buffer, { type: 'buffer' });
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      // Convertir a array de objetos, la primera fila son las cabeceras
-      const rawData = xlsx.utils.sheet_to_json(worksheet, { defval: null });
-      
-      if (rawData.length === 0) {
-        throw new Error('El archivo está vacío');
+      results.nuevosActivos.push({ serie: row.serie, marca: row.marca || 'No definida' });
+    }
+
+    // Detectar Colaborador (RUT)
+    if (row.rut_responsable) {
+      const rut = row.rut_responsable.replace(/[^0-9kK-]/g, '').toUpperCase();
+      if (!procesarRuts.has(rut)) {
+        procesarRuts.add(rut);
+        const colaborador = await db.getColaboradorByRut(rut);
+        if (colaborador) {
+          results.duplicadosUsuarios.push({ rut });
+        } else {
+          results.nuevosUsuarios.push({ rut, nombre: row.responsable_nombre || 'Desconocido' });
+        }
       }
-
-      // Obtener cabeceras y mapear
-      const originalHeaders = Object.keys(rawData[0]);
-      const mappedHeaders = mapHeaders(originalHeaders);
-      
-      // Transformar filas crudas a filas con las claves de base de datos
-      dataRows = rawData.map(row => {
-        const newRow = {};
-        for (const [origKey, val] of Object.entries(row)) {
-          if (val === null || val === undefined || val === '') continue;
-          
-          if (mappedHeaders[origKey]) {
-            let processedVal = val;
-            
-            // Tratamiento especial para campos como la fecha de compra
-            if (mappedHeaders[origKey] === 'fecha_compra') {
-              processedVal = parseDateFromExcel(val);
-            } else if (typeof val === 'string') {
-              processedVal = val.trim();
-            } else {
-              processedVal = String(val).trim();
-            }
-            
-            newRow[mappedHeaders[origKey]] = getDefaultValue(processedVal, mappedHeaders[origKey]);
-          }
-        }
-        return newRow;
-      });
     }
-
-    const results = {
-      totalLeidos: dataRows.length,
-      creados: 0,
-      actualizados: 0,
-      colaboradoresCreados: 0,
-      errores: [],
-      omitidos: 0
-    };
-
-    // Procesar fila por fila (Éxito Parcial)
-    for (let i = 0; i < dataRows.length; i++) {
-        const row = dataRows[i];
-        
-        try {
-            // Validaciones básicas que nunca pueden faltar
-            if (!row.serie) {
-                 results.errores.push(`Fila ${i+2}: Falta la columna 'N° Serie'. Registro omitido.`);
-                 results.omitidos++;
-                 continue;
-            }
-            if (!row.marca) row.marca = 'Genérica';
-            if (!row.modelo) row.modelo = 'Desconocido';
-            if (!row.estado) row.estado = 'Disponible';
-            if (!row.tipo_dispositivo) row.tipo_dispositivo = 'Otro';
-
-            // Comprobar RUT responsable
-            if (row.rut_responsable) {
-                const rut = row.rut_responsable.replace(/[^0-9kK-]/g, '').toUpperCase();
-                row.rut_responsable = rut; // Normalizar en el row
-                let colaborador = await db.getColaboradorByRut(rut);
-                
-                if (!colaborador) {
-                    // Auto-crear colaborador (Auto-provisioning)
-                    colaborador = await db.createColaborador({
-                        rut: rut,
-                        nombre: row.responsable_nombre || 'Usuario sin nombre (Auto-creado)',
-                        area: 'Otro'
-                    });
-                    results.colaboradoresCreados++;
-                    console.log(`[Import] Creado nuevo colaborador RUT: ${rut}`);
-                }
-            }
-
-            // Comprobar si existe el activo
-            const activoExistente = await db.getActivoBySerie(row.serie);
-
-            if (activoExistente) {
-                // Actualizar (usamos el archivo como fuente de la verdad)
-                const payload = {
-                    ...activoExistente,
-                    ...row // Sobrescribir con info del archivo
-                };
-                
-                // Mantenemos el ID original de la base de forma segura. Update usa serie.
-                await db.updateActivo(row.serie, payload, usuarioId);
-                results.actualizados++;
-            } else {
-                // Crear
-                await db.createActivo(row, usuarioId);
-                results.creados++;
-            }
-
-        } catch (err) {
-            console.error(`[Import Error] Fila ${i+2} (Serie ${row.serie}):`, err.message);
-            results.errores.push(`Fila ${i+2} (Serie ${row.serie || 'Desconocida'}): ${err.message}`);
-            results.omitidos++;
-        }
-    }
-
-    return results;
-
-  } catch (error) {
-    throw new Error(`Error procesando archivo: ${error.message}`);
   }
+
+  return results;
+};
+
+const processImportRows = async (dataRows, usuarioId) => {
+  const results = {
+    totalLeidos: dataRows.length,
+    creados: 0,
+    actualizados: 0,
+    colaboradoresCreados: 0,
+    errores: [],
+    omitidos: 0
+  };
+
+  for (let i = 0; i < dataRows.length; i++) {
+      const row = Object.assign({}, dataRows[i]); // Copia segura
+      try {
+          if (!row.serie) {
+               results.errores.push(`Fila ${i+2}: Falta 'serie'. Omitido.`);
+               results.omitidos++;
+               continue;
+          }
+          if (!row.marca) row.marca = 'Genérica';
+          if (!row.modelo) row.modelo = 'Desconocido';
+          if (!row.estado) row.estado = 'Disponible';
+          if (!row.tipo_dispositivo) row.tipo_dispositivo = 'Otro';
+
+          if (row.rut_responsable) {
+              const rut = row.rut_responsable.replace(/[^0-9kK-]/g, '').toUpperCase();
+              row.rut_responsable = rut; 
+              let colaborador = await db.getColaboradorByRut(rut);
+              if (!colaborador) {
+                  colaborador = await db.createColaborador({
+                      rut: rut,
+                      nombre: row.responsable_nombre || 'Usuario sin nombre (Auto-creado)',
+                      area: 'Otro'
+                  });
+                  results.colaboradoresCreados++;
+              }
+          }
+
+          const activoExistente = await db.getActivoBySerie(row.serie);
+          if (activoExistente) {
+              const payload = { ...activoExistente, ...row };
+              await db.updateActivo(row.serie, payload, usuarioId);
+              results.actualizados++;
+          } else {
+              await db.createActivo(row, usuarioId);
+              results.creados++;
+          }
+      } catch (err) {
+          results.errores.push(`Fila ${i+2} (Serie ${row.serie || '?'}) : ${err.message}`);
+          results.omitidos++;
+      }
+  }
+  return results;
 };
 
 module.exports = {
-  processImportFile
+  normalizeString,
+  headerMap,
+  getDefaultValue,
+  parseDateFromExcel,
+  previewImportRows,
+  processImportRows
 };

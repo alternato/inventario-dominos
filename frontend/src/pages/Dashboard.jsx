@@ -7,11 +7,13 @@ import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 const COLORS_TIPO  = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#6B7280'];
 const COLORS_ESTADO = { Asignado: '#10B981', Disponible: '#F59E0B', Mantenimiento: '#EF4444', Descartado: '#6B7280' };
 
 export const Dashboard = () => {
+  const navigate = useNavigate();
   const { activos, cargarActivos } = useActivosStore();
   const { usuario } = useAuthStore();
   const [kpis, setKpis] = useState(null);
@@ -132,12 +134,38 @@ export const Dashboard = () => {
         </div>
       </div>
 
+      {/* Alertas del Sistema */}
+      {kpis?.duplicados && (kpis.duplicados.imeis?.length > 0 || kpis.duplicados.sims?.length > 0) && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-bold text-red-800">Alerta de Integridad: Registros Duplicados Detectados</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <ul className="list-disc pl-5 space-y-1">
+                  {kpis.duplicados.imeis?.length > 0 && (
+                    <li>Hay {kpis.duplicados.imeis.length} IMEI(s) repetidos (ej: {kpis.duplicados.imeis[0].imei} usado por {kpis.duplicados.imeis[0].cantidad} activos)</li>
+                  )}
+                  {kpis.duplicados.sims?.length > 0 && (
+                    <li>Hay {kpis.duplicados.sims.length} Número(s) SIM repetidos (ej: {kpis.duplicados.sims[0].numero_sim} usado por {kpis.duplicados.sims[0].cantidad} activos)</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {visibleWidgets.includes('kpi-total') && <KpiCard title="Total Activos" value={stats.total} icon={Package} color="blue" sub={`${pct}% asignados`} />}
-        {visibleWidgets.includes('kpi-asignados') && <KpiCard title="Asignados" value={stats.asignados} icon={Users} color="green" sub="En uso" />}
-        {visibleWidgets.includes('kpi-disponibles') && <KpiCard title="Disponibles" value={stats.disponibles} icon={Activity} color="yellow" sub="Listos para asignar" />}
-        {visibleWidgets.includes('kpi-mantenimiento') && <KpiCard title="Mantenimiento" value={stats.mantenimiento} icon={TrendingUp} color="red" sub="En revisión" />}
+        {visibleWidgets.includes('kpi-total') && <KpiCard title="Total Activos" value={stats.total} icon={Package} color="blue" sub={`${pct}% asignados`} onClick={() => navigate('/activos')} />}
+        {visibleWidgets.includes('kpi-asignados') && <KpiCard title="Asignados" value={stats.asignados} icon={Users} color="green" sub="En uso" onClick={() => navigate('/activos', { state: { filtroEstado: 'Asignado' }})} />}
+        {visibleWidgets.includes('kpi-disponibles') && <KpiCard title="Disponibles" value={stats.disponibles} icon={Activity} color="yellow" sub="Listos para asignar" onClick={() => navigate('/activos', { state: { filtroEstado: 'Disponible' }})} />}
+        {visibleWidgets.includes('kpi-mantenimiento') && <KpiCard title="Mantenimiento" value={stats.mantenimiento} icon={TrendingUp} color="red" sub="En revisión" onClick={() => navigate('/activos', { state: { filtroEstado: 'Mantenimiento' }})} />}
       </div>
 
       {/* Fila de gráficos */}
@@ -174,7 +202,11 @@ export const Dashboard = () => {
           ) : (
             <div className="space-y-3">
               {topColaboradores.map((c, i) => (
-                <div key={i} className="flex items-center gap-3">
+                <div 
+                  key={i} 
+                  className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                  onClick={() => navigate('/activos', { state: { busqueda: c.colaborador } })}
+                >
                   <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold flex-shrink-0">
                     {i + 1}
                   </span>
@@ -199,7 +231,11 @@ export const Dashboard = () => {
               <p className="text-sm text-gray-400 text-center py-8">Sin activos registrados</p>
             ) : (
               porTipo.map((t, i) => (
-                <div key={i} className="flex items-center gap-3">
+                <div 
+                  key={i} 
+                  className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                  onClick={() => navigate('/activos', { state: { busqueda: t.tipo_dispositivo } })}
+                >
                   <div className="flex-1">
                     <div className="flex justify-between mb-1">
                       <span className="text-sm text-gray-700">{t.tipo_dispositivo}</span>
@@ -228,7 +264,7 @@ export const Dashboard = () => {
   );
 };
 
-const KpiCard = ({ title, value, icon: Icon, color, sub }) => {
+const KpiCard = ({ title, value, icon: Icon, color, sub, onClick }) => {
   const styles = {
     blue:   { b: 'border-[#0066CC]', t: 'text-[#0066CC]', txt: 'text-gray-500' },
     green:  { b: 'border-[#10B981]', t: 'text-[#10B981]', txt: 'text-green-600' },
@@ -238,7 +274,10 @@ const KpiCard = ({ title, value, icon: Icon, color, sub }) => {
   const s = styles[color] || styles.blue;
   
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 p-5 pl-6 border-l-[6px] ${s.b} hover:shadow-md transition relative overflow-hidden flex flex-col justify-between min-h-[140px]`}>
+    <div 
+      onClick={onClick}
+      className={`bg-white rounded-xl shadow-sm border border-gray-100 p-5 pl-6 border-l-[6px] ${s.b} hover:shadow-md transition relative overflow-hidden flex flex-col justify-between min-h-[140px] ${onClick ? 'cursor-pointer hover:bg-gray-50 transform hover:-translate-y-1' : ''}`}
+    >
       <div>
         <p className="text-[10px] font-bold text-gray-400 tracking-wider uppercase mb-1">{title}</p>
         <p className={`text-4xl font-extrabold ${s.t}`}>{value}</p>
@@ -257,6 +296,7 @@ const EmptyChart = () => (
 );
 
 const DynamicChartPanel = ({ id, activos, defaultType, defaultGroupBy }) => {
+  const navigate = useNavigate();
   const [type, setType] = useState(() => localStorage.getItem(`${id}-type`) || defaultType);
   const [groupBy, setGroupBy] = useState(() => localStorage.getItem(`${id}-groupBy`) || defaultGroupBy);
 
@@ -339,6 +379,14 @@ const DynamicChartPanel = ({ id, activos, defaultType, defaultGroupBy }) => {
                 cx="50%" cy="50%"
                 innerRadius={60} outerRadius={90}
                 paddingAngle={3}
+                onClick={(entry) => {
+                  if (groupBy === 'estado') {
+                    navigate('/activos', { state: { filtroEstado: entry.name } });
+                  } else {
+                    navigate('/activos', { state: { busqueda: entry.name } });
+                  }
+                }}
+                className="cursor-pointer"
               >
                 {data.map((entry, i) => (
                   <Cell key={i} fill={COLORS_ESTADO[entry.name] || COLORS_TIPO[i % COLORS_TIPO.length]} />
@@ -353,7 +401,18 @@ const DynamicChartPanel = ({ id, activos, defaultType, defaultGroupBy }) => {
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip cursor={{fill: '#f8fafc'}} />
-              <Bar dataKey="cantidad" radius={[4, 4, 0, 0]}>
+              <Bar 
+                dataKey="cantidad" 
+                radius={[4, 4, 0, 0]} 
+                onClick={(entry) => {
+                  if (groupBy === 'estado') {
+                    navigate('/activos', { state: { filtroEstado: entry.name } });
+                  } else {
+                    navigate('/activos', { state: { busqueda: entry.name } });
+                  }
+                }}
+                className="cursor-pointer"
+              >
                 {data.map((entry, i) => (
                   <Cell key={i} fill={COLORS_ESTADO[entry.name] || COLORS_TIPO[i % COLORS_TIPO.length]} />
                 ))}

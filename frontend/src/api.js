@@ -47,13 +47,8 @@ export const activosAPI = {
   actualizar: (serie, data)=> apiClient.put(`/activos/${encodeURIComponent(serie)}`, data),
   eliminar:   (serie)      => apiClient.delete(`/activos/${encodeURIComponent(serie)}`),
   historial:  (serie)      => apiClient.get(`/activos/${encodeURIComponent(serie)}/historial`),
-  importar:   (file)       => {
-    const formData = new FormData();
-    formData.append('archivo', file);
-    return apiClient.post('/import', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-  }
+  importarPreview: (rows) => apiClient.post('/import/preview', { rows }),
+  importarCommit:  (rows) => apiClient.post('/import/commit', { rows })
 };
 
 // ─── COLABORADORES ──────────────────────────────────────────
