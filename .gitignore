@@ -12,7 +12,6 @@ export-data.js
 
 # Dependencias
 node_modules/
-package-lock.json
 yarn.lock
 
 # Logs
