@@ -20,6 +20,8 @@ const activoSchema = z.object({
   imei: z.string().optional().nullable(),
   numero_sim: z.string().optional().nullable(),
   imsi: z.string().optional().nullable(),
+  numero_telefono: z.string().optional().nullable(),
+  compania: z.string().optional().nullable(),
 });
 
 export const ModalFormulario = ({ isOpen, onClose, activo }) => {
@@ -130,11 +132,19 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
             {(tipo === 'Smartphone' || tipo === 'SIM Card') && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Número de SIM / Línea</label>
-                  <input {...register('numero_sim')} placeholder="+569..." className="w-full px-3 py-2 border border-blue-200 bg-blue-50/30 rounded-lg outline-none focus:ring-2 focus:ring-blue-400" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Número de SIM / ICCID</label>
+                  <input {...register('numero_sim')} placeholder="Número de Chip (ICCID)" className="w-full px-3 py-2 border border-blue-200 bg-blue-50/30 rounded-lg outline-none focus:ring-2 focus:ring-blue-400" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">IMSI (Chip)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Número Telefónico</label>
+                  <input {...register('numero_telefono')} placeholder="+569..." className="w-full px-3 py-2 border border-blue-200 bg-blue-50/30 rounded-lg outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Compañía</label>
+                  <input {...register('compania')} placeholder="Ej: Entel, Movistar" className="w-full px-3 py-2 border border-blue-200 bg-blue-50/30 rounded-lg outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">IMSI</label>
                   <input {...register('imsi')} placeholder="IMSI de 15 dígitos" className="w-full px-3 py-2 border border-blue-200 bg-blue-50/30 rounded-lg outline-none focus:ring-2 focus:ring-blue-400" />
                 </div>
               </>

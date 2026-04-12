@@ -166,10 +166,28 @@ export const ActivosPage = () => {
                         {!['Laptop', 'Smartphone', 'SIM Card', 'Desktop'].includes(activo.tipo_dispositivo) && <Package className="w-4 h-4" />}
                       </div>
                       <div>
-                        <p className="font-medium text-gray-800">{activo.marca}</p>
+                        <div className="flex items-center gap-2">
+                            <p className="font-medium text-gray-800">{activo.marca}</p>
+                            {/* Duplicate Badge */}
+                            {(() => {
+                              const isDuplicate = activos.some(a => 
+                                a.serie !== activo.serie && (
+                                  (a.imei && activo.imei && a.imei === activo.imei) ||
+                                  (a.numero_telefono && activo.numero_telefono && a.numero_telefono === activo.numero_telefono)
+                                )
+                              );
+                              return isDuplicate ? (
+                                <span className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded flex items-center gap-1" title="Posible duplicado en BD (IMEI o Teléfono)">
+                                  ⚠️ Duplicado
+                                </span>
+                              ) : null;
+                            })()}
+                        </div>
                         <p className="text-gray-600 text-xs">{activo.modelo}</p>
-                        {activo.imei && <p className="text-[10px] text-blue-600 font-mono mt-1">IMEI: {activo.imei}</p>}
-                        {activo.numero_sim && <p className="text-[10px] text-green-600 font-bold mt-0.5">SIM: {activo.numero_sim}</p>}
+                        {activo.imei && <p className="text-[10px] text-blue-600 font-mono mt-1">IMEI/ICCID: {activo.imei}</p>}
+                        {activo.numero_sim && <p className="text-[10px] text-green-700 font-mono mt-0.5">N° SIM: {activo.numero_sim}</p>}
+                        {activo.numero_telefono && <p className="text-[10px] text-green-700 font-bold mt-0.5">Teléfono: {activo.numero_telefono}</p>}
+                        {activo.compania && <p className="text-[10px] text-orange-600 font-bold mt-0.5">CIA: {activo.compania}</p>}
                         {activo.imsi && <p className="text-[10px] text-purple-600 font-mono mt-0.5">IMSI: {activo.imsi}</p>}
                       </div>
                     </div>

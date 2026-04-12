@@ -40,6 +40,8 @@ const createActivoSchema = z.object({
   imei:             z.string().optional().nullable(),
   numero_sim:       z.string().optional().nullable(),
   imsi:             z.string().optional().nullable(),
+  numero_telefono:  z.string().optional().nullable(),
+  compania:         z.string().optional().nullable(),
 });
 
 // Para actualizaciones: todos los campos son opcionales

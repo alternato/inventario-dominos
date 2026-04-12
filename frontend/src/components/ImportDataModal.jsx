@@ -17,7 +17,9 @@ const DB_FIELDS = [
   { value: 'valor', label: 'Valor/Precio' },
   { value: 'numero_factura', label: 'N° Factura' },
   { value: 'imei', label: 'IMEI' },
-  { value: 'numero_sim', label: 'Número SIM' },
+  { value: 'numero_sim', label: 'Número SIM (Chip)' },
+  { value: 'numero_telefono', label: 'N° Teléfono' },
+  { value: 'compania', label: 'Compañía' },
   { value: 'imsi', label: 'IMSI' },
 ];
 
@@ -36,8 +38,10 @@ const AUTO_MAP = {
   fecha_compra: ['fechadecompra', 'fechacompra', 'compra', 'adquisicion', 'date'],
   valor: ['valor', 'precio', 'costo', 'cost', 'price'],
   numero_factura: ['factura', 'numerodefactura', 'numerofactura', 'nfactura', 'invoice'],
-  imei: ['imei', 'nimei', 'numeroimei'],
-  numero_sim: ['numerosim', 'sim', 'telefono', 'celular', 'numerocelular', 'linea'],
+  imei: ['imei', 'nimei', 'numeroimei', 'iccid'],
+  numero_sim: ['numerosim', 'sim', 'chip'],
+  numero_telefono: ['telefono', 'celular', 'numerocelular', 'linea', 'ntelefono'],
+  compania: ['compania', 'operador', 'carrier', 'empresa'],
   imsi: ['imsi', 'nimsi']
 };
 

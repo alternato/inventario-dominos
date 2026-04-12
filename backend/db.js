@@ -133,21 +133,23 @@ const createActivo = async (activoData, usuarioId = null) => {
   const {
     serie, marca, modelo, estado, tipo_dispositivo,
     rut_responsable, ubicacion, observaciones,
-    fecha_compra, valor, numero_factura, imei, numero_sim, imsi
+    fecha_compra, valor, numero_factura, imei, numero_sim, imsi,
+    numero_telefono, compania
   } = activoData;
 
   const { rows } = await query(
     `INSERT INTO activos
        (serie, marca, modelo, estado, tipo_dispositivo, rut_responsable,
         ubicacion, observaciones, fecha_compra, valor, numero_factura,
-        imei, numero_sim, imsi, created_at, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,NOW(),NOW())
+        imei, numero_sim, imsi, numero_telefono, compania, created_at, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,NOW(),NOW())
      RETURNING *`,
     [
       serie, marca, modelo, estado, tipo_dispositivo,
       rut_responsable || null, ubicacion || null, observaciones || null,
       fecha_compra || null, valor || null, numero_factura || null,
-      imei || null, numero_sim || null, imsi || null
+      imei || null, numero_sim || null, imsi || null,
+      numero_telefono || null, compania || null
     ]
   );
 
@@ -173,7 +175,8 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
   const {
     marca, modelo, estado, tipo_dispositivo,
     rut_responsable, ubicacion, observaciones,
-    fecha_compra, valor, numero_factura, imei, numero_sim, imsi
+    fecha_compra, valor, numero_factura, imei, numero_sim, imsi,
+    numero_telefono, compania
   } = activoData;
 
   const { rows } = await query(
@@ -181,14 +184,16 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
        marca = $1, modelo = $2, estado = $3, tipo_dispositivo = $4,
        rut_responsable = $5, ubicacion = $6, observaciones = $7,
        fecha_compra = $8, valor = $9, numero_factura = $10,
-       imei = $11, numero_sim = $12, imsi = $13, updated_at = NOW()
-     WHERE serie = $14
+       imei = $11, numero_sim = $12, imsi = $13,
+       numero_telefono = $14, compania = $15, updated_at = NOW()
+     WHERE serie = $16
      RETURNING *`,
     [
       marca, modelo, estado, tipo_dispositivo,
       rut_responsable || null, ubicacion || null, observaciones || null,
       fecha_compra || null, valor || null, numero_factura || null,
       imei || null, numero_sim || null, imsi || null,
+      numero_telefono || null, compania || null,
       serie
     ]
   );

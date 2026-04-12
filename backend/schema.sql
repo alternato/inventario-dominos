@@ -59,9 +59,11 @@ CREATE TABLE IF NOT EXISTS activos (
   valor DECIMAL(12, 2),
   numero_factura VARCHAR(100),
   -- Campos nuevos para teléfonos y SIM
-  imei VARCHAR(20),
-  numero_sim VARCHAR(20),
-  imsi VARCHAR(20),
+  imei VARCHAR(50),
+  numero_sim VARCHAR(50),
+  imsi VARCHAR(50),
+  numero_telefono VARCHAR(50),
+  compania VARCHAR(100),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );

@@ -58,6 +58,32 @@ export const Dashboard = () => {
     }, {})
   ).map(([tipo_dispositivo, cantidad]) => ({ tipo_dispositivo, cantidad }));
 
+  // Calcular duplicados localmente si el backend no los provee
+  const duplicadosLocales = useMemo(() => {
+    if (kpis?.duplicados) return kpis.duplicados;
+    const imeisMap = {};
+    const simsMap = {};
+    const telefonosMap = {};
+
+    activos.forEach(a => {
+      if (a.imei && String(a.imei).trim() !== '') {
+        imeisMap[a.imei] = (imeisMap[a.imei] || 0) + 1;
+      }
+      if (a.numero_sim && String(a.numero_sim).trim() !== '') {
+        simsMap[a.numero_sim] = (simsMap[a.numero_sim] || 0) + 1;
+      }
+      if (a.numero_telefono && String(a.numero_telefono).trim() !== '') {
+        telefonosMap[a.numero_telefono] = (telefonosMap[a.numero_telefono] || 0) + 1;
+      }
+    });
+
+    return {
+      imeis: Object.entries(imeisMap).filter(([_, c]) => c > 1).map(([imei, cantidad]) => ({ imei, cantidad })),
+      sims: Object.entries(simsMap).filter(([_, c]) => c > 1).map(([numero_sim, cantidad]) => ({ numero_sim, cantidad })),
+      telefonos: Object.entries(telefonosMap).filter(([_, c]) => c > 1).map(([numero_telefono, cantidad]) => ({ numero_telefono, cantidad }))
+    };
+  }, [activos, kpis]);
+
   const porEstado = kpis?.porEstado ?? Object.entries(
     activos.reduce((acc, a) => {
       acc[a.estado] = (acc[a.estado] || 0) + 1;
@@ -135,7 +161,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Alertas del Sistema */}
-      {kpis?.duplicados && (kpis.duplicados.imeis?.length > 0 || kpis.duplicados.sims?.length > 0) && (
+      {duplicadosLocales && (duplicadosLocales.imeis?.length > 0 || duplicadosLocales.sims?.length > 0 || duplicadosLocales.telefonos?.length > 0) && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -147,11 +173,14 @@ export const Dashboard = () => {
               <h3 className="text-sm font-bold text-red-800">Alerta de Integridad: Registros Duplicados Detectados</h3>
               <div className="mt-2 text-sm text-red-700">
                 <ul className="list-disc pl-5 space-y-1">
-                  {kpis.duplicados.imeis?.length > 0 && (
-                    <li>Hay {kpis.duplicados.imeis.length} IMEI(s) repetidos (ej: {kpis.duplicados.imeis[0].imei} usado por {kpis.duplicados.imeis[0].cantidad} activos)</li>
+                  {duplicadosLocales.imeis?.length > 0 && (
+                    <li>Hay {duplicadosLocales.imeis.length} IMEI(s) repetidos (ej: {duplicadosLocales.imeis[0].imei} usado en {duplicadosLocales.imeis[0].cantidad} activos)</li>
                   )}
-                  {kpis.duplicados.sims?.length > 0 && (
-                    <li>Hay {kpis.duplicados.sims.length} Número(s) SIM repetidos (ej: {kpis.duplicados.sims[0].numero_sim} usado por {kpis.duplicados.sims[0].cantidad} activos)</li>
+                  {duplicadosLocales.sims?.length > 0 && (
+                    <li>Hay {duplicadosLocales.sims.length} Número(s) de Chip ICCID repetidos (ej: {duplicadosLocales.sims[0].numero_sim} usado en {duplicadosLocales.sims[0].cantidad} activos)</li>
+                  )}
+                  {duplicadosLocales.telefonos?.length > 0 && (
+                    <li>Hay {duplicadosLocales.telefonos.length} Teléfono(s) repetidos (ej: {duplicadosLocales.telefonos[0].numero_telefono} usado en {duplicadosLocales.telefonos[0].cantidad} activos)</li>
                   )}
                 </ul>
               </div>
