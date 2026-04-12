@@ -12,8 +12,8 @@ services:
       POSTGRES_DB: inventario_db
       POSTGRES_USER: inventario_user
       POSTGRES_PASSWORD: ${DB_PASSWORD:-inventario_secret_2024}
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"  <-- Comentado para evitar el conflicto bind: address already in use
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
