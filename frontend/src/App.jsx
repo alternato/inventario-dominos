@@ -1,13 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { LoginPage } from './pages/LoginPage-simple';
-import { Dashboard } from './pages/Dashboard';
-import { ActivosPage } from './pages/ActivosPage';
-import { ColaboradoresPage } from './pages/ColaboradoresPage';
-import { HistorialPage } from './pages/HistorialPage';
-import { BusquedaPage } from './pages/BusquedaPage';
-import { UsuariosPage } from './pages/UsuariosPage';
 import { Layout } from './components/Layout';
+
+// Lazy loaded pages
+const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
+const ActivosPage = lazy(() => import('./pages/ActivosPage').then(module => ({ default: module.ActivosPage })));
+const ColaboradoresPage = lazy(() => import('./pages/ColaboradoresPage').then(module => ({ default: module.ColaboradoresPage })));
+const HistorialPage = lazy(() => import('./pages/HistorialPage').then(module => ({ default: module.HistorialPage })));
+const BusquedaPage = lazy(() => import('./pages/BusquedaPage').then(module => ({ default: module.BusquedaPage })));
+const UsuariosPage = lazy(() => import('./pages/UsuariosPage').then(module => ({ default: module.UsuariosPage })));
+
 import { authAPI } from './api';
 import { useAuthStore } from './store/authStore';
 
@@ -55,24 +58,32 @@ function App() {
   const ProtectedRoute = ({ children }) =>
     isAuthenticated ? <Layout onLogout={handleLogout}>{children}</Layout> : <Navigate to="/login" replace />;
 
+  const SuspenseFallback = () => (
+    <div className="flex items-center justify-center h-full min-h-[50vh]">
+      <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+    </div>
+  );
+
   return (
     <Router>
-      <Routes>
-        <Route
-          path="/login"
-          element={isAuthenticated
-            ? <Navigate to="/" replace />
-            : <LoginPage onLoginSuccess={handleLoginSuccess} />
-          }
-        />
-        <Route path="/"              element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/activos"       element={<ProtectedRoute><ActivosPage /></ProtectedRoute>} />
-        <Route path="/colaboradores" element={<ProtectedRoute><ColaboradoresPage /></ProtectedRoute>} />
-        <Route path="/historial"     element={<ProtectedRoute><HistorialPage /></ProtectedRoute>} />
-        <Route path="/buscar"        element={<ProtectedRoute><BusquedaPage /></ProtectedRoute>} />
-        <Route path="/usuarios"      element={<ProtectedRoute>{isSuperAdmin() ? <UsuariosPage /> : <Navigate to="/" replace />}</ProtectedRoute>} />
-        <Route path="*"              element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<SuspenseFallback />}>
+        <Routes>
+          <Route
+            path="/login"
+            element={isAuthenticated
+              ? <Navigate to="/" replace />
+              : <LoginPage onLoginSuccess={handleLoginSuccess} />
+            }
+          />
+          <Route path="/"              element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/activos"       element={<ProtectedRoute><ActivosPage /></ProtectedRoute>} />
+          <Route path="/colaboradores" element={<ProtectedRoute><ColaboradoresPage /></ProtectedRoute>} />
+          <Route path="/historial"     element={<ProtectedRoute><HistorialPage /></ProtectedRoute>} />
+          <Route path="/buscar"        element={<ProtectedRoute><BusquedaPage /></ProtectedRoute>} />
+          <Route path="/usuarios"      element={<ProtectedRoute>{isSuperAdmin() ? <UsuariosPage /> : <Navigate to="/" replace />}</ProtectedRoute>} />
+          <Route path="*"              element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

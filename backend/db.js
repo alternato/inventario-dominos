@@ -1,6 +1,6 @@
-// backend/db.js — Conexión directa a PostgreSQL (sin Supabase SDK)
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
+const mail = require('./mail');
 
 // =============================================
 // POOL DE CONEXIONES A POSTGRESQL
@@ -109,7 +109,8 @@ const getActivos = async () => {
        a.*,
        json_build_object('nombre', c.nombre, 'correo', c.correo) AS colaborador
      FROM activos a
-     LEFT JOIN colaboradores c ON a.rut_responsable = c.rut
+     LEFT JOIN colaboradores c ON a.rut_responsable = c.rut AND c.deleted_at IS NULL
+     WHERE a.deleted_at IS NULL
      ORDER BY a.created_at DESC`
   );
   return rows;
@@ -121,8 +122,8 @@ const getActivoBySerie = async (serie) => {
        a.*,
        json_build_object('nombre', c.nombre, 'correo', c.correo) AS colaborador
      FROM activos a
-     LEFT JOIN colaboradores c ON a.rut_responsable = c.rut
-     WHERE a.serie = $1
+     LEFT JOIN colaboradores c ON a.rut_responsable = c.rut AND c.deleted_at IS NULL
+     WHERE a.serie = $1 AND a.deleted_at IS NULL
      LIMIT 1`,
     [serie]
   );
@@ -217,6 +218,16 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
         tipo_movimiento: tipoMovimiento,
         usuario_id: usuarioId,
       });
+      if (cambioEstado && (estado === 'Mantenimiento' || estado === 'Descartado')) {
+        try {
+          // Obtener información adicional para el correo
+          const activoDetalle = await getActivoBySerie(serie);
+          // Ocupar el correo solicitado: informatica@dominospizza.cl
+          await mail.sendStatusEventAlert(activoDetalle, anterior.estado, estado, 'informatica@dominospizza.cl');
+        } catch (error) {
+          console.error('[Mail] Error enviando alerta de cambio de estado:', error);
+        }
+      }
     }
   }
 
@@ -227,14 +238,22 @@ const deleteActivo = async (serie, usuarioId = null) => {
   // Guardar snapshot antes de borrar para el historial
   const activo = await getActivoBySerie(serie);
 
-  console.log(`[deleteActivo] Intentando borrar serie="${serie}" | Encontrado en BD: ${!!activo}`);
+  console.log(`[deleteActivo] Intentando borrar suavemente serie="${serie}" | Encontrado en BD: ${!!activo}`);
 
-  const result = await query('DELETE FROM activos WHERE serie = $1', [serie]);
+  const stamp = Date.now();
+  const result = await query(
+    `UPDATE activos 
+     SET deleted_at = NOW(), 
+         serie = serie || '_borrado_' || $2 
+     WHERE serie = $1 
+     RETURNING *`, 
+    [serie, stamp]
+  );
 
-  console.log(`[deleteActivo] Filas eliminadas: ${result.rowCount}`);
+  console.log(`[deleteActivo] Filas ocultadas (soft delete): ${result.rowCount}`);
 
   if (result.rowCount === 0) {
-    throw new Error(`No se encontró activo con serie: "${serie}" (0 filas eliminadas)`);
+    throw new Error(`No se encontró activo con serie: "${serie}" (0 filas afectadas)`);
   }
 
   // Registrar baja en historial (persiste aunque el activo ya no exista)
@@ -262,7 +281,8 @@ const getColaboradores = async () => {
        c.*,
        COUNT(a.serie) AS total_activos
      FROM colaboradores c
-     LEFT JOIN activos a ON a.rut_responsable = c.rut AND a.estado = 'Asignado'
+     LEFT JOIN activos a ON a.rut_responsable = c.rut AND a.estado = 'Asignado' AND a.deleted_at IS NULL
+     WHERE c.deleted_at IS NULL
      GROUP BY c.id, c.rut
      ORDER BY c.nombre ASC`
   );
@@ -271,7 +291,7 @@ const getColaboradores = async () => {
 
 const getColaboradorByRut = async (rut) => {
   const { rows } = await query(
-    'SELECT * FROM colaboradores WHERE rut = $1 LIMIT 1',
+    'SELECT * FROM colaboradores WHERE rut = $1 AND deleted_at IS NULL LIMIT 1',
     [rut]
   );
   return rows[0] || null;
@@ -279,7 +299,7 @@ const getColaboradorByRut = async (rut) => {
 
 const getActivosByColaborador = async (rut) => {
   const { rows } = await query(
-    `SELECT * FROM activos WHERE rut_responsable = $1 ORDER BY tipo_dispositivo ASC`,
+    `SELECT * FROM activos WHERE rut_responsable = $1 AND deleted_at IS NULL ORDER BY tipo_dispositivo ASC`,
     [rut]
   );
   return rows;
@@ -324,7 +344,14 @@ const deleteColaborador = async (rut, usuarioId = null) => {
       notas: `Desasignación automática por eliminación de colaborador`,
     });
   }
-  await query('DELETE FROM colaboradores WHERE rut = $1', [rut]);
+  const stamp = Date.now();
+  await query(
+    `UPDATE colaboradores 
+     SET deleted_at = NOW(), 
+         rut = rut || '_borrado_' || $2
+     WHERE rut = $1`, 
+    [rut, stamp]
+  );
 };
 
 // =============================================
@@ -387,13 +414,16 @@ const buscarGlobal = async (q) => {
        FROM activos a
        LEFT JOIN colaboradores c ON a.rut_responsable = c.rut
        WHERE
-         LOWER(a.serie) LIKE $1 OR
-         LOWER(a.marca) LIKE $1 OR
-         LOWER(a.modelo) LIKE $1 OR
-         LOWER(COALESCE(a.imei,'')) LIKE $1 OR
-         LOWER(COALESCE(a.numero_sim,'')) LIKE $1 OR
-         LOWER(COALESCE(a.imsi,'')) LIKE $1 OR
-         LOWER(COALESCE(c.nombre,'')) LIKE $1
+         a.deleted_at IS NULL AND
+         (
+           LOWER(a.serie) LIKE $1 OR
+           LOWER(a.marca) LIKE $1 OR
+           LOWER(a.modelo) LIKE $1 OR
+           LOWER(COALESCE(a.imei,'')) LIKE $1 OR
+           LOWER(COALESCE(a.numero_sim,'')) LIKE $1 OR
+           LOWER(COALESCE(a.imsi,'')) LIKE $1 OR
+           LOWER(COALESCE(c.nombre,'')) LIKE $1
+         )
        ORDER BY a.updated_at DESC
        LIMIT 20`,
       [termino]
@@ -401,12 +431,15 @@ const buscarGlobal = async (q) => {
     query(
       `SELECT * FROM colaboradores
        WHERE
-         LOWER(nombre) LIKE $1 OR
-         LOWER(rut) LIKE $1 OR
-         LOWER(COALESCE(correo,'')) LIKE $1 OR
-         LOWER(COALESCE(telefono,'')) LIKE $1 OR
-         LOWER(COALESCE(cargo,'')) LIKE $1 OR
-         LOWER(COALESCE(area,'')) LIKE $1
+         deleted_at IS NULL AND
+         (
+           LOWER(nombre) LIKE $1 OR
+           LOWER(rut) LIKE $1 OR
+           LOWER(COALESCE(correo,'')) LIKE $1 OR
+           LOWER(COALESCE(telefono,'')) LIKE $1 OR
+           LOWER(COALESCE(cargo,'')) LIKE $1 OR
+           LOWER(COALESCE(area,'')) LIKE $1
+         )
        ORDER BY nombre ASC
        LIMIT 20`,
       [termino]
@@ -433,16 +466,19 @@ const getKPIs = async () => {
         COUNT(*) FILTER (WHERE estado = 'Mantenimiento') AS mantenimiento,
         COUNT(*) FILTER (WHERE estado = 'Descartado') AS descartados
       FROM activos
+      WHERE deleted_at IS NULL
     `),
     query(`
       SELECT tipo_dispositivo, COUNT(*) AS cantidad
       FROM activos
+      WHERE deleted_at IS NULL
       GROUP BY tipo_dispositivo
       ORDER BY cantidad DESC
     `),
     query(`
       SELECT estado, COUNT(*) AS cantidad
       FROM activos
+      WHERE deleted_at IS NULL
       GROUP BY estado
     `),
     query(`
