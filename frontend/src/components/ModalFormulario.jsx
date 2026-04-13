@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useActivosStore } from '../store/activosStore';
-import { X } from 'lucide-react';
+import { X, AlertTriangle, UserMinus } from 'lucide-react';
 
 const activoSchema = z.object({
   serie: z.string().min(1, 'Serie requerida'),
@@ -38,6 +38,10 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
     defaultValues: activo || {},
   });
 
+  const [devolucionData, setDevolucionData] = useState(null);
+  const [motivo, setMotivo] = useState('Desvinculación');
+  const [faltaFirma, setFaltaFirma] = useState(false);
+
   const tipo = watch('tipo_dispositivo'); // Para mostrar campos condicionales
   const imei = watch('imei');
 
@@ -59,14 +63,46 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
   }, [isOpen, activo, reset]);
 
   const onSubmit = async (data) => {
+    // Detectar si es una devolución (quitando al responsable anterior)
+    if (activo) {
+      const responsableAnterior = activo.rut_responsable;
+      const responsableNuevo = data.rut_responsable;
+
+      if (responsableAnterior && responsableAnterior !== responsableNuevo) {
+        // Es una devolución o transferencia!
+        setDevolucionData(data); // Retenemos los datos, no borramos aún
+        return; // Pausamos el submit
+      }
+    }
+
+    ejecutarGuardadoFinal(data);
+  };
+
+  const ejecutarGuardadoFinal = async (dataAGuardar) => {
     const success = activo
-      ? await actualizarActivo(activo.serie, data)
-      : await crearActivo(data);
+      ? await actualizarActivo(activo.serie, dataAGuardar)
+      : await crearActivo(dataAGuardar);
 
     if (success) {
+      setDevolucionData(null);
       onClose();
       reset();
     }
+  };
+
+  const confirmarDevolucion = () => {
+    const payload = {
+      ...devolucionData,
+      motivo_devolucion: motivo,
+      desvincular_usuario: motivo === 'Desvinculación',
+      falta_firma: faltaFirma,
+    };
+    ejecutarGuardadoFinal(payload);
+  };
+
+  const handleCerrar = () => {
+    setDevolucionData(null);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -77,15 +113,89 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-bold text-gray-800">
-            {activo ? 'Editar Activo' : 'Nuevo Activo'}
+            {devolucionData ? 'Asistente de Devolución' : (activo ? 'Editar Activo' : 'Nuevo Activo')}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={handleCerrar} className="text-gray-500 hover:text-gray-700">
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Formulario */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+        {/* Asistente de Devolución */}
+        {devolucionData ? (
+          <div className="p-6 space-y-6">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+              <div className="flex items-start">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" />
+                <p className="text-sm text-yellow-800">
+                  El sistema detectó que se le ha quitado la asignación de este equipo a <strong>{activo.rut_responsable}</strong>. Por favor, selecciona el motivo de devolución.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Motivo de Devolución</label>
+              <select
+                value={motivo}
+                onChange={(e) => setMotivo(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none"
+              >
+                <option value="Desvinculación">Desvinculación del Colaborador</option>
+                <option value="Cambio de Equipo">Cambio o Renovación de Equipo</option>
+                <option value="Reparación">Enviado a Reparación</option>
+                <option value="Licencia Prolongada">Licencia Prolongada / Vacaciones</option>
+                <option value="Otro">Otro / No especificado</option>
+              </select>
+            </div>
+
+            {motivo === 'Desvinculación' && (
+              <div className="bg-red-50 p-4 rounded-lg flex items-center gap-3 border border-red-100">
+                <UserMinus className="text-red-500 w-6 h-6 flex-shrink-0" />
+                <p className="text-sm text-red-700">
+                  <strong>Acción Automática:</strong> Al confirmar, el colaborador será marcado como Inactivo en la base de datos automáticamente.
+                </p>
+              </div>
+            )}
+
+            <div className="border border-gray-200 rounded-lg p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={faltaFirma}
+                  onChange={(e) => setFaltaFirma(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                />
+                <div>
+                  <span className="block text-sm font-medium text-gray-800">
+                    Falta Firma de Recepción (Alerta Automática)
+                  </span>
+                  <span className="block text-xs text-gray-500 mt-1">
+                    Marque esto si el colaborador entregó el equipo sin firmar el documento de recepción. Se enviará un correo automático a Informática avisando para gestión.
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            <div className="flex gap-3 justify-end pt-4 border-t">
+              <button
+                type="button"
+                onClick={() => setDevolucionData(null)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                Atrás
+              </button>
+              <button
+                type="button"
+                onClick={confirmarDevolucion}
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600 disabled:opacity-50"
+              >
+                Confirmar Devolución
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Formulario Normal */
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Serie */}
             <div>
@@ -229,7 +339,7 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
           <div className="flex gap-3 justify-end pt-4 border-t">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleCerrar}
               className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
             >
               Cancelar
@@ -243,6 +353,7 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );

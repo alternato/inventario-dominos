@@ -177,7 +177,9 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
     marca, modelo, estado, tipo_dispositivo,
     rut_responsable, ubicacion, observaciones,
     fecha_compra, valor, numero_factura, imei, numero_sim, imsi,
-    numero_telefono, compania
+    numero_telefono, compania,
+    // Payload extra de devolución
+    motivo_devolucion, desvincular_usuario, falta_firma
   } = activoData;
 
   const { rows } = await query(
@@ -209,6 +211,11 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
       if (cambioResponsable && rut_responsable) tipoMovimiento = 'asignacion';
       if (cambioResponsable && !rut_responsable) tipoMovimiento = 'devolucion';
 
+      let notasHistorial = null;
+      if (motivo_devolucion) {
+        notasHistorial = `Devolución por: ${motivo_devolucion}`;
+      }
+
       await registrarHistorial({
         serie,
         rut_anterior: anterior.rut_responsable,
@@ -217,7 +224,24 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
         estado_nuevo: estado,
         tipo_movimiento: tipoMovimiento,
         usuario_id: usuarioId,
+        notas: notasHistorial,
       });
+
+      // Flujo 1: Desvincular Colaborador
+      if (desvincular_usuario && anterior.rut_responsable) {
+        await desactivarColaborador(anterior.rut_responsable);
+      }
+
+      // Flujo 2: Falta Firma
+      if (falta_firma && anterior.rut_responsable) {
+        try {
+          const colaborador = await getColaboradorByRut(anterior.rut_responsable);
+          const activoDetalle = await getActivoBySerie(serie);
+          await mail.sendMissingSignatureAlert(activoDetalle, colaborador, 'informatica@dominospizza.cl');
+        } catch (err) {
+          console.error('[Mail] Error enviando alerta de falta de firma:', err);
+        }
+      }
       if (cambioEstado && (estado === 'Mantenimiento' || estado === 'Descartado')) {
         try {
           // Obtener información adicional para el correo
@@ -327,6 +351,14 @@ const updateColaborador = async (rut, colaboradorData) => {
     [nombre, correo || null, area, cargo || null, telefono || null, rut]
   );
   return rows[0];
+};
+
+const desactivarColaborador = async (rut) => {
+  console.log(`[desactivarColaborador] Desvinculando colaborador RUT: ${rut}`);
+  await query(
+    `UPDATE colaboradores SET activo = false, updated_at = NOW() WHERE rut = $1`,
+    [rut]
+  );
 };
 
 const deleteColaborador = async (rut, usuarioId = null) => {

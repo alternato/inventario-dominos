@@ -44,8 +44,12 @@ const createActivoSchema = z.object({
   compania:         z.string().optional().nullable(),
 });
 
-// Para actualizaciones: todos los campos son opcionales
-const updateActivoSchema = createActivoSchema.partial().required({ serie: false });
+// Para actualizaciones: todos los campos son opcionales, pero se pueden inyectar banderas de devolución
+const updateActivoSchema = createActivoSchema.partial().extend({
+  motivo_devolucion: z.string().optional().nullable(),
+  desvincular_usuario: z.boolean().optional().nullable(),
+  falta_firma: z.boolean().optional().nullable()
+}).required({ serie: false });
 
 // ─── Colaboradores ───────────────────────────────────────────
 const AREAS = ['Operaciones', 'Administración', 'Logística', 'TI', 'RRHH', 'Marketing', 'Otro'];
