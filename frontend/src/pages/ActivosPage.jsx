@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useActivosStore } from '../store/activosStore';
 import { useAuthStore } from '../store/authStore';
-import { Edit2, Trash2, Plus, Search, Laptop, Smartphone, Wifi, HardDrive, Package, Upload } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search, Laptop, Smartphone, Wifi, HardDrive, Package, Upload, Undo2 } from 'lucide-react';
 import { ModalFormulario } from '../components/ModalFormulario';
+import { ModalDevolucion } from '../components/ModalDevolucion';
 import ImportDataModal from '../components/ImportDataModal';
 
 import { useLocation } from 'react-router-dom';
@@ -14,6 +15,7 @@ export const ActivosPage = () => {
   const [busqueda, setBusqueda] = useState(location.state?.busqueda || '');
   const [filtroEstado, setFiltroEstado] = useState(location.state?.filtroEstado || '');
   const [modalOpen, setModalOpen] = useState(false);
+  const [devolucionModalOpen, setDevolucionModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [activoSeleccionado, setActivoSeleccionado] = useState(null);
 
@@ -54,6 +56,11 @@ export const ActivosPage = () => {
   const handleEditar = (activo) => {
     setActivoSeleccionado(activo);
     setModalOpen(true);
+  };
+
+  const handleDevolucionRapida = (activo) => {
+    setActivoSeleccionado(activo);
+    setDevolucionModalOpen(true);
   };
 
   return (
@@ -204,9 +211,19 @@ export const ActivosPage = () => {
                   {isAdmin() && (
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2">
+                        {activo.rut_responsable && (
+                          <button
+                            onClick={() => handleDevolucionRapida(activo)}
+                            className="p-1 hover:bg-orange-100 rounded text-orange-500"
+                            title="Desasignar / Devolver Rápido"
+                          >
+                            <Undo2 className="w-4 h-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleEditar(activo)}
                           className="p-1 hover:bg-blue-100 rounded text-blue-600"
+                          title="Editar Ficha"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -233,11 +250,20 @@ export const ActivosPage = () => {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modal Edición Regular */}
       <ModalFormulario
         isOpen={modalOpen}
         onClose={() => {
           setModalOpen(false);
+          setActivoSeleccionado(null);
+        }}
+        activo={activoSeleccionado}
+      />
+      {/* Modal Devolución Expresa */}
+      <ModalDevolucion
+        isOpen={devolucionModalOpen}
+        onClose={() => {
+          setDevolucionModalOpen(false);
           setActivoSeleccionado(null);
         }}
         activo={activoSeleccionado}

@@ -79,6 +79,11 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
   };
 
   const ejecutarGuardadoFinal = async (dataAGuardar) => {
+    // Forzar mayúsculas siempre
+    if (dataAGuardar.serie) {
+      dataAGuardar.serie = dataAGuardar.serie.trim().toUpperCase();
+    }
+
     const success = activo
       ? await actualizarActivo(activo.serie, dataAGuardar)
       : await crearActivo(dataAGuardar);
@@ -204,8 +209,8 @@ export const ModalFormulario = ({ isOpen, onClose, activo }) => {
               </label>
               <input
                 {...register('serie')}
-                disabled={!!activo}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg hover:border-gray-400 focus:ring-2 focus:ring-primary"
+                style={{ textTransform: 'uppercase' }}
               />
               {errors.serie && <p className="text-red-500 text-xs mt-1">{errors.serie.message}</p>}
             </div>

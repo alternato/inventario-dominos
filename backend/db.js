@@ -174,6 +174,7 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
   const anterior = await getActivoBySerie(serie);
 
   const {
+    serie: serieIngresada,
     marca, modelo, estado, tipo_dispositivo,
     rut_responsable, ubicacion, observaciones,
     fecha_compra, valor, numero_factura, imei, numero_sim, imsi,
@@ -182,16 +183,21 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
     motivo_devolucion, desvincular_usuario, falta_firma
   } = activoData;
 
+  let nuevaSerie = serieIngresada ? serieIngresada.trim().toUpperCase() : serie;
+  // Prevenir vacíos por error
+  nuevaSerie = nuevaSerie === '' ? serie : nuevaSerie;
+
   const { rows } = await query(
     `UPDATE activos SET
-       marca = $1, modelo = $2, estado = $3, tipo_dispositivo = $4,
-       rut_responsable = $5, ubicacion = $6, observaciones = $7,
-       fecha_compra = $8, valor = $9, numero_factura = $10,
-       imei = $11, numero_sim = $12, imsi = $13,
-       numero_telefono = $14, compania = $15, updated_at = NOW()
-     WHERE serie = $16
+       serie = $1, marca = $2, modelo = $3, estado = $4, tipo_dispositivo = $5,
+       rut_responsable = $6, ubicacion = $7, observaciones = $8,
+       fecha_compra = $9, valor = $10, numero_factura = $11,
+       imei = $12, numero_sim = $13, imsi = $14,
+       numero_telefono = $15, compania = $16, updated_at = NOW()
+     WHERE serie = $17
      RETURNING *`,
     [
+      nuevaSerie,
       marca, modelo, estado, tipo_dispositivo,
       rut_responsable || null, ubicacion || null, observaciones || null,
       fecha_compra || null, valor || null, numero_factura || null,
@@ -200,6 +206,12 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
       serie
     ]
   );
+
+  // Si la serie cambió, debemos heredar la trazabilidad manual de historial_activos
+  if (nuevaSerie !== serie) {
+    console.log(`[updateActivo] La serie primaria cambió de ${serie} a ${nuevaSerie}. Actualizando historial...`);
+    await query(`UPDATE historial_activos SET serie = $1 WHERE serie = $2`, [nuevaSerie, serie]);
+  }
 
   // Registrar en historial si hubo cambio de responsable o estado
   if (anterior) {
@@ -217,7 +229,7 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
       }
 
       await registrarHistorial({
-        serie,
+        serie: nuevaSerie,
         rut_anterior: anterior.rut_responsable,
         rut_nuevo: rut_responsable || null,
         estado_anterior: anterior.estado,
@@ -255,6 +267,7 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
     }
   }
 
+  // Notar que ahora se devuelve el primer registro con su serie nueva si la hubo
   return rows[0];
 };
 
