@@ -95,22 +95,22 @@ export const LoginPage = ({ onLoginSuccess }) => {
     <div className="min-h-screen flex w-full bg-white font-sans overflow-hidden">
       
       {/* ─── PANE IZQUIERDO: Branding VOLTA (Oculto en Móvil) ─── */}
-      <div className="hidden lg:flex lg:w-[55%] relative flex-col justify-center px-16 bg-gray-900 border-r border-gray-800">
+      <div className="hidden lg:flex lg:w-[55%] relative flex-col justify-center px-16 bg-[#f8f9fa] border-r border-gray-200">
         {/* Abstract Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#0070bc] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-t from-black outline-none via-transparent to-transparent opacity-80" />
+          <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#0070bc] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-t from-gray-200/50 outline-none via-transparent to-transparent opacity-80" />
         </div>
 
         <div className="relative z-10 w-full max-w-xl">
-          <h2 className="text-blue-500 font-bold tracking-[0.3em] text-sm mb-4 uppercase">Bienvenido a</h2>
+          <h2 className="text-[#0070bc] font-bold tracking-[0.3em] text-sm mb-4 uppercase">Bienvenido a</h2>
           
-          <h1 className="text-white text-7xl md:text-8xl font-black italic tracking-tighter mb-6 relative hover:scale-105 transition-transform duration-700 ease-out" style={{ filter: 'drop-shadow(0 10px 20px rgba(0,112,188,0.3))' }}>
+          <h1 className="text-gray-900 text-7xl md:text-8xl font-black italic tracking-tighter mb-6 relative hover:scale-105 transition-transform duration-700 ease-out" style={{ filter: 'drop-shadow(0 10px 20px rgba(0,112,188,0.15))' }}>
             <span className="text-[#0070bc]">V</span>OLTA<span className="text-[#E31837]">.</span>
           </h1>
           
-          <p className="text-gray-300 text-lg md:text-xl font-light leading-relaxed mb-10 max-w-md">
-            El sistema de <strong className="text-white font-semibold">Gestión de Inventario TI</strong> y Control de Activos. Todo el hardware corporativo en un mismo lugar, en tiempo real.
+          <p className="text-gray-600 text-lg md:text-xl font-light leading-relaxed mb-10 max-w-md">
+            El sistema de <strong className="text-gray-900 font-bold">Gestión de Inventario TI</strong> y Control de Activos. Todo el hardware corporativo en un mismo lugar, en tiempo real.
           </p>
           
           <div className="h-1 w-20 bg-gradient-to-r from-[#0070bc] to-[#E31837] rounded-full" />
