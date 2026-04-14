@@ -122,10 +122,12 @@ export const LoginPage = ({ onLoginSuccess }) => {
         
         <div className="w-full max-w-md">
           {/* Logo y Titular */}
-          <div className="flex flex-col items-start mb-10">
+          <div className="flex flex-col items-center text-center mb-10">
             <DominosLogo />
-            <h2 className="text-3xl font-black text-gray-900 mb-1 tracking-tight">ACCESO VOLTA.</h2>
-            <p className="text-gray-500 font-medium text-sm">Inicia sesión en tu cuenta para continuar</p>
+            <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter text-gray-900 mb-1" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.05))' }}>
+              <span className="text-[#0070bc]">A</span>CCESO<span className="text-[#E31837]">.</span>
+            </h2>
+            <p className="text-gray-500 font-medium text-sm mt-3">Inicia sesión en tu cuenta para continuar</p>
           </div>
 
           {/* Área de Errores Globales */}
