@@ -6,6 +6,7 @@ import {
   Phone, Mail, Building2, ChevronRight, X
 } from 'lucide-react';
 import { ModalColaborador } from '../components/ModalColaborador';
+import { MicrosoftPhoto } from '../components/MicrosoftPhoto';
 
 export const ColaboradoresPage = () => {
   const { colaboradores, cargarColaboradores, cargarActivos, activos, eliminarColaborador } = useActivosStore();
@@ -205,9 +206,11 @@ export const ColaboradoresPage = () => {
 
             {/* Avatar y datos */}
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mx-auto mb-3">
-                {vistaDetalle.nombre?.charAt(0).toUpperCase()}
-              </div>
+              <MicrosoftPhoto 
+                email={vistaDetalle.correo} 
+                nombre={vistaDetalle.nombre} 
+                className="w-16 h-16 rounded-full mx-auto mb-3"
+              />
               <h4 className="font-semibold text-gray-800">{vistaDetalle.nombre}</h4>
               <p className="text-sm text-gray-500 font-mono">{vistaDetalle.rut}</p>
               <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${coloresArea[vistaDetalle.area] || coloresArea['Otro']}`}>
