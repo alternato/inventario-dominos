@@ -612,9 +612,6 @@ module.exports = {
   buscarGlobal,
   // KPIs
   getKPIs,
-  // PIN
-  getUsuarioByPin,
-  setUsuarioPin,
   // Pool directo (para queries custom)
   pool,
 };
