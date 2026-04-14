@@ -251,38 +251,7 @@ app.post('/api/auth/sso-login', loginLimiter, async (req, res) => {
   }
 });
 
-// PIN Login
-app.post('/api/auth/pin-login', pinLimiter, async (req, res) => {
-  try {
-    const { pin } = req.body;
-    if (!pin || pin.length < 4) {
-      return res.status(400).json({ error: 'PIN debe tener al menos 4 dígitos' });
-    }
-    const usuario = await db.getUsuarioByPin(pin);
-    if (!usuario) {
-      return res.status(401).json({ error: 'PIN incorrecto' });
-    }
-    if (!usuario.activo) {
-      return res.status(401).json({ error: 'Usuario inactivo' });
-    }
-    const token = jwt.sign(
-      { id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol },
-      process.env.JWT_SECRET,
-      { expiresIn: '8h' }
-    );
-    res.cookie('authToken', token, {
-      httpOnly: true, secure: true,
-      sameSite: 'strict', maxAge: 8 * 60 * 60 * 1000, path: '/'
-    });
-    res.json({
-      message: 'Login por PIN exitoso',
-      usuario: { id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol }
-    });
-  } catch (error) {
-    console.error('PIN Login Error:', error);
-    res.status(500).json({ error: 'Error al procesar PIN login' });
-  }
-});
+
 // Verificar sesión activa
 app.get('/api/auth/verify', authenticate, (req, res) => {
   res.json({ usuario: req.user });
@@ -299,24 +268,7 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ message: 'Sesión cerrada' });
 });
 
-// Asignar PIN a usuario (solo superadmin)
-app.post('/api/usuarios/:id/set-pin', authenticate, requireSuperAdmin, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { pin } = req.body;
-    // Si pin es null, se elimina el PIN del usuario
-    if (pin !== null && pin !== undefined && !/^\d{4,8}$/.test(pin)) {
-      return res.status(400).json({ error: 'El PIN debe ser numérico y tener entre 4 y 8 dígitos' });
-    }
-    const usuario = await db.setUsuarioPin(parseInt(id), pin);
-    if (!usuario) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
-    }
-    res.json({ message: 'PIN configurado exitosamente', usuario });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al configurar PIN' });
-  }
-});
+
 
 // [ELIMINADO] Rutas duplicadas de logout y verify (A3)
 

@@ -576,39 +576,7 @@ const getKPIs = async () => {
   };
 };
 
-// =============================================
-// PIN DE ACCESO RÁPIDO
-// =============================================
 
-const getUsuarioByPin = async (pin) => {
-  // Buscamos todos los usuarios con pin configurado
-  const { rows } = await query(
-    `SELECT * FROM usuarios WHERE pin IS NOT NULL AND activo = true`
-  );
-  // Comparamos el PIN ingresado con cada hash almacenado
-  for (const usuario of rows) {
-    const match = await bcrypt.compare(pin, usuario.pin);
-    if (match) return usuario;
-  }
-  return null;
-};
-
-const setUsuarioPin = async (usuarioId, pin) => {
-  if (pin === null || pin === undefined) {
-    // Eliminar PIN
-    const { rows } = await query(
-      `UPDATE usuarios SET pin = NULL, updated_at = NOW() WHERE id = $1 RETURNING id, email, nombre, rol`,
-      [usuarioId]
-    );
-    return rows[0] || null;
-  }
-  const hashedPin = await bcrypt.hash(pin, 10);
-  const { rows } = await query(
-    `UPDATE usuarios SET pin = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, nombre, rol`,
-    [hashedPin, usuarioId]
-  );
-  return rows[0] || null;
-};
 
 // =============================================
 // EXPORTS

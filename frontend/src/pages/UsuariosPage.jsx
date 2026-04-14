@@ -1,79 +1,6 @@
 import { useEffect, useState } from 'react';
 import { usuariosAPI } from '../api';
-import { Shield, Key, Check, X, AlertCircle, UserCheck, Loader2, Pencil, UserX, UserPlus, ChevronDown, ChevronUp } from 'lucide-react';
-
-// ─── Teclado numérico para asignar PIN ───────────────────────────────────────
-const PinKeypad = ({ onConfirm, onCancel }) => {
-  const [pin, setPin] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [step, setStep] = useState('enter'); // 'enter' | 'confirm'
-  const [error, setError] = useState('');
-  const PIN_LEN = 6;
-
-  const handlePress = (d) => {
-    if (step === 'enter' && pin.length < PIN_LEN) {
-      const next = pin + d;
-      setPin(next);
-      if (next.length === PIN_LEN) setStep('confirm');
-    } else if (step === 'confirm' && confirm.length < PIN_LEN) {
-      const next = confirm + d;
-      setConfirm(next);
-      if (next.length === PIN_LEN) {
-        if (next !== pin) {
-          setError('Los PINes no coinciden. Empieza de nuevo.');
-          setPin(''); setConfirm(''); setStep('enter');
-        } else {
-          onConfirm(pin);
-        }
-      }
-    }
-  };
-
-  const handleDel = () => {
-    if (step === 'enter') setPin(p => p.slice(0, -1));
-    else setConfirm(p => p.slice(0, -1));
-  };
-
-  const keys = [1,2,3,4,5,6,7,8,9,null,0,'del'];
-  const current = step === 'enter' ? pin : confirm;
-
-  return (
-    <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200">
-      <p className="text-center text-sm font-bold text-gray-700 mb-1">
-        {step === 'enter' ? '🔢 Ingresa el nuevo PIN (6 dígitos)' : '✅ Confirma el PIN'}
-      </p>
-      <div className="flex justify-center gap-3 my-3">
-        {Array.from({ length: PIN_LEN }).map((_, i) => (
-          <div key={i} className={`w-3.5 h-3.5 rounded-full border-2 transition-all ${
-            i < current.length ? 'bg-[#0070bc] border-[#0070bc]' : 'bg-transparent border-gray-300'
-          }`} />
-        ))}
-      </div>
-      {error && <p className="text-red-500 text-xs text-center mb-2 font-medium">{error}</p>}
-      <div className="grid grid-cols-3 gap-2">
-        {keys.map((k, i) => {
-          if (k === null) return <div key={i} />;
-          if (k === 'del') return (
-            <button key={i} onClick={handleDel}
-              className="bg-gray-200 hover:bg-gray-300 active:scale-95 rounded-xl h-12 flex items-center justify-center text-gray-500 font-bold text-base transition-all">
-              ⌫
-            </button>
-          );
-          return (
-            <button key={i} onClick={() => handlePress(k.toString())}
-              className="bg-white hover:bg-blue-50 active:scale-95 border border-gray-200 hover:border-blue-300 rounded-xl h-12 flex items-center justify-center text-gray-800 font-semibold text-lg transition-all shadow-sm">
-              {k}
-            </button>
-          );
-        })}
-      </div>
-      <button onClick={onCancel}
-        className="w-full mt-3 text-xs text-gray-400 hover:text-gray-600 font-medium transition text-center">
-        Cancelar
-      </button>
-    </div>
-  );
-};
+import { Shield, Check, X, AlertCircle, UserCheck, Loader2, Pencil, UserX, UserPlus, ChevronDown, ChevronUp } from 'lucide-react';
 
 // ─── Formulario de edición ────────────────────────────────────────────────────
 const EditForm = ({ usuario, onSave, onCancel }) => {
@@ -261,7 +188,6 @@ export const UsuariosPage = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [editando, setEditando] = useState(null);     // ID en modo edición
-  const [configurandoPin, setConfigurandoPin] = useState(null); // ID con teclado PIN abierto
   const [mostrarNuevo, setMostrarNuevo] = useState(false);
   const [expandedRow, setExpandedRow] = useState(null); // fila con acciones expandidas
 
@@ -298,29 +224,6 @@ export const UsuariosPage = () => {
     fetchUsuarios();
   };
 
-  const handleSetPin = async (usuarioId, pin) => {
-    try {
-      await usuariosAPI.setPin(usuarioId, pin);
-      notify('✅ PIN configurado correctamente');
-      setConfigurandoPin(null);
-      fetchUsuarios();
-    } catch (e) {
-      notify(e.response?.data?.error || 'Error al configurar PIN', true);
-      setConfigurandoPin(null);
-    }
-  };
-
-  const handleRemovePin = async (usuarioId) => {
-    if (!window.confirm('¿Deseas eliminar el PIN de acceso rápido de este usuario?')) return;
-    try {
-      await usuariosAPI.setPin(usuarioId, null);
-      notify('PIN eliminado');
-      fetchUsuarios();
-    } catch {
-      notify('Error al eliminar PIN', true);
-    }
-  };
-
   if (loading) return (
     <div className="flex items-center justify-center h-64">
       <Loader2 className="w-8 h-8 animate-spin text-[#0070bc]" />
@@ -336,12 +239,12 @@ export const UsuariosPage = () => {
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-gray-800">Gestión de Usuarios y PINes</h1>
-            <p className="text-sm text-gray-500">Crea, edita y administra los PINes de cada usuario.</p>
+            <h1 className="text-xl font-extrabold text-gray-800">Gestión de Usuarios</h1>
+            <p className="text-sm text-gray-500">Crea, edita y administra los usuarios del sistema.</p>
           </div>
         </div>
         <button
-          onClick={() => { setMostrarNuevo(v => !v); setEditando(null); setConfigurandoPin(null); }}
+          onClick={() => { setMostrarNuevo(v => !v); setEditando(null); }}
           className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition shadow-sm"
         >
           <UserPlus className="w-4 h-4" />
@@ -366,15 +269,6 @@ export const UsuariosPage = () => {
         <NuevoUsuarioForm onCrear={handleCrear} onCancel={() => setMostrarNuevo(false)} />
       )}
 
-      {/* Info */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-700 flex gap-2">
-        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-        <span>
-          El PIN de acceso rápido permite ingresar al sistema sin correo ni contraseña.
-          Debe tener <strong>6 dígitos numéricos</strong> y es <strong>único por usuario</strong>.
-        </span>
-      </div>
-
       {/* Tabla */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
@@ -385,7 +279,6 @@ export const UsuariosPage = () => {
                 <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-4">Email</th>
                 <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-4">Rol</th>
                 <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-4">Estado</th>
-                <th className="text-center text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-4">PIN</th>
                 <th className="text-right text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-4">Acciones</th>
               </tr>
             </thead>
@@ -413,22 +306,12 @@ export const UsuariosPage = () => {
                         {u.activo ? <><UserCheck className="w-3.5 h-3.5" />Activo</> : <><UserX className="w-3.5 h-3.5" />Inactivo</>}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-center">
-                      {u.pin ? (
-                        <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">
-                          <Key className="w-3 h-3" /> Configurado
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400 font-medium">Sin PIN</span>
-                      )}
-                    </td>
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => {
                           const next = expandedRow === u.id ? null : u.id;
                           setExpandedRow(next);
                           setEditando(null);
-                          setConfigurandoPin(null);
                         }}
                         className="inline-flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-2 rounded-lg transition"
                       >
@@ -441,32 +324,17 @@ export const UsuariosPage = () => {
                   {/* Fila expandida con acciones */}
                   {expandedRow === u.id && (
                     <tr key={`exp-${u.id}`}>
-                      <td colSpan={6} className="px-6 py-4 bg-gray-50/80 border-b border-gray-100">
+                      <td colSpan={5} className="px-6 py-4 bg-gray-50/80 border-b border-gray-100">
                         <div className="space-y-4">
                           {/* Botones de acción */}
-                          {editando !== u.id && configurandoPin !== u.id && (
+                          {editando !== u.id && (
                             <div className="flex flex-wrap gap-2">
                               <button
-                                onClick={() => { setEditando(u.id); setConfigurandoPin(null); }}
+                                onClick={() => setEditando(u.id)}
                                 className="flex items-center gap-1.5 bg-[#0070bc] hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition"
                               >
                                 <Pencil className="w-3.5 h-3.5" /> Editar datos
                               </button>
-                              <button
-                                onClick={() => { setConfigurandoPin(u.id); setEditando(null); }}
-                                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition"
-                              >
-                                <Key className="w-3.5 h-3.5" />
-                                {u.pin ? 'Cambiar PIN' : 'Asignar PIN'}
-                              </button>
-                              {u.pin && (
-                                <button
-                                  onClick={() => handleRemovePin(u.id)}
-                                  className="flex items-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-4 py-2 rounded-lg border border-red-200 transition"
-                                >
-                                  <X className="w-3.5 h-3.5" /> Quitar PIN
-                                </button>
-                              )}
                             </div>
                           )}
 
@@ -477,19 +345,6 @@ export const UsuariosPage = () => {
                               onSave={handleEditar}
                               onCancel={() => setEditando(null)}
                             />
-                          )}
-
-                          {/* Teclado PIN */}
-                          {configurandoPin === u.id && (
-                            <div className="max-w-xs">
-                              <p className="text-xs font-bold text-indigo-700 mb-3 uppercase tracking-widest">
-                                Asignando PIN a {u.nombre}
-                              </p>
-                              <PinKeypad
-                                onConfirm={(pin) => handleSetPin(u.id, pin)}
-                                onCancel={() => setConfigurandoPin(null)}
-                              />
-                            </div>
                           )}
                         </div>
                       </td>

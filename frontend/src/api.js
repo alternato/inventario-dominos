@@ -32,7 +32,6 @@ apiClient.interceptors.response.use(
 export const authAPI = {
   login:         (email, password) => apiClient.post('/auth/login', { email, password }),
   ssoLogin:      (email, msToken)  => apiClient.post('/auth/sso-login', { email, msToken }),
-  pinLogin:      (pin)             => apiClient.post('/auth/pin-login', { pin }),
   logout:        ()                => apiClient.post('/auth/logout'),
   verify:        ()                => apiClient.get('/auth/verify'),
   forgotPassword:(email)           => apiClient.post('/auth/forgot-password', { email }),
@@ -81,7 +80,6 @@ export const usuariosAPI = {
   listar:     ()           => apiClient.get('/usuarios'),
   crear:      (data)       => apiClient.post('/usuarios', data),
   actualizar: (id, data)   => apiClient.put(`/usuarios/${id}`, data),
-  setPin:     (id, pin)    => apiClient.post(`/usuarios/${id}/set-pin`, { pin }),
 };
 
 export default apiClient;
