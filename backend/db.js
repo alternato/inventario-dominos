@@ -354,14 +354,14 @@ const createColaborador = async (colaboradorData) => {
 };
 
 const updateColaborador = async (rut, colaboradorData) => {
-  const { nombre, correo, area, cargo, telefono } = colaboradorData;
+  const { rut: rutNuevo, nombre, correo, area, cargo, telefono } = colaboradorData;
   const { rows } = await query(
     `UPDATE colaboradores SET
-       nombre = $1, correo = $2, area = $3, cargo = $4,
-       telefono = $5, updated_at = NOW()
-     WHERE rut = $6
+       rut = $1, nombre = $2, correo = $3, area = $4, cargo = $5,
+       telefono = $6, updated_at = NOW()
+     WHERE rut = $7
      RETURNING *`,
-    [nombre, correo || null, area, cargo || null, telefono || null, rut]
+    [rutNuevo || rut, nombre, correo || null, area, cargo || null, telefono || null, rut]
   );
   return rows[0];
 };

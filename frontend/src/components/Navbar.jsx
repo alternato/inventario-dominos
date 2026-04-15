@@ -75,7 +75,7 @@ export const Navbar = ({ onLogout }) => {
   ];
 
   return (
-    <nav className="bg-[#008ce7] text-white shadow-md relative z-50">
+    <nav className="bg-white text-gray-800 shadow-md relative z-50 border-b border-gray-100">
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 flex items-center justify-between h-16">
 
         {/* LOGO AREA */}
@@ -86,10 +86,9 @@ export const Navbar = ({ onLogout }) => {
             className="w-8 h-8 object-contain shrink-0"
           />
           <span
-            className="font-black italic tracking-tighter text-xl ml-1 mr-4"
-            style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.25))' }}
+            className="font-black italic tracking-tighter text-[1.6rem] leading-none ml-1 mr-4 select-none"
           >
-            <span style={{ color: '#ffffff' }}>V</span>OLTA<span style={{ color: '#E31837' }}>.</span>
+            <span style={{ color: '#008ce7' }}>V</span><span style={{ color: '#0f1c2e' }}>OLTA</span><span style={{ color: '#E31837' }}>.</span>
           </span>
         </div>
 
@@ -101,8 +100,8 @@ export const Navbar = ({ onLogout }) => {
               to={path}
               className={`text-xs font-bold uppercase tracking-wide px-2 py-5 border-b-4 transition-colors ${
                 isActive(path)
-                  ? 'border-white text-white'
-                  : 'border-transparent text-blue-100 hover:text-white'
+                  ? 'border-[#008ce7] text-[#008ce7]'
+                  : 'border-transparent text-gray-500 hover:text-[#0f1c2e] hover:border-gray-300'
               }`}
             >
               {label}
@@ -114,10 +113,10 @@ export const Navbar = ({ onLogout }) => {
         <div className="hidden md:flex items-center gap-3">
           <UserPhoto email={usuario?.email} nombre={usuario?.nombre} />
           <div className="text-right leading-tight">
-            <span className="block text-[10px] font-bold text-blue-200 uppercase tracking-widest">
+            <span className="block text-[10px] font-bold text-[#008ce7] uppercase tracking-widest">
               {usuario?.rol || 'USER'}
             </span>
-            <span className="block text-sm font-semibold">{usuario?.nombre || 'Usuario'}</span>
+            <span className="block text-sm font-semibold text-[#0f1c2e]">{usuario?.nombre || 'Usuario'}</span>
           </div>
           <button
             onClick={handleLogout}
@@ -139,7 +138,7 @@ export const Navbar = ({ onLogout }) => {
 
       {/* MOBILE MENU */}
       {isOpen && (
-        <div className="md:hidden bg-[#008ce7] border-t border-blue-400 absolute w-full left-0 shadow-xl">
+        <div className="md:hidden bg-white border-t border-gray-200 absolute w-full left-0 shadow-xl">
           <div className="px-4 py-3 space-y-2">
             {menuItems.map(({ path, label }) => (
               <Link
@@ -147,18 +146,18 @@ export const Navbar = ({ onLogout }) => {
                 to={path}
                 onClick={() => setIsOpen(false)}
                 className={`block px-3 py-2 rounded-md font-bold text-sm ${
-                  isActive(path) ? 'bg-white/20 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white'
+                  isActive(path) ? 'bg-blue-50 text-[#008ce7]' : 'text-gray-600 hover:bg-gray-50 hover:text-[#0f1c2e]'
                 }`}
               >
                 {label}
               </Link>
             ))}
-            <div className="border-t border-blue-400 mt-2 pt-2 flex items-center justify-between">
+            <div className="border-t border-gray-200 mt-2 pt-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <UserPhoto email={usuario?.email} nombre={usuario?.nombre} />
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-blue-200 uppercase">{usuario?.rol || 'USER'}</span>
-                  <span className="text-sm font-semibold">{usuario?.nombre}</span>
+                  <span className="text-[10px] text-[#008ce7] uppercase font-bold">{usuario?.rol || 'USER'}</span>
+                  <span className="text-sm font-semibold text-[#0f1c2e]">{usuario?.nombre}</span>
                 </div>
               </div>
               <button

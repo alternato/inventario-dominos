@@ -68,7 +68,12 @@ export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) =>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Field label="RUT" name="rut" required disabled={!!colaborador} placeholder="12.345.678-9" />
+            <div>
+              <Field label="RUT" name="rut" required placeholder="12345678-9" />
+              {colaborador && (
+                <p className="text-xs text-amber-600 mt-1">⚠️ Cambia solo si el RUT era incorrecto</p>
+              )}
+            </div>
             <Field label="Nombre completo" name="nombre" required placeholder="Juan Pérez" />
           </div>
 
