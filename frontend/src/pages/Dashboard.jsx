@@ -79,12 +79,21 @@ export const Dashboard = () => {
 
   const duplicadosLocales = useMemo(() => {
     if (kpis?.duplicados) return kpis.duplicados;
+
+    // Solo chequeamos activos NO descartados — un equipo descartado libera su SIM/IMEI
+    const activos_activos = activos.filter(a => a.estado !== 'Descartado');
+
     const imeisMap = {}, simsMap = {}, telefonosMap = {};
-    activos.forEach(a => {
-      if (a.imei && String(a.imei).trim())           imeisMap[a.imei]                     = (imeisMap[a.imei] || 0) + 1;
-      if (a.numero_sim && String(a.numero_sim).trim()) simsMap[a.numero_sim]               = (simsMap[a.numero_sim] || 0) + 1;
-      if (a.numero_telefono && String(a.numero_telefono).trim()) telefonosMap[a.numero_telefono] = (telefonosMap[a.numero_telefono] || 0) + 1;
+    activos_activos.forEach(a => {
+      const imei = String(a.imei ?? '').trim();
+      const sim  = String(a.numero_sim ?? '').trim();
+      const tel  = String(a.numero_telefono ?? '').trim();
+
+      if (imei) imeisMap[imei] = (imeisMap[imei] || 0) + 1;
+      if (sim)  simsMap[sim]   = (simsMap[sim]   || 0) + 1;
+      if (tel)  telefonosMap[tel] = (telefonosMap[tel] || 0) + 1;
     });
+
     return {
       imeis:    Object.entries(imeisMap).filter(([,c]) => c > 1).map(([imei, cantidad]) => ({ imei, cantidad })),
       sims:     Object.entries(simsMap).filter(([,c]) => c > 1).map(([numero_sim, cantidad]) => ({ numero_sim, cantidad })),
