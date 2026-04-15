@@ -550,14 +550,18 @@ const getKPIs = async () => {
     query(`
       SELECT imei, COUNT(*) AS cantidad, array_agg(serie) AS series
       FROM activos
-      WHERE imei IS NOT NULL AND imei != ''
+      WHERE imei IS NOT NULL AND TRIM(imei) != ''
+        AND deleted_at IS NULL
+        AND estado != 'Descartado'
       GROUP BY imei
       HAVING COUNT(*) > 1
     `),
     query(`
       SELECT numero_sim, COUNT(*) AS cantidad, array_agg(serie) AS series
       FROM activos
-      WHERE numero_sim IS NOT NULL AND numero_sim != ''
+      WHERE numero_sim IS NOT NULL AND TRIM(numero_sim) != ''
+        AND deleted_at IS NULL
+        AND estado != 'Descartado'
       GROUP BY numero_sim
       HAVING COUNT(*) > 1
     `),
