@@ -1,8 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Menu, X, Package, Home, Users, Clock, Search, Settings, Power } from 'lucide-react';
+import { Menu, X, Power } from 'lucide-react';
+import { getMsalInstance } from '../msalInstance';
 
+// ─── Foto del usuario logueado desde Microsoft Graph ─────────────────────────
+const UserPhoto = ({ email, nombre }) => {
+  const [photoUrl, setPhotoUrl] = useState(null);
+
+  useEffect(() => {
+    if (!email) return;
+    const fetchPhoto = async () => {
+      try {
+        const msal = await getMsalInstance();
+        const accounts = msal.getAllAccounts();
+        if (accounts.length === 0) return;
+        const tokenResp = await msal.acquireTokenSilent({
+          scopes: ['User.Read'],
+          account: accounts[0],
+        });
+        // Foto del propio usuario logueado
+        const resp = await fetch(
+          'https://graph.microsoft.com/v1.0/me/photo/$value',
+          { headers: { Authorization: `Bearer ${tokenResp.accessToken}` } }
+        );
+        if (resp.ok) {
+          const blob = await resp.blob();
+          setPhotoUrl(URL.createObjectURL(blob));
+        }
+      } catch {
+        // Sin foto: muestra iniciales
+      }
+    };
+    fetchPhoto();
+  }, [email]);
+
+  const inicial = nombre?.charAt(0).toUpperCase() || '?';
+
+  if (photoUrl) {
+    return (
+      <img
+        src={photoUrl}
+        alt={nombre}
+        className="w-8 h-8 rounded-full object-cover ring-2 ring-white/40 shadow-sm flex-shrink-0"
+      />
+    );
+  }
+  return (
+    <div className="w-8 h-8 rounded-full bg-white/20 ring-2 ring-white/40 flex items-center justify-center text-sm font-black text-white flex-shrink-0">
+      {inicial}
+    </div>
+  );
+};
+
+// ─── Navbar principal ─────────────────────────────────────────────────────────
 export const Navbar = ({ onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { logout, usuario, isAdmin, isSuperAdmin } = useAuthStore();
@@ -26,11 +77,20 @@ export const Navbar = ({ onLogout }) => {
   return (
     <nav className="bg-[#008ce7] text-white shadow-md relative z-50">
       <div className="max-w-[1600px] mx-auto px-4 md:px-6 flex items-center justify-between h-16">
-        
+
         {/* LOGO AREA */}
         <div className="flex items-center gap-2">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Domino%27s_pizza_logo.svg" alt="Domino's logo" className="w-8 h-8 object-contain shrink-0" />
-          <span className="font-black text-xl tracking-tight ml-2 mr-4">VOLTA</span>
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Domino%27s_pizza_logo.svg"
+            alt="Domino's logo"
+            className="w-8 h-8 object-contain shrink-0"
+          />
+          <span
+            className="font-black italic tracking-tighter text-xl ml-1 mr-4"
+            style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.25))' }}
+          >
+            <span style={{ color: '#ffffff' }}>V</span>OLTA<span style={{ color: '#E31837' }}>.</span>
+          </span>
         </div>
 
         {/* DESKTOP LINKS */}
@@ -50,15 +110,18 @@ export const Navbar = ({ onLogout }) => {
           ))}
         </div>
 
-        {/* RIGHT AREA (USER INFO & LOGOUT) */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* RIGHT AREA (USER PHOTO, INFO & LOGOUT) */}
+        <div className="hidden md:flex items-center gap-3">
+          <UserPhoto email={usuario?.email} nombre={usuario?.nombre} />
           <div className="text-right leading-tight">
-            <span className="block text-[10px] font-bold text-blue-200 uppercase tracking-widest">{usuario?.rol || 'USER'}</span>
+            <span className="block text-[10px] font-bold text-blue-200 uppercase tracking-widest">
+              {usuario?.rol || 'USER'}
+            </span>
             <span className="block text-sm font-semibold">{usuario?.nombre || 'Usuario'}</span>
           </div>
-          <button 
-            onClick={handleLogout} 
-            className="flex items-center gap-2 bg-[#E31837] hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all shadow-md active:scale-95"
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 bg-[#E31837] hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-all shadow-md active:scale-95 ml-1"
             title="Cerrar Sesión"
           >
             <Power className="w-3.5 h-3.5" />
@@ -91,12 +154,15 @@ export const Navbar = ({ onLogout }) => {
               </Link>
             ))}
             <div className="border-t border-blue-400 mt-2 pt-2 flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-[10px] text-blue-200 uppercase">{usuario?.rol || 'USER'}</span>
-                <span className="text-sm font-semibold">{usuario?.nombre}</span>
+              <div className="flex items-center gap-2">
+                <UserPhoto email={usuario?.email} nombre={usuario?.nombre} />
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-blue-200 uppercase">{usuario?.rol || 'USER'}</span>
+                  <span className="text-sm font-semibold">{usuario?.nombre}</span>
+                </div>
               </div>
-              <button 
-                onClick={handleLogout} 
+              <button
+                onClick={handleLogout}
                 className="flex items-center gap-2 px-3 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm text-xs font-bold uppercase tracking-wider transition-colors"
                 title="Cerrar Sesión"
               >
