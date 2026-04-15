@@ -231,7 +231,7 @@ export const UsuariosPage = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-y-auto h-full">
       {/* Header */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-3">

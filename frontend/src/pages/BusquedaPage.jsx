@@ -50,7 +50,7 @@ export const BusquedaPage = () => {
     : 0;
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto overflow-y-auto h-full">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-800">Búsqueda Global</h1>

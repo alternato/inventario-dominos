@@ -65,7 +65,7 @@ export const HistorialPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-y-auto h-full">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-800">Historial de Trazabilidad</h1>

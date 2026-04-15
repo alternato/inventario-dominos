@@ -64,7 +64,7 @@ export const ColaboradoresPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-y-auto h-full">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all ${toast.tipo === 'error' ? 'bg-red-500' : 'bg-green-500'}`}>
