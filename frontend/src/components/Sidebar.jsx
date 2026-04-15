@@ -36,12 +36,11 @@ export const Sidebar = () => {
         {/* Logo */}
         <div className="mb-8 px-1">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Package className="w-4 h-4 text-white" />
-            </div>
-            <h1 className="text-lg font-bold">VOLTA</h1>
+            <h1 className="text-2xl font-black italic tracking-tighter" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,112,188,0.4))' }}>
+              <span className="text-[#0070bc]">V</span>OLTA<span className="text-[#E31837]">.</span>
+            </h1>
           </div>
-          <p className="text-blue-300 text-xs pl-10">Domino's Pizza Chile</p>
+          <p className="text-blue-300 text-xs pl-1">Gestión de Inventario TI</p>
         </div>
 
         {/* Menú */}

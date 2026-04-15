@@ -209,7 +209,7 @@ export const ColaboradoresPage = () => {
               <MicrosoftPhoto 
                 email={vistaDetalle.correo} 
                 nombre={vistaDetalle.nombre} 
-                className="w-16 h-16 rounded-full mx-auto mb-3"
+                className="w-24 h-24 rounded-full mx-auto mb-3 ring-4 ring-gray-100 shadow-md"
               />
               <h4 className="font-semibold text-gray-800">{vistaDetalle.nombre}</h4>
               <p className="text-sm text-gray-500 font-mono">{vistaDetalle.rut}</p>
