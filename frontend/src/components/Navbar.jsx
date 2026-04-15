@@ -93,9 +93,14 @@ export const Navbar = ({ onLogout }) => {
           />
           <span
             className="font-black italic tracking-tighter text-[1.6rem] leading-none ml-1 mr-4 select-none"
-            style={{ filter: 'drop-shadow(0 1px 6px rgba(0,0,0,0.25))' }}
           >
-            <span className="text-white">V</span><span className="text-white/90">OLTA</span><span style={{ color: '#E31837' }}>.</span>
+            <span style={{
+              color: '#008ce7',
+              textShadow: '0 0 6px white, 0 0 3px white, 1px 1px 0 white, -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white'
+            }}>V</span><span style={{
+              color: '#0f1c2e',
+              textShadow: '0 0 6px white, 0 0 3px white, 1px 1px 0 white, -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white'
+            }}>OLTA</span><span style={{ color: '#E31837', textShadow: '0 0 4px white' }}>.</span>
           </span>
         </div>
 
