@@ -121,7 +121,7 @@ export const ActivosPage = () => {
 
       {/* ── Columna principal ───────────────────────────────────── */}
       <div
-        className="flex-1 flex flex-col gap-5 overflow-y-auto transition-all duration-300"
+        className="flex-1 flex flex-col gap-5 overflow-y-auto transition-all duration-300 2xl:px-4"
         style={{ minWidth: 0 }}
       >
         {/* Header */}
@@ -344,7 +344,7 @@ export const ActivosPage = () => {
       {/* ── Panel lateral de detalle ─────────────────────────────── */}
       <div
         className={`flex-shrink-0 overflow-y-auto bg-white border-l border-gray-200 shadow-xl transition-all duration-300 ease-in-out ${
-          panelActivo ? 'w-80 opacity-100' : 'w-0 opacity-0 overflow-hidden'
+          panelActivo ? 'w-80 2xl:w-[450px] opacity-100' : 'w-0 opacity-0 overflow-hidden'
         }`}
       >
         {panelActivo && <DetallePanelActivo

@@ -145,23 +145,30 @@ export const Dashboard = () => {
       </div>
 
       {/* ── Jumbotron ── */}
-      <div className="bg-[#0070bc] text-white rounded-2xl p-8 md:p-10 relative overflow-hidden shadow-sm">
+      <div className="bg-[#0070bc] text-white rounded-2xl p-6 md:p-8 2xl:p-10 relative overflow-hidden shadow-sm transition-all">
         <div className="absolute -right-10 -top-20 opacity-10 pointer-events-none">
           <svg width="300" height="300" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
           </svg>
         </div>
-        <div className="relative z-10">
-          <p className="text-sm md:text-base font-semibold text-blue-100 mb-1">
-            Hola, <span className="font-bold text-white">{usuario?.nombre || 'Administrador'} 👋</span>
-          </p>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2">Inventario Activo</h1>
-          <p className="text-5xl md:text-6xl font-black text-white mb-4">
-            {stats.asignados} <span className="text-2xl font-bold text-blue-200">/ {stats.total}</span>
-          </p>
-          <p className="text-sm font-medium text-blue-100">
-            Tienes <span className="font-bold text-white">{stats.asignados}</span> equipos asignados hoy ({pct}% del total general)
-          </p>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <p className="text-sm md:text-base font-semibold text-blue-100 mb-1">
+              Hola, <span className="font-bold text-white">{usuario?.nombre || 'Administrador'} 👋</span>
+            </p>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2">Inventario Activo</h1>
+            <p className="text-sm font-medium text-blue-100 max-w-md">
+              Gestiona y monitorea todos los activos tecnológicos de la empresa desde un solo panel adaptable.
+            </p>
+          </div>
+          <div className="text-left md:text-right">
+            <p className="text-5xl md:text-6xl font-black text-white leading-none">
+              {stats.asignados} <span className="text-2xl font-bold text-blue-200">/ {stats.total}</span>
+            </p>
+            <p className="text-sm font-bold text-blue-100 mt-2">
+              EQUIPOS ASIGNADOS ({pct}%)
+            </p>
+          </div>
         </div>
       </div>
 
@@ -171,21 +178,17 @@ export const Dashboard = () => {
       )}
 
       {/* ── KPI Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 2xl:gap-6">
         {show('kpi-total')         && <KpiCard title="Total Activos"  value={stats.total}         color="blue"   sub={`${pct}% asignados`}      onClick={() => navigate('/activos')} />}
         {show('kpi-asignados')     && <KpiCard title="Asignados"      value={stats.asignados}     color="green"  sub="En uso"                   onClick={() => navigate('/activos', { state: { filtroEstado: 'Asignado' } })} />}
         {show('kpi-disponibles')   && <KpiCard title="Disponibles"    value={stats.disponibles}   color="yellow" sub="Listos para asignar"      onClick={() => navigate('/activos', { state: { filtroEstado: 'Disponible' } })} />}
         {show('kpi-mantenimiento') && <KpiCard title="Mantenimiento"  value={stats.mantenimiento} color="red"    sub="En revisión"              onClick={() => navigate('/activos', { state: { filtroEstado: 'Mantenimiento' } })} />}
       </div>
 
-      {/* ── Gráficos Fila 1: Tipo + Estado ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* ── Contenedor de Gráficos Adaptable ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-4 2xl:gap-6">
         {show('chart-tipo')   && <DynamicChartPanel id="chart1" activos={activos} defaultType="pie"        defaultGroupBy="tipo_dispositivo" title="Distribución de Equipos" />}
         {show('chart-estado') && <DynamicChartPanel id="chart2" activos={activos} defaultType="bar"        defaultGroupBy="estado"           title="Equipos por Estado" />}
-      </div>
-
-      {/* ── Gráficos Fila 2: Área + Marca ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {show('chart-area')  && <DynamicChartPanel id="chart3" activos={activos} defaultType="horizontal" defaultGroupBy="area"             title="Distribución por Área" />}
         {show('chart-marca') && <DynamicChartPanel id="chart4" activos={activos} defaultType="radial"     defaultGroupBy="marca"            title="Equipos por Marca" />}
       </div>
