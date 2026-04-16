@@ -107,7 +107,7 @@ const getActivos = async () => {
   const { rows } = await query(
     `SELECT
        a.*,
-       json_build_object('nombre', c.nombre, 'correo', c.correo) AS colaborador
+       json_build_object('nombre', c.nombre, 'correo', c.correo, 'area', c.area) AS colaborador
      FROM activos a
      LEFT JOIN colaboradores c ON a.rut_responsable = c.rut AND c.deleted_at IS NULL
      WHERE a.deleted_at IS NULL
@@ -586,6 +586,35 @@ const getKPIs = async () => {
 
 
 // =============================================
+// ÁREAS (LISTA MAESTRA)
+// =============================================
+
+const getAreas = async () => {
+  const { rows } = await query('SELECT * FROM areas ORDER BY nombre ASC');
+  return rows;
+};
+
+const createArea = async (nombre) => {
+  const { rows } = await query(
+    'INSERT INTO areas (nombre) VALUES ($1) RETURNING *',
+    [nombre]
+  );
+  return rows[0];
+};
+
+const updateArea = async (id, nombre) => {
+  const { rows } = await query(
+    'UPDATE areas SET nombre = $1 WHERE id = $2 RETURNING *',
+    [nombre, id]
+  );
+  return rows[0];
+};
+
+const deleteArea = async (id) => {
+  await query('DELETE FROM areas WHERE id = $1', [id]);
+};
+
+// =============================================
 // EXPORTS
 // =============================================
 
@@ -619,6 +648,11 @@ module.exports = {
   buscarGlobal,
   // KPIs
   getKPIs,
+  // Áreas
+  getAreas,
+  createArea,
+  updateArea,
+  deleteArea,
   // Pool directo (para queries custom)
   pool,
 };

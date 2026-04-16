@@ -9,7 +9,7 @@ import { ModalColaborador } from '../components/ModalColaborador';
 import { MicrosoftPhoto } from '../components/MicrosoftPhoto';
 
 export const ColaboradoresPage = () => {
-  const { colaboradores, cargarColaboradores, cargarActivos, activos, eliminarColaborador } = useActivosStore();
+  const { colaboradores, cargarColaboradores, cargarActivos, activos, eliminarColaborador, areas, cargarAreas } = useActivosStore();
   const { isAdmin } = useAuthStore();
   const [busqueda, setBusqueda] = useState('');
   const [filtroArea, setFiltroArea] = useState('');
@@ -21,6 +21,7 @@ export const ColaboradoresPage = () => {
   useEffect(() => {
     cargarColaboradores();
     cargarActivos();
+    cargarAreas();
   }, []);
 
   const showToast = (msg, tipo = 'success') => {
@@ -60,7 +61,7 @@ export const ColaboradoresPage = () => {
     'Administración': 'bg-purple-100 text-purple-800',
     'Logística': 'bg-orange-100 text-orange-800',
     'RRHH': 'bg-pink-100 text-pink-800',
-    'Otro': 'bg-gray-100 text-gray-800',
+    'Default': 'bg-gray-100 text-gray-800',
   };
 
   return (
@@ -106,7 +107,7 @@ export const ColaboradoresPage = () => {
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
         >
           <option value="">Todas las áreas</option>
-          {areas.map(a => <option key={a} value={a}>{a}</option>)}
+          {areas.map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
         </select>
       </div>
 
@@ -147,7 +148,7 @@ export const ColaboradoresPage = () => {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${coloresArea[col.area] || coloresArea['Otro']}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${coloresArea[col.area] || coloresArea['Default']}`}>
                           {col.area}
                         </span>
                         <p className="text-xs text-gray-500 mt-1">{col.cargo || '—'}</p>
@@ -213,7 +214,7 @@ export const ColaboradoresPage = () => {
               />
               <h4 className="font-semibold text-gray-800">{vistaDetalle.nombre}</h4>
               <p className="text-sm text-gray-500 font-mono">{vistaDetalle.rut}</p>
-              <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${coloresArea[vistaDetalle.area] || coloresArea['Otro']}`}>
+              <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${coloresArea[vistaDetalle.area] || coloresArea['Default']}`}>
                 {vistaDetalle.area}
               </span>
             </div>

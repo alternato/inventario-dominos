@@ -82,4 +82,12 @@ export const usuariosAPI = {
   actualizar: (id, data)   => apiClient.put(`/usuarios/${id}`, data),
 };
 
+// ─── ÁREAS (CONFIGURACIÓN) ──────────────────────────────────
+export const areasAPI = {
+  listar:     ()           => apiClient.get('/areas'),
+  crear:      (nombre)     => apiClient.post('/areas', { nombre }),
+  actualizar: (id, nombre) => apiClient.put(`/areas/${id}`, { nombre }),
+  eliminar:   (id)         => apiClient.delete(`/areas/${id}`),
+};
+
 export default apiClient;

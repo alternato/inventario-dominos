@@ -71,6 +71,7 @@ export const Navbar = ({ onLogout }) => {
     { path: '/colaboradores', label: 'COLABORADORES' },
     { path: '/historial', label: 'HISTORIAL' },
     { path: '/buscar', label: 'BÚSQUEDA' },
+    ...(isAdmin() ? [{ path: '/ajustes', label: 'AJUSTES' }] : []),
     ...(isSuperAdmin() ? [{ path: '/usuarios', label: 'USUARIOS' }] : []),
   ];
 

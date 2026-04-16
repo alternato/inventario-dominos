@@ -563,6 +563,50 @@ app.get('/api/kpis', authenticate, async (req, res) => {
   }
 });
 
+// ===== RUTAS DE ÁREAS (CONFIGURACIÓN) =====
+
+app.get('/api/areas', authenticate, async (req, res) => {
+  try {
+    const areas = await db.getAreas();
+    res.json(areas);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener áreas' });
+  }
+});
+
+app.post('/api/areas', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { nombre } = req.body;
+    if (!nombre) return res.status(400).json({ error: 'Nombre de área requerido' });
+    const area = await db.createArea(nombre);
+    res.status(201).json(area);
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ error: 'El área ya existe' });
+    res.status(500).json({ error: 'Error al crear área' });
+  }
+});
+
+app.put('/api/areas/:id', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre } = req.body;
+    const area = await db.updateArea(parseInt(id), nombre);
+    res.json(area);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar área' });
+  }
+});
+
+app.delete('/api/areas/:id', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.deleteArea(parseInt(id));
+    res.json({ message: 'Área eliminada' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al eliminar área' });
+  }
+});
+
 // ===== HEALTH CHECK =====
 
 app.get('/health', (req, res) => {

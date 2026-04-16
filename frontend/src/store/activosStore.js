@@ -1,9 +1,10 @@
 import { create } from 'zustand';
-import { activosAPI, colaboradoresAPI } from '../api';
+import { activosAPI, colaboradoresAPI, areasAPI } from '../api';
 
 export const useActivosStore = create((set, get) => ({
   activos: [],
   colaboradores: [],
+  areas: [],
   loading: false,
   error: null,
 
@@ -108,6 +109,48 @@ export const useActivosStore = create((set, get) => ({
       const msg = error.response?.data?.error || error.message;
       set({ error: msg });
       return { ok: false, error: msg };
+    }
+  },
+
+  // ─── ÁREAS ──────────────────────────────────────────────
+  cargarAreas: async () => {
+    try {
+      const response = await areasAPI.listar();
+      set({ areas: response.data });
+    } catch (error) {
+      console.error('Error al cargar áreas:', error);
+    }
+  },
+
+  crearArea: async (nombre) => {
+    try {
+      const response = await areasAPI.crear(nombre);
+      set((state) => ({ areas: [...state.areas, response.data] }));
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error.response?.data?.error || error.message };
+    }
+  },
+
+  actualizarArea: async (id, nombre) => {
+    try {
+      const response = await areasAPI.actualizar(id, nombre);
+      set((state) => ({
+        areas: state.areas.map((a) => (a.id === id ? response.data : a)),
+      }));
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error.response?.data?.error || error.message };
+    }
+  },
+
+  eliminarArea: async (id) => {
+    try {
+      await areasAPI.eliminar(id);
+      set((state) => ({ areas: state.areas.filter((a) => a.id !== id) }));
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error.response?.data?.error || error.message };
     }
   },
 

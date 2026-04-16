@@ -507,7 +507,12 @@ const DynamicChartPanel = ({ id, activos, defaultType, defaultGroupBy, title }) 
   const data = useMemo(() => {
     if (!activos?.length) return [];
     const count = activos.reduce((acc, a) => {
-      const val = a[groupBy] || 'Sin dato';
+      let val = a[groupBy];
+      // Si agrupamos por Área, buscamos en el colaborador vinculado
+      if (groupBy === 'area' && !val) {
+        val = a.colaborador?.area;
+      }
+      val = val || 'Sin dato';
       acc[val] = (acc[val] || 0) + 1;
       return acc;
     }, {});

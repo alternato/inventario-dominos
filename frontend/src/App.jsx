@@ -10,6 +10,7 @@ const ColaboradoresPage = lazy(() => import('./pages/ColaboradoresPage').then(mo
 const HistorialPage = lazy(() => import('./pages/HistorialPage').then(module => ({ default: module.HistorialPage })));
 const BusquedaPage = lazy(() => import('./pages/BusquedaPage').then(module => ({ default: module.BusquedaPage })));
 const UsuariosPage = lazy(() => import('./pages/UsuariosPage').then(module => ({ default: module.UsuariosPage })));
+const AjustesPage = lazy(() => import('./pages/AjustesPage').then(module => ({ default: module.AjustesPage })));
 
 import { authAPI } from './api';
 import { useAuthStore } from './store/authStore';
@@ -81,6 +82,7 @@ function App() {
           <Route path="/historial"     element={<ProtectedRoute><HistorialPage /></ProtectedRoute>} />
           <Route path="/buscar"        element={<ProtectedRoute><BusquedaPage /></ProtectedRoute>} />
           <Route path="/usuarios"      element={<ProtectedRoute>{isSuperAdmin() ? <UsuariosPage /> : <Navigate to="/" replace />}</ProtectedRoute>} />
+          <Route path="/ajustes"       element={<ProtectedRoute>{useAuthStore.getState().isAdmin() ? <AjustesPage /> : <Navigate to="/" replace />}</ProtectedRoute>} />
           <Route path="*"              element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
