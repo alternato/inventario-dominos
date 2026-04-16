@@ -105,7 +105,7 @@ export const Dashboard = () => {
   const pct = stats.total > 0 ? Math.round((stats.asignados / stats.total) * 100) : 0;
 
   return (
-    <div className="space-y-6 relative overflow-y-auto h-full">
+    <div className="space-y-6 relative">
 
       {/* ── Botón Configuración ── */}
       <div className="absolute top-2 right-4 md:right-8 z-20 flex justify-end">

@@ -64,7 +64,7 @@ export const ColaboradoresPage = () => {
   };
 
   return (
-    <div className="space-y-6 overflow-y-auto h-full">
+    <div className="space-y-6">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all ${toast.tipo === 'error' ? 'bg-red-500' : 'bg-green-500'}`}>
@@ -196,7 +196,7 @@ export const ColaboradoresPage = () => {
 
         {/* Panel de detalle */}
         {vistaDetalle && (
-          <div className="w-80 2xl:w-[450px] bg-white rounded-lg shadow p-5 space-y-4 flex-shrink-0">
+          <div className="w-80 2xl:w-[450px] sticky top-0 h-fit max-h-[calc(100vh-120px)] overflow-y-auto bg-white rounded-xl shadow-xl p-5 space-y-4 flex-shrink-0 border border-gray-200">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-800">Detalle</h3>
               <button onClick={() => setVistaDetalle(null)} className="p-1 hover:bg-gray-100 rounded">

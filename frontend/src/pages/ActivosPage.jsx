@@ -116,12 +116,12 @@ export const ActivosPage = () => {
     );
 
   return (
-    /* Wrapper con overflow hidden para que el panel lateral no se salga */
-    <div className="flex h-full gap-0 overflow-hidden" style={{ minHeight: 0 }}>
+    /* Wrapper fluido sin overflow-hidden para usar el scroll del navegador */
+    <div className="flex gap-0" style={{ minHeight: 0 }}>
 
       {/* ── Columna principal ───────────────────────────────────── */}
       <div
-        className="flex-1 flex flex-col gap-5 overflow-y-auto transition-all duration-300 2xl:px-4"
+        className="flex-1 flex flex-col gap-5 transition-all duration-300 2xl:px-4"
         style={{ minWidth: 0 }}
       >
         {/* Header */}
@@ -343,8 +343,8 @@ export const ActivosPage = () => {
 
       {/* ── Panel lateral de detalle ─────────────────────────────── */}
       <div
-        className={`flex-shrink-0 overflow-y-auto bg-white border-l border-gray-200 shadow-xl transition-all duration-300 ease-in-out ${
-          panelActivo ? 'w-80 2xl:w-[450px] opacity-100' : 'w-0 opacity-0 overflow-hidden'
+        className={`flex-shrink-0 sticky top-0 h-fit max-h-[calc(100vh-120px)] overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-xl transition-all duration-300 ease-in-out ${
+          panelActivo ? 'w-80 2xl:w-[450px] opacity-100 ml-6' : 'w-0 opacity-0 overflow-hidden'
         }`}
       >
         {panelActivo && <DetallePanelActivo
