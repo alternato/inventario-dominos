@@ -13,7 +13,8 @@ export const MicrosoftPhoto = ({ email, nombre, className = "" }) => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!email || !email.endsWith('@dominospizza.cl')) {
+    if (!email || !email.toLowerCase().endsWith('@dominospizza.cl')) {
+      console.log(`[MicrosoftPhoto] Email no válido para AD: ${email}`);
       setLoading(false);
       setError(true);
       return;
@@ -28,7 +29,7 @@ export const MicrosoftPhoto = ({ email, nombre, className = "" }) => {
 
         // Intentar obtener token para Microsoft Graph
         const tokenResponse = await msal.acquireTokenSilent({
-          scopes: ["User.ReadBasic.All"],
+          scopes: ["User.Read", "User.ReadBasic.All"],
           account: accounts[0]
         });
 

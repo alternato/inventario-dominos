@@ -532,7 +532,10 @@ const getKPIs = async () => {
         c.area,
         COUNT(a.serie) AS total_equipos
       FROM colaboradores c
-      INNER JOIN activos a ON a.rut_responsable = c.rut AND a.estado = 'Asignado'
+      INNER JOIN activos a ON a.rut_responsable = c.rut
+      WHERE a.estado = 'Asignado' 
+        AND a.deleted_at IS NULL 
+        AND c.deleted_at IS NULL
       GROUP BY c.rut, c.nombre, c.area
       ORDER BY total_equipos DESC
       LIMIT 5
