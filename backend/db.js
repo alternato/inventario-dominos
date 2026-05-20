@@ -236,8 +236,28 @@ const updateActivo = async (serie, activoData, usuarioId = null) => {
         estado_nuevo: estado,
         tipo_movimiento: tipoMovimiento,
         usuario_id: usuarioId,
-        notas: notasHistorial,
+        notas: notasHistorial || (motivo_devolucion ? `Devolución por: ${motivo_devolucion}` : null),
       });
+
+      // Sincronizar automáticamente con la tabla asignaciones (Tercer Eje)
+      if (cambioResponsable) {
+        // Cerrar cualquier asignación activa previa para este activo
+        await query(
+          `UPDATE asignaciones 
+           SET estado = 'cerrada', fecha_fin = NOW(), motivo_devolucion = $2 
+           WHERE serie_activo = $1 AND estado = 'activa'`,
+          [nuevaSerie, motivo_devolucion || 'Edición directa de responsable']
+        );
+
+        // Si hay nuevo responsable, crear la nueva asignación activa
+        if (rut_responsable) {
+          await query(
+            `INSERT INTO asignaciones (serie_activo, rut_colaborador, fecha_inicio, estado, notas, usuario_id)
+             VALUES ($1, $2, NOW(), 'activa', 'Creado automáticamente al editar responsable de activo', $3)`,
+            [nuevaSerie, rut_responsable, usuarioId]
+          );
+        }
+      }
 
       // Flujo 1: Desvincular Colaborador
       if (desvincular_usuario && anterior.rut_responsable) {
