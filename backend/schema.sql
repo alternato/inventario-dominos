@@ -23,6 +23,25 @@ CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
 CREATE INDEX IF NOT EXISTS idx_usuarios_activo ON usuarios(activo);
 
 -- ============================================================
+-- TABLA: areas (Lista Maestra)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS areas (
+  id     SERIAL PRIMARY KEY,
+  nombre VARCHAR(255) UNIQUE NOT NULL
+);
+
+-- Poblar áreas iniciales
+INSERT INTO areas (nombre) VALUES 
+('Operaciones'),
+('Administración'),
+('Logística'),
+('TI'),
+('RRHH'),
+('Marketing'),
+('Otro')
+ON CONFLICT (nombre) DO NOTHING;
+
+-- ============================================================
 -- TABLA: colaboradores
 -- ============================================================
 CREATE TABLE IF NOT EXISTS colaboradores (
@@ -30,7 +49,7 @@ CREATE TABLE IF NOT EXISTS colaboradores (
   rut VARCHAR(50) UNIQUE NOT NULL,
   nombre VARCHAR(255) NOT NULL,
   correo VARCHAR(255),
-  area VARCHAR(100) NOT NULL CHECK (area IN ('Operaciones', 'Administración', 'Logística', 'TI', 'RRHH', 'Marketing', 'Otro')),
+  area VARCHAR(100) NOT NULL,
   cargo VARCHAR(255),
   telefono VARCHAR(20),
   activo BOOLEAN DEFAULT true,

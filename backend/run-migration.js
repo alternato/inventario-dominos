@@ -20,8 +20,9 @@ const pool = new Pool({
 });
 
 async function ejecutarMigracion() {
-  console.log('🔄 Ejecutando migración SQL...');
-  const migrationPath = path.join(__dirname, 'migrations', '004_asignaciones.sql');
+  const archivo = process.argv[2] || '004_asignaciones.sql';
+  console.log(`🔄 Ejecutando migración SQL: ${archivo}...`);
+  const migrationPath = path.join(__dirname, 'migrations', archivo);
   
   if (!fs.existsSync(migrationPath)) {
     console.error(`❌ No se encontró el archivo de migración en: ${migrationPath}`);
