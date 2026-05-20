@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { ModalFormulario } from '../components/ModalFormulario';
 import { ModalDevolucion } from '../components/ModalDevolucion';
+import { ModalAsignacion } from '../components/ModalAsignacion';
 import ImportDataModal from '../components/ImportDataModal';
 import { useLocation } from 'react-router-dom';
 
@@ -54,9 +55,15 @@ export const ActivosPage = () => {
   const [filtroEstado, setFiltroEstado] = useState(location.state?.filtroEstado || '');
   const [modalOpen,           setModalOpen]           = useState(false);
   const [devolucionModalOpen, setDevolucionModalOpen] = useState(false);
+  const [asignacionModalOpen, setAsignacionModalOpen] = useState(false);
   const [importModalOpen,     setImportModalOpen]     = useState(false);
   const [activoSeleccionado,  setActivoSeleccionado]  = useState(null);
   const [panelActivo,         setPanelActivo]         = useState(null); // panel lateral
+  const [toast, setToast] = useState(null);
+  const showToast = (msg, tipo = 'success') => {
+    setToast({ msg, tipo });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => { cargarActivos(); }, []);
 
@@ -107,6 +114,12 @@ export const ActivosPage = () => {
     setDevolucionModalOpen(true);
   };
 
+  const handleAsignar = (activo, e) => {
+    e?.stopPropagation();
+    setActivoSeleccionado(activo);
+    setAsignacionModalOpen(true);
+  };
+
   const isDuplicate = (activo) =>
     activos.some(a =>
       a.serie !== activo.serie && (
@@ -118,6 +131,14 @@ export const ActivosPage = () => {
   return (
     /* Wrapper fluido sin overflow-hidden para usar el scroll del navegador */
     <div className="flex gap-0" style={{ minHeight: 0 }}>
+
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium ${
+          toast.tipo === 'error' ? 'bg-red-500' : 'bg-green-500'
+        }`}>
+          {toast.msg}
+        </div>
+      )}
 
       {/* ── Columna principal ───────────────────────────────────── */}
       <div
@@ -352,6 +373,7 @@ export const ActivosPage = () => {
           isAdmin={isAdmin()}
           onEditar={(a) => handleEditar(a)}
           onDevolucion={(a) => handleDevolucionRapida(a)}
+          onAsignar={(a) => handleAsignar(a)}
           onCerrar={() => setPanelActivo(null)}
           isDuplicate={isDuplicate(panelActivo)}
         />}
@@ -367,6 +389,13 @@ export const ActivosPage = () => {
         isOpen={devolucionModalOpen}
         onClose={() => { setDevolucionModalOpen(false); setActivoSeleccionado(null); }}
         activo={activoSeleccionado}
+        onSuccess={(msg) => showToast(msg)}
+      />
+      <ModalAsignacion
+        isOpen={asignacionModalOpen}
+        onClose={() => { setAsignacionModalOpen(false); setActivoSeleccionado(null); }}
+        activo={activoSeleccionado}
+        onSuccess={(msg) => showToast(msg)}
       />
       <ImportDataModal
         isOpen={importModalOpen}
@@ -378,7 +407,7 @@ export const ActivosPage = () => {
 };
 
 /* ── Panel lateral ───────────────────────────────────────────── */
-const DetallePanelActivo = ({ activo, isAdmin, onEditar, onDevolucion, onCerrar, isDuplicate }) => {
+const DetallePanelActivo = ({ activo, isAdmin, onEditar, onDevolucion, onAsignar, onCerrar, isDuplicate }) => {
   const tipo = activo.tipo_dispositivo;
   const esTelefonia = tipo === 'Smartphone' || tipo === 'SIM Card';
 
@@ -459,7 +488,7 @@ const DetallePanelActivo = ({ activo, isAdmin, onEditar, onDevolucion, onCerrar,
       {/* Footer con acciones */}
       {isAdmin && (
         <div className="p-4 border-t border-gray-100 flex gap-2">
-          {activo.rut_responsable && (
+          {activo.rut_responsable ? (
             <button
               onClick={() => onDevolucion(activo)}
               className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition"
@@ -467,7 +496,15 @@ const DetallePanelActivo = ({ activo, isAdmin, onEditar, onDevolucion, onCerrar,
               <Undo2 className="w-3.5 h-3.5" />
               Devolver
             </button>
-          )}
+          ) : activo.estado === 'Disponible' ? (
+            <button
+              onClick={() => onAsignar(activo)}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition"
+            >
+              <Package className="w-3.5 h-3.5" />
+              Asignar
+            </button>
+          ) : null}
           <button
             onClick={() => onEditar(activo)}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-white bg-primary rounded-lg hover:bg-blue-700 transition"

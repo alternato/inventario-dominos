@@ -90,4 +90,13 @@ export const areasAPI = {
   eliminar:   (id)         => apiClient.delete(`/areas/${id}`),
 };
 
-export default apiClient;
+// ─── ASIGNACIONES ────────────────────────────────────────────
+export const asignacionesAPI = {
+  listar:    (params) => apiClient.get('/asignaciones', { params }),
+  crear:     (data)   => apiClient.post('/asignaciones', data),
+  cerrar:    (id, data) => apiClient.put(`/asignaciones/${id}/cerrar`, data),
+  porActivo: (serie)  => apiClient.get(`/activos/${encodeURIComponent(serie)}/asignaciones`),
+  porColab:  (rut)    => apiClient.get(`/colaboradores/${rut}/asignaciones`),
+};
+
+export default apiClient;

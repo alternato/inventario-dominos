@@ -145,8 +145,141 @@ const sendMissingSignatureAlert = async (activoInfo, colaboradorInfo, adminEmail
   });
 };
 
+// ──────────────────────────────────────────────────────────────
+// Email informativo a RRHH cuando se crea una asignación
+// ──────────────────────────────────────────────────────────────
+const sendMailAsignacion = async ({ colaborador, activo, entregadoPor, fecha }) => {
+  const fechaFmt = fecha
+    ? new Date(fecha).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric' })
+    : new Date().toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  const htmlContent = `
+    <html dir="ltr" lang="es">
+      <head><meta charset="UTF-8"><title>Asignación de Equipo - IT COMPASS</title></head>
+      <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-top: 5px solid #0066CC;">
+          <h2 style="color: #0066CC; text-align: center; margin-bottom: 5px;">IT COMPASS</h2>
+          <p style="text-align:center; color:#666; font-size:13px; margin-top:0;">Domino's Pizza Chile — Departamento de TI</p>
+          <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
+
+          <h3 style="color:#1e293b;">📦 Nueva Asignación de Equipo</h3>
+          <p style="color:#475569; font-size:14px;">Se ha registrado la siguiente asignación en el sistema de inventario:</p>
+
+          <table style="width:100%; border-collapse:collapse; margin:20px 0; font-size:14px;">
+            <tr style="background:#f8fafc;">
+              <td style="padding:10px 14px; font-weight:bold; color:#64748b; width:40%;">👤 Colaborador</td>
+              <td style="padding:10px 14px; color:#1e293b;">${colaborador.nombre}</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px; font-weight:bold; color:#64748b;">🪪 RUT</td>
+              <td style="padding:10px 14px; color:#1e293b; font-family:monospace;">${colaborador.rut}</td>
+            </tr>
+            <tr style="background:#f8fafc;">
+              <td style="padding:10px 14px; font-weight:bold; color:#64748b;">🏢 Área</td>
+              <td style="padding:10px 14px; color:#1e293b;">${colaborador.area || '—'}</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px; font-weight:bold; color:#64748b;">💻 Equipo</td>
+              <td style="padding:10px 14px; color:#1e293b;">${activo.tipo_dispositivo} — ${activo.marca} ${activo.modelo}</td>
+            </tr>
+            <tr style="background:#f8fafc;">
+              <td style="padding:10px 14px; font-weight:bold; color:#64748b;">🔢 Serie</td>
+              <td style="padding:10px 14px; color:#1e293b; font-family:monospace;">${activo.serie}</td>
+            </tr>
+            ${activo.imei ? `<tr><td style="padding:10px 14px; font-weight:bold; color:#64748b;">📱 IMEI</td><td style="padding:10px 14px; color:#1e293b; font-family:monospace;">${activo.imei}</td></tr>` : ''}
+            <tr>
+              <td style="padding:10px 14px; font-weight:bold; color:#64748b;">📅 Fecha</td>
+              <td style="padding:10px 14px; color:#1e293b;">${fechaFmt}</td>
+            </tr>
+            <tr style="background:#f8fafc;">
+              <td style="padding:10px 14px; font-weight:bold; color:#64748b;">👷 Entregado por</td>
+              <td style="padding:10px 14px; color:#1e293b;">${entregadoPor || 'TI'}</td>
+            </tr>
+          </table>
+
+          <p style="font-size:12px; color:#94a3b8; text-align:center; margin-top:30px;">
+            Este correo es informativo. No requiere respuesta.<br>
+            © 2026 Domino's Pizza Chile — Departamento de TI
+          </p>
+        </div>
+      </body>
+    </html>
+  `;
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: 'rrhh@dominospizza.cl',
+    subject: `[TI] Asignación de equipo — ${colaborador.nombre} (${fechaFmt})`,
+    html: htmlContent,
+  });
+};
+
+// ──────────────────────────────────────────────────────────────
+// Email con link de confirmación de devolución al colaborador
+// ──────────────────────────────────────────────────────────────
+const sendMailConfirmacionDevolucion = async ({ colaborador, activo, token, emailDestino, viaPersonal }) => {
+  const backendUrl = process.env.BACKEND_URL || 'http://localhost:8081';
+  const confirmLink = `${backendUrl}/api/asignaciones/confirmar/${token}`;
+  const expira = new Date(Date.now() + 72 * 60 * 60 * 1000)
+    .toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  const htmlContent = `
+    <html dir="ltr" lang="es">
+      <head><meta charset="UTF-8"><title>Confirma tu devolución — IT COMPASS</title></head>
+      <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-top: 5px solid #f97316;">
+          <h2 style="color: #f97316; text-align: center; margin-bottom: 5px;">IT COMPASS</h2>
+          <p style="text-align:center; color:#666; font-size:13px; margin-top:0;">Domino's Pizza Chile — Departamento de TI</p>
+          <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
+
+          <h3 style="color:#1e293b;">Hola, ${colaborador.nombre.split(' ')[0]}.</h3>
+          <p style="color:#475569; font-size:14px; line-height:1.6;">
+            El equipo de TI ha registrado la <strong>devolución</strong> del siguiente equipo a tu nombre.
+            Para completar el proceso, por favor confirma haciendo clic en el botón a continuación:
+          </p>
+
+          <table style="width:100%; border-collapse:collapse; margin:20px 0; font-size:14px; background:#fff7ed; border-radius:8px; overflow:hidden;">
+            <tr>
+              <td style="padding:10px 14px; font-weight:bold; color:#9a3412; width:40%;">💻 Equipo</td>
+              <td style="padding:10px 14px; color:#431407;">${activo.tipo_dispositivo} — ${activo.marca} ${activo.modelo}</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px; font-weight:bold; color:#9a3412;">🔢 Serie</td>
+              <td style="padding:10px 14px; color:#431407; font-family:monospace;">${activo.serie}</td>
+            </tr>
+          </table>
+
+          <div style="text-align:center; margin: 30px 0;">
+            <a href="${confirmLink}"
+               style="background:#f97316; color:white; padding:14px 36px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:15px; display:inline-block;">
+              ✓ Confirmar Devolución
+            </a>
+          </div>
+
+          <p style="font-size:12px; color:#94a3b8; text-align:center;">
+            Este link expira el ${expira}.<br>
+            Si no reconoces esta devolución, comunícate con el Departamento de TI.<br><br>
+            © 2026 Domino's Pizza Chile — Departamento de TI
+          </p>
+        </div>
+      </body>
+    </html>
+  `;
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: emailDestino,
+    subject: `Confirma la devolución de tu equipo — ${activo.marca} ${activo.modelo}`,
+    html: htmlContent,
+  });
+};
+
 module.exports = {
+
   sendPasswordResetEmail,
   sendStatusEventAlert,
-  sendMissingSignatureAlert
+  sendMissingSignatureAlert,
+  sendMailAsignacion,
+  sendMailConfirmacionDevolucion,
 };
+

@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { activosAPI, colaboradoresAPI, areasAPI } from '../api';
+import { activosAPI, colaboradoresAPI, areasAPI, asignacionesAPI } from '../api';
 
 export const useActivosStore = create((set, get) => ({
   activos: [],
   colaboradores: [],
   areas: [],
+  asignaciones: [],
   loading: false,
   error: null,
 
@@ -155,4 +156,51 @@ export const useActivosStore = create((set, get) => ({
   },
 
   clearError: () => set({ error: null }),
+
+  // ─── ASIGNACIONES ────────────────────────────────────────────────
+  crearAsignacion: async (data) => {
+    try {
+      const response = await asignacionesAPI.crear(data);
+      const nueva = response.data?.data || response.data;
+      // Refresh activos to reflect new state
+      const resActivos = await activosAPI.listar();
+      set({ activos: resActivos.data });
+      return { ok: true, data: nueva };
+    } catch (error) {
+      const msg = error.response?.data?.error || error.message;
+      return { ok: false, error: msg };
+    }
+  },
+
+  cerrarAsignacion: async (id, data) => {
+    try {
+      const response = await asignacionesAPI.cerrar(id, data);
+      const cerrada = response.data?.data || response.data;
+      // Refresh activos
+      const resActivos = await activosAPI.listar();
+      set({ activos: resActivos.data });
+      return { ok: true, data: cerrada };
+    } catch (error) {
+      const msg = error.response?.data?.error || error.message;
+      return { ok: false, error: msg };
+    }
+  },
+
+  cargarAsignacionesActivo: async (serie) => {
+    try {
+      const response = await asignacionesAPI.porActivo(serie);
+      return { ok: true, data: response.data };
+    } catch (error) {
+      return { ok: false, data: [] };
+    }
+  },
+
+  cargarAsignacionesColab: async (rut) => {
+    try {
+      const response = await asignacionesAPI.porColab(rut);
+      return { ok: true, data: response.data };
+    } catch (error) {
+      return { ok: false, data: [] };
+    }
+  },
 }));

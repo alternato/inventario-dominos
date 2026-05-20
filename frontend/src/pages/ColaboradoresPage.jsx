@@ -9,13 +9,14 @@ import { ModalColaborador } from '../components/ModalColaborador';
 import { MicrosoftPhoto } from '../components/MicrosoftPhoto';
 
 export const ColaboradoresPage = () => {
-  const { colaboradores, cargarColaboradores, cargarActivos, activos, eliminarColaborador, areas, cargarAreas } = useActivosStore();
+  const { colaboradores, cargarColaboradores, cargarActivos, activos, eliminarColaborador, areas, cargarAreas, cargarAsignacionesColab } = useActivosStore();
   const { isAdmin } = useAuthStore();
   const [busqueda, setBusqueda] = useState('');
   const [filtroArea, setFiltroArea] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [seleccionado, setSeleccionado] = useState(null);
   const [vistaDetalle, setVistaDetalle] = useState(null);
+  const [historialAsig, setHistorialAsig] = useState([]);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -23,6 +24,18 @@ export const ColaboradoresPage = () => {
     cargarActivos();
     cargarAreas();
   }, []);
+
+  useEffect(() => {
+    if (vistaDetalle) {
+      cargarAsignacionesColab(vistaDetalle.rut).then((res) => {
+        if (res.ok) {
+          setHistorialAsig(res.data);
+        }
+      });
+    } else {
+      setHistorialAsig([]);
+    }
+  }, [vistaDetalle]);
 
   const showToast = (msg, tipo = 'success') => {
     setToast({ msg, tipo });
@@ -239,24 +252,77 @@ export const ColaboradoresPage = () => {
               )}
             </div>
 
-            {/* Equipos asignados */}
-            <div>
-              <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Equipos Asignados
-              </h5>
-              {activosDeColaborador(vistaDetalle.rut).length === 0 ? (
-                <p className="text-sm text-gray-400 italic">Sin equipos asignados</p>
-              ) : (
-                <div className="space-y-2">
-                  {activosDeColaborador(vistaDetalle.rut).map((a) => (
-                    <div key={a.serie} className="bg-gray-50 rounded-lg p-2.5 text-xs">
-                      <p className="font-semibold text-gray-800">{a.marca} {a.modelo}</p>
-                      <p className="text-gray-500">{a.tipo_dispositivo} · {a.serie}</p>
-                      {a.imei && <p className="text-gray-400">IMEI: {a.imei}</p>}
-                    </div>
-                  ))}
-                </div>
-              )}
+            {/* Equipos asignados e Historial de Asignaciones */}
+            <div className="space-y-4">
+              <div>
+                <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  Asignaciones Activas
+                </h5>
+                {historialAsig.filter(a => a.estado === 'activa' || a.estado === 'pendiente_firma').length === 0 ? (
+                  <p className="text-sm text-gray-400 italic">Sin asignaciones activas</p>
+                ) : (
+                  <div className="space-y-2">
+                    {historialAsig.filter(a => a.estado === 'activa' || a.estado === 'pendiente_firma').map((asig) => (
+                      <div key={asig.id} className="bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs space-y-1 relative">
+                        <div className="flex justify-between items-start">
+                          <p className="font-bold text-gray-800 text-sm">{asig.marca} {asig.modelo}</p>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            asig.estado === 'activa' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
+                          }`}>
+                            {asig.estado === 'activa' ? 'En Uso' : 'Pendiente Confirmar'}
+                          </span>
+                        </div>
+                        <p className="text-gray-500">{asig.tipo_dispositivo} · <span className="font-mono">{asig.serie}</span></p>
+                        <p className="text-[11px] text-gray-400 mt-1">
+                          Asignado: {new Date(asig.fecha_inicio).toLocaleDateString('es-CL')}
+                        </p>
+                        {asig.entregado_por && (
+                          <p className="text-[11px] text-gray-400">Entregado por: {asig.entregado_por}</p>
+                        )}
+                        {asig.estado === 'pendiente_firma' && asig.token_confirmacion && (
+                          <div className="mt-2 pt-2 border-t border-gray-200">
+                            <span className="text-[10px] text-amber-600 block mb-1">Link de confirmación:</span>
+                            <input
+                              type="text"
+                              readOnly
+                              value={`${window.location.origin.replace(':5173', ':8081')}/api/asignaciones/confirmar/${asig.token_confirmacion}`}
+                              onClick={(e) => { e.target.select(); document.execCommand('copy'); showToast('Link copiado al portapapeles'); }}
+                              className="w-full text-[10px] bg-white border border-amber-200 rounded px-1.5 py-1 outline-none cursor-pointer font-mono"
+                              title="Haz clic para copiar"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  Historial de Devoluciones
+                </h5>
+                {historialAsig.filter(a => a.estado === 'cerrada').length === 0 ? (
+                  <p className="text-sm text-gray-400 italic">Sin historial de devoluciones</p>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {historialAsig.filter(a => a.estado === 'cerrada').map((asig) => (
+                      <div key={asig.id} className="bg-gray-50 border border-gray-100 rounded-lg p-2 text-[11px] space-y-0.5 opacity-80">
+                        <div className="flex justify-between font-semibold text-gray-700">
+                          <span>{asig.marca} {asig.modelo}</span>
+                          <span className="text-gray-400 font-mono text-[9px]">{asig.serie}</span>
+                        </div>
+                        <p className="text-gray-500 text-[10px]">
+                          Uso: {new Date(asig.fecha_inicio).toLocaleDateString('es-CL')} - {new Date(asig.fecha_fin).toLocaleDateString('es-CL')}
+                        </p>
+                        {asig.motivo_devolucion && (
+                          <p className="text-gray-500 text-[10px]">Motivo: <span className="italic">{asig.motivo_devolucion}</span></p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

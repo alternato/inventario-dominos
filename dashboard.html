@@ -285,8 +285,9 @@
             </div>
 
             <div id="view-audit" class="hidden">
-                <div class="kpi-header" style="font-size: 18px; color: var(--dominos-blue);">
-                    <i class="fas fa-balance-scale"></i> Auditoría y Resoluciones Rápidas
+                <div class="kpi-header" style="font-size: 18px; color: var(--dominos-blue); justify-content: space-between;">
+                    <span><i class="fas fa-balance-scale"></i> Auditoría y Resoluciones Rápidas</span>
+                    <button class="admin-only" onclick="window.abrirNuevoColab()" style="font-size:13px;padding:8px 18px;background:var(--success);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px;"><i class="fas fa-user-plus"></i> Nuevo Colaborador</button>
                 </div>
                 
                 <div class="kpi-grid" style="margin-bottom: 30px;">
@@ -359,18 +360,37 @@
         </div>
     </main>
 
-    <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:var(--dominos-blue); margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><select id="f_area"><option>Operaciones</option><option>Informática</option><option>Administración</option><option>Marketing</option><option>Logística</option><option>Finanzas</option><option>RRHH</option></select></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div>
+    <div id="modalFicha" class="modal hidden"><div class="modal-content"><h2 style="color:var(--dominos-blue); margin-bottom:20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Ficha Técnica</h2><div class="form-grid"><div class="section-tag"><i class="fas fa-user"></i> 1. Colaborador</div><div class="field"><label>RUT *</label><input type="text" id="f_rut"></div><div class="field" style="grid-column: span 2;"><label>Nombre Completo</label><input type="text" id="f_nombre" list="listaNombres"><datalist id="listaNombres"></datalist></div><div class="field"><label>Correo</label><input type="email" id="f_correo"></div><div class="field"><label>Área</label><div style="display:flex;gap:6px;"><select id="f_area" style="flex:1;"></select><button type="button" title="Nueva área" onclick="window.agregarNuevaArea('f_area')" style="padding:0 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;font-size:16px;">＋</button></div></div><div class="field"><label>Tienda / Ubicación</label><select id="f_tienda"></select></div><div class="field"><label>Contrato</label><select id="f_contractual"><option>Vigente</option><option>Cesado</option></select></div><div class="section-tag"><i class="fas fa-laptop"></i> 2. Equipo PC</div>
     <div class="field"><label>Marca PC</label><input type="text" id="f_marca" style="text-transform: uppercase;"></div>
     <div class="field"><label>Modelo PC</label><input type="text" id="f_modelo" style="text-transform: uppercase;"></div>
     <div class="field"><label>Serie PC *</label><input type="text" id="f_serie"><div id="err_serie" class="error-msg"></div></div><div class="field"><label>Estado Asignación</label><select id="f_estado"><option>Asignado</option><option>Disponible</option><option>Mantención</option><option>Baja</option></select></div><div class="section-tag"><i class="fas fa-mobile-alt"></i> 3. Telefonía Móvil</div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_equipo" onchange="window.toggleTelefonia()"><span class="slider"></span></label><span>Equipo Celular</span></div><div class="switch-box"><label class="toggle"><input type="checkbox" id="sw_sim" onchange="window.toggleTelefonia()"><span class="slider"></span></label><span>SIM Card</span></div><div class="field"><label>Número Telefónico</label><input type="text" id="f_numero"><div id="err_numero" class="error-msg"></div></div>
     <div class="field"><label>Marca Cel</label><input type="text" id="f_mar_cel" class="disabled-field" disabled style="text-transform: uppercase;"></div>
     <div class="field"><label>Modelo Cel</label><input type="text" id="f_mod_cel" class="disabled-field" disabled style="text-transform: uppercase;"></div>
-    <div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div></div><div style="margin-top:30px; text-align:right;"><button onclick="window.cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; margin-right:10px; cursor:pointer;">Cancelar</button><button onclick="window.guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--dominos-blue); color:white; font-weight:700; border-radius:8px; cursor:pointer;">GUARDAR</button></div></div></div>
+    <div class="field"><label>IMEI Equipo</label><input type="text" id="f_imei" class="disabled-field" disabled><div id="err_imei" class="error-msg"></div></div><div class="field"><label>IMSI (SIM)</label><input type="text" id="f_imsi" class="disabled-field" disabled><div id="err_imsi" class="error-msg"></div></div><div class="section-tag"><i class="fas fa-clipboard-check"></i> 4. Control</div><div class="field"><label>Fecha Entrega</label><input type="date" id="f_fecha_ent"></div><div class="field"><label>Entregado Por</label><input type="text" id="f_ent_it"></div><div class="field" style="grid-column: span 2;"><label>Observaciones</label><input type="text" id="f_obs"></div><div class="section-tag"><i class="fas fa-pen-nib"></i> 5. Firma de Recepción</div><div style="grid-column:span 4;"><div style="border:2px dashed #cbd5e1;border-radius:10px;padding:12px;background:#f8fafc;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:12px;color:#64748b;font-weight:600;">Firma del Receptor</span><button type="button" onclick="window.limpiarFirma('firmaCanvas')" style="font-size:11px;padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:white;cursor:pointer;">Limpiar</button></div><canvas id="firmaCanvas" width="700" height="140" style="border:1px solid #e2e8f0;border-radius:8px;background:white;cursor:crosshair;width:100%;touch-action:none;"></canvas></div></div></div><div style="margin-top:30px; text-align:right;"><button onclick="window.cerrarFicha()" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; margin-right:10px; cursor:pointer;">Cancelar</button><button onclick="window.guardarTodoSincronizado()" id="btnSave" style="padding:10px 25px; border:none; background:var(--dominos-blue); color:white; font-weight:700; border-radius:8px; cursor:pointer;">GUARDAR</button></div></div></div>
 
     <div id="modalDevolucion" class="modal hidden" style="z-index: 1200;"><div class="modal-content" style="max-width: 500px;"><h3 style="color:var(--warning); margin-bottom:15px;">Devolución</h3><p style="margin-bottom:20px;">El equipo serie <strong id="dev_serie"></strong> será reasignado.</p><div class="field" style="margin-bottom:15px;"><label>Nuevo Estado</label><select id="dev_estado"><option value="Disponible">Disponible (Stock)</option><option value="Mantención">A Mantención</option><option value="Baja">Dar de Baja</option></select></div><div class="field" style="margin-bottom:15px;"><label>Nueva Ubicación</label><select id="dev_ubicacion"></select></div><div class="field"><label>Observaciones</label><textarea id="dev_obs" rows="3"></textarea></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px; margin-right:10px;">Cancelar</button><button onclick="window.procesarDevolucion()" style="padding:10px 20px; border:none; background:var(--warning); color:#fff; font-weight:700; cursor:pointer; border-radius:6px;">CONFIRMAR</button></div></div></div>
     <div id="modalConfirm" class="modal hidden" style="z-index: 1500;"><div class="modal-content" style="max-width: 400px; text-align: center;"><i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--tile-red); margin-bottom: 20px;"></i><h3>¿Estás seguro?</h3><p>Eliminarás este registro permanentemente.</p><div style="display: flex; justify-content: center; gap: 15px; margin-top:20px;"><button onclick="document.getElementById('modalConfirm').classList.add('hidden')" style="padding:10px 20px; border:none; background:#f1f5f9; border-radius:8px; cursor:pointer;">Cancelar</button><button id="btnConfirmDelete" style="padding:10px 20px; border:none; background:var(--tile-red); color:white; font-weight:700; border-radius:8px; cursor:pointer;">ELIMINAR</button></div></div></div>
     <div id="modalHistorial" class="modal hidden" style="z-index: 1300;"><div class="modal-content" style="max-width: 600px;"><h3>Historial</h3><div id="historialContent" style="max-height: 400px; overflow-y: auto; margin-top:15px;">Cargando...</div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalHistorial').classList.add('hidden')" style="padding:8px 20px; border:none; background:#f1f5f9; cursor:pointer; border-radius:6px;">Cerrar</button></div></div></div>
     <div id="modalVerUsuario" class="modal hidden" style="z-index: 1100;"><div class="modal-content" style="max-width: 600px;"><div id="userProfileContent"></div><div style="text-align:right; margin-top:20px;"><button onclick="document.getElementById('modalVerUsuario').classList.add('hidden')" style="background:#334155; color:white; padding:8px 20px; border:none; border-radius:6px; cursor:pointer;">Cerrar</button></div></div></div>
+
+    <!-- MODAL NUEVO COLABORADOR -->
+    <div id="modalNuevoColab" class="modal hidden" style="z-index: 1400;">
+      <div class="modal-content" style="max-width:600px;">
+        <h2 style="color:var(--dominos-blue);margin-bottom:20px;border-bottom:1px solid #e2e8f0;padding-bottom:15px;"><i class="fas fa-user-plus"></i> Nuevo Colaborador</h2>
+        <div class="form-grid" style="grid-template-columns:repeat(2,1fr);">
+          <div class="field"><label>RUT *</label><input type="text" id="nc_rut" placeholder="12.345.678-9"></div>
+          <div class="field"><label>Nombre Completo *</label><input type="text" id="nc_nombre" placeholder="Nombre Apellido"></div>
+          <div class="field"><label>Correo</label><input type="email" id="nc_correo" placeholder="nombre@dominospizza.cl"></div>
+          <div class="field"><label>Área *</label><div style="display:flex;gap:6px;"><select id="nc_area" style="flex:1;"></select><button type="button" title="Nueva área" onclick="window.agregarNuevaArea('nc_area')" style="padding:0 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;font-size:16px;">＋</button></div></div>
+          <div class="field"><label>Tienda / Ubicación</label><select id="nc_tienda"></select></div>
+          <div class="field"><label>Estado Contrato</label><select id="nc_contrato"><option value="Vigente">Vigente</option><option value="Cesado">Cesado</option></select></div>
+        </div>
+        <div style="margin-top:30px;text-align:right;display:flex;justify-content:flex-end;gap:10px;">
+          <button onclick="document.getElementById('modalNuevoColab').classList.add('hidden')" style="padding:10px 20px;border:none;background:#f1f5f9;border-radius:8px;cursor:pointer;">Cancelar</button>
+          <button onclick="window.guardarNuevoColab()" id="btnSaveColab" style="padding:10px 25px;border:none;background:var(--dominos-blue);color:white;font-weight:700;border-radius:8px;cursor:pointer;"><i class="fas fa-save"></i> GUARDAR</button>
+        </div>
+      </div>
+    </div>
 
 <script>
 if(typeof ChartDataLabels!=='undefined') Chart.register(ChartDataLabels);
@@ -596,7 +616,9 @@ window.asignarNuevoA = function(rut) {
             rInput.value = rut;
             rInput.dispatchEvent(new Event('blur')); 
         }
-    }, 150);
+        // Inicializar canvas de firma
+        window.iniciarFirmaCanvas('firmaCanvas');
+    }, 200);
 }
 
 window.setupValidationListeners = function() {
@@ -775,23 +797,26 @@ window.nuevoRegistro = function(){
     document.querySelectorAll('.error-msg').forEach(e=>e.innerText=''); 
     document.getElementById('sw_equipo').checked=false; 
     document.getElementById('sw_sim').checked=false; 
-    window.toggleTelefonia(); 
-    document.getElementById('modalFicha').classList.remove('hidden'); 
+    window.toggleTelefonia();
+    window.poblarSelectAreas('f_area');
+    document.getElementById('modalFicha').classList.remove('hidden');
+    setTimeout(()=>window.iniciarFirmaCanvas('firmaCanvas'), 100);
 }
 window.editar = function(s){ 
     currentEditingSerie = s; 
     const a=DB_ACTIVOS.find(x=>x.serie===s); if(!a) return; 
     const c=DB_COLABS.find(x=>x.rut===a.rut_responsable)||{}; 
     document.getElementById('f_rut').value=a.rut_responsable; document.getElementById('f_nombre').value=c.nombre||''; document.getElementById('f_correo').value=c.correo||''; 
-    window.setSelect('f_area',c.area); window.setSelect('f_tienda',a.ubicacion); window.setSelect('f_contractual',c.estado_contractual); window.setSelect('f_estado',a.estado); 
-    document.getElementById('f_marca').value=a.marca; document.getElementById('f_modelo').value=a.modelo; document.getElementById('f_serie').value=a.serie; 
-    document.getElementById('f_fecha_ent').value=a.fecha_entrega; document.getElementById('f_ent_it').value=a.entrega_it||''; document.getElementById('f_obs').value=a.observaciones||''; 
+    window.poblarSelectAreas('f_area'); window.setSelect('f_area',c.area); window.setSelect('f_tienda',a.ubicacion); window.setSelect('f_contractual',c.estado_contractual); window.setSelect('f_estado',a.estado); 
+    document.getElementById('f_marca').value=a.marca||''; document.getElementById('f_modelo').value=a.modelo||''; document.getElementById('f_serie').value=a.serie; 
+    document.getElementById('f_fecha_ent').value=a.fecha_entrega||''; document.getElementById('f_ent_it').value=a.entrega_it||''; document.getElementById('f_obs').value=a.observaciones||''; 
     const hasCel = (a.marca_cel && a.marca_cel.length > 1) || (a.imei_cel && a.imei_cel.length > 1);
     const hasSim = (a.imei_sim && a.imei_sim.length > 1);
     document.getElementById('sw_equipo').checked = hasCel; document.getElementById('sw_sim').checked = hasSim; 
     document.getElementById('f_numero').value=a.numero||''; document.getElementById('f_mar_cel').value=a.marca_cel||''; document.getElementById('f_mod_cel').value=a.modelo_cel||''; document.getElementById('f_imei').value=a.imei_cel||''; document.getElementById('f_imsi').value=a.imei_sim||''; 
     window.toggleTelefonia(); 
-    document.getElementById('modalFicha').classList.remove('hidden'); 
+    document.getElementById('modalFicha').classList.remove('hidden');
+    setTimeout(()=>window.iniciarFirmaCanvas('firmaCanvas'), 100);
 }
 
 // --- FORZAR MAYUSCULAS AL GUARDAR ---
@@ -856,6 +881,144 @@ window.formatearFechaCSV = function(s){ if(!s) return null; const p=s.split(/[\/
 window.showView = function(v){ document.querySelectorAll('.content-area > div').forEach(d=>d.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(v==='telephony') document.getElementById('btn-phone').classList.add('active'); if(v==='home') document.getElementById('btn-home').classList.add('active'); if(v==='inventory') document.getElementById('btn-inv').classList.add('active'); if(v==='metrics') document.getElementById('btn-metrics').classList.add('active'); if(v==='audit') document.getElementById('btn-audit').classList.add('active'); }
 window.abrirFicha = function(){ document.getElementById('modalFicha').classList.remove('hidden'); }
 window.cerrarFicha = function(){ document.getElementById('modalFicha').classList.add('hidden'); }
+
+// --- AREAS DINAMICAS ---
+const AREAS_DEFAULT = ['Operaciones','Informática','Administración','Marketing','Logística','Finanzas','RRHH'];
+let DB_AREAS = [...AREAS_DEFAULT];
+
+window.poblarSelectAreas = function(selectId) {
+    const areas = [...new Set([...DB_AREAS, ...DB_COLABS.map(c=>c.area).filter(Boolean)])];
+    DB_AREAS = areas;
+    const sel = document.getElementById(selectId);
+    if(!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = areas.map(a=>`<option value="${a}">${a}</option>`).join('');
+    if(cur && areas.includes(cur)) sel.value = cur;
+}
+
+window.agregarNuevaArea = function(selectId) {
+    Swal.fire({
+        title: 'Nueva Área',
+        input: 'text',
+        inputPlaceholder: 'Nombre del área...',
+        showCancelButton: true,
+        confirmButtonText: 'Agregar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: 'var(--dominos-blue)',
+        inputValidator: (v) => { if(!v || !v.trim()) return 'Ingresa un nombre de área'; }
+    }).then(r => {
+        if(r.isConfirmed && r.value) {
+            const nueva = r.value.trim();
+            if(!DB_AREAS.includes(nueva)) DB_AREAS.push(nueva);
+            window.poblarSelectAreas(selectId);
+            document.getElementById(selectId).value = nueva;
+        }
+    });
+}
+
+// --- MODAL NUEVO COLABORADOR ---
+window.abrirNuevoColab = function() {
+    document.getElementById('nc_rut').value = '';
+    document.getElementById('nc_nombre').value = '';
+    document.getElementById('nc_correo').value = '';
+    document.getElementById('nc_contrato').value = 'Vigente';
+    // poblar áreas
+    window.poblarSelectAreas('nc_area');
+    // poblar tiendas
+    const ncTienda = document.getElementById('nc_tienda');
+    if(ncTienda) ncTienda.innerHTML = DB_TIENDAS.map(t=>`<option>${t}</option>`).join('');
+    document.getElementById('modalNuevoColab').classList.remove('hidden');
+}
+
+window.guardarNuevoColab = async function() {
+    const rut = window.formatearRut(document.getElementById('nc_rut').value.trim());
+    const nombre = document.getElementById('nc_nombre').value.trim();
+    const correo = document.getElementById('nc_correo').value.trim();
+    const area = document.getElementById('nc_area').value;
+    const tienda = document.getElementById('nc_tienda').value;
+    const contrato = document.getElementById('nc_contrato').value;
+    if(!rut || !nombre || !area) return showToast('Faltan datos obligatorios (RUT, Nombre, Área)', 'error');
+    const btn = document.getElementById('btnSaveColab');
+    btn.innerText = 'GUARDANDO...'; btn.disabled = true;
+    try {
+        const { error } = await sb.from('colaboradores').upsert({ rut, nombre, correo, area, estado_contractual: contrato }, { onConflict: 'rut' });
+        if(error) throw error;
+        showToast(`Colaborador ${nombre} registrado`);
+        document.getElementById('modalNuevoColab').classList.add('hidden');
+        window.cargarDatos();
+    } catch(e) { console.error(e); showToast('Error al guardar colaborador', 'error'); }
+    finally { btn.innerText = 'GUARDAR'; btn.disabled = false; }
+}
+
+// --- FIRMA CANVAS ---
+// Estado global para el canvas de firma
+const _firmaState = {};
+
+window.iniciarFirmaCanvas = function(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if(!canvas) return;
+
+    // Limpiar listeners anteriores si existen
+    if(_firmaState[canvasId]) {
+        canvas.removeEventListener('mousedown', _firmaState[canvasId].start);
+        canvas.removeEventListener('mousemove', _firmaState[canvasId].move);
+        canvas.removeEventListener('mouseup', _firmaState[canvasId].stop);
+        canvas.removeEventListener('mouseleave', _firmaState[canvasId].stop);
+        canvas.removeEventListener('touchstart', _firmaState[canvasId].start);
+        canvas.removeEventListener('touchmove', _firmaState[canvasId].move);
+        canvas.removeEventListener('touchend', _firmaState[canvasId].stop);
+    }
+
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+
+    let drawing = false, lx = 0, ly = 0;
+
+    const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const src = e.touches ? e.touches[0] : e;
+        return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
+    };
+    const start = (e) => { e.preventDefault(); drawing = true; const p = getPos(e); lx = p.x; ly = p.y; };
+    const move = (e) => {
+        e.preventDefault();
+        if (!drawing) return;
+        const p = getPos(e);
+        ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(p.x, p.y); ctx.stroke();
+        lx = p.x; ly = p.y;
+    };
+    const stop = () => { drawing = false; };
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    canvas.addEventListener('mouseup', stop);
+    canvas.addEventListener('mouseleave', stop);
+    canvas.addEventListener('touchstart', start, { passive: false });
+    canvas.addEventListener('touchmove', move, { passive: false });
+    canvas.addEventListener('touchend', stop);
+
+    _firmaState[canvasId] = { start, move, stop };
+}
+
+window.limpiarFirma = function(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+window.obtenerFirmaBase64 = function(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if(!canvas) return null;
+    return canvas.toDataURL('image/png');
+}
 
 initSystem();
 </script>
