@@ -129,16 +129,17 @@ export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) =>
               {!showNuevaArea ? (
                 <div className="flex gap-2">
                   <select 
-                    {...register('area')} 
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none"
-                    onChange={(e) => {
-                      if (e.target.value === 'ADD_NEW') {
-                        setShowNuevaArea(true);
-                        setValue('area', '');
-                      } else {
-                        setValue('area', e.target.value);
+                    {...register('area', {
+                      onChange: (e) => {
+                        if (e.target.value === 'ADD_NEW') {
+                          setShowNuevaArea(true);
+                          setValue('area', '', { shouldValidate: true });
+                        } else {
+                          setValue('area', e.target.value, { shouldValidate: true });
+                        }
                       }
-                    }}
+                    })} 
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none"
                   >
                     <option value="">Seleccionar área...</option>
                     {areas.map(a => (

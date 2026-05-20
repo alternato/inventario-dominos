@@ -93,7 +93,7 @@ export const Navbar = ({ onLogout }) => {
             className="w-8 h-8 object-contain shrink-0"
           />
           <span
-            className="font-black italic tracking-tighter text-[1.6rem] leading-none ml-1 mr-4 select-none"
+            className="font-black italic tracking-tighter text-[1.6rem] leading-none ml-1 mr-2 select-none"
           >
             <span style={{
               color: '#008ce7',
@@ -102,6 +102,9 @@ export const Navbar = ({ onLogout }) => {
               color: '#0f1c2e',
               textShadow: '0 0 6px white, 0 0 3px white, 1px 1px 0 white, -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white'
             }}>OLTA</span><span style={{ color: '#E31837', textShadow: '0 0 4px white' }}>.</span>
+          </span>
+          <span className="text-[10px] bg-white/20 text-white font-bold px-1.5 py-0.5 rounded tracking-wide align-middle select-none mr-4">
+            v1.2.0
           </span>
         </div>
 
