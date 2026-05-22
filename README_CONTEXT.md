@@ -2,6 +2,8 @@
 
 Este documento centraliza toda la información técnica, lógica, operativa y de base de datos de **IT COMPASS** (versión actual: **v1.2.1**), optimizado para que agentes AI como **Claude Code** entiendan el codebase al instante.
 
+> **Última actualización:** 2026-05-22 — Agente IA, ESLint/Prettier, CI/CD, validación RUT, reorganización scripts.
+
 ---
 
 ## 📋 Descripción del Sistema
@@ -16,37 +18,48 @@ Este documento centraliza toda la información técnica, lógica, operativa y de
 
 ## 🛠️ Stack Tecnológico
 *   **Base de Datos**: PostgreSQL 15-alpine (Dockerizado).
-*   **Backend API**: Node.js v20 (Express, controlador `pg` nativo, `nodemailer` para SMTP, `jsonwebtoken` para tokens).
-*   **Frontend**: React (Vite, Zustand para store de estados, Tailwind CSS, Lucide icons, React Hook Form + Zod para validación).
-*   **Infraestructura**: Docker Compose (`docker-compose.yml` para desarrollo, `docker-compose.prod.yml` para producción).
+*   **Backend API**: Node.js v20 (Express, `pg` nativo, `nodemailer` SMTP, `jsonwebtoken`, `@anthropic-ai/sdk` para el agente IA).
+*   **Frontend**: React 18 (Vite, Zustand, Tailwind CSS, Lucide icons, React Hook Form + Zod, `vite-plugin-pwa`).
+*   **Infraestructura**: Docker Compose (`docker-compose.yml` dev, `docker-compose.prod.yml` prod). CI/CD con GitHub Actions (`.github/workflows/ci.yml`).
+*   **Calidad**: ESLint 8 + Prettier en frontend y backend. ESLint config en `.eslintrc.cjs` (frontend ESM requiere CJS para eslint).
 
 ---
 
 ## 📁 Estructura del Workspace
 ```text
 inventario-dominos/
+├── .github/workflows/ci.yml       # CI: lint + build en push/PR a main
 ├── backend/
+│   ├── scripts/                   # Scripts utilitarios (seed, migración, conciliación, etc.)
 │   ├── migrations/                # Scripts SQL de migraciones correlativas
-│   │   ├── 004_asignaciones.sql   # Esquema Tercer Eje y Vista v_activos
-│   │   └── 005_crear_tabla_areas.sql # Tabla areas y eliminación check constraint
-│   ├── db.js                      # Capa de datos (Consultas SQL parametrizadas)
+│   │   ├── 004_asignaciones.sql
+│   │   └── 005_crear_tabla_areas.sql
+│   ├── agent.js                   # Agente IA: tool use con Claude API (buscar/actualizar activos)
+│   ├── db.js                      # Capa de datos (consultas SQL parametrizadas con pg Pool)
 │   ├── mail.js                    # Plantillas de correo y envíos SMTP
-│   ├── server.js                  # Rutas API Express y confirmación pública de devoluciones
-│   ├── run-migration.js           # CLI dinámico para correr migraciones SQL
-│   ├── migrate-asignaciones.js    # Script de migración de datos anteriores
-│   ├── schema.sql                 # Script maestro de inicialización de la Base de Datos
+│   ├── schemas.js                 # Schemas Zod + validación RUT chileno (dígito verificador)
+│   ├── server.js                  # Rutas API Express (incluye POST /api/chat para el agente)
+│   ├── schema.sql                 # Script maestro de inicialización de la BD
 │   ├── Dockerfile
 │   └── package.json
 ├── frontend/
 │   ├── src/
-│   │   ├── components/            # Modales (ModalAsignacion, ModalDevolucion, ModalColaborador)
-│   │   ├── pages/                 # Páginas (ActivosPage, ColaboradoresPage, HistorialPage, AjustesPage)
+│   │   ├── components/
+│   │   │   ├── activos/
+│   │   │   │   └── constants.jsx  # IMPORTANTE: extensión .jsx (contiene JSX, no .js)
+│   │   │   ├── AgentChat.jsx      # Chat flotante del agente IA (bottom-right)
+│   │   │   ├── Layout.jsx         # Layout principal (incluye <AgentChat />)
+│   │   │   └── ...                # Modales, Navbar, etc.
+│   │   ├── pages/                 # ActivosPage, ColaboradoresPage, HistorialPage, AjustesPage
 │   │   ├── store/                 # Zustand (activosStore.js)
-│   │   ├── authConfig.js          # Configuración del Cliente Azure MSAL
-│   │   ├── msalInstance.js        # Inicialización de PublicClientApplication de MSAL
-│   │   ├── api.js                 # Cliente Axios y catálogo de APIs
+│   │   ├── authConfig.js          # Configuración Azure MSAL
+│   │   ├── msalInstance.js        # PublicClientApplication de MSAL
+│   │   ├── api.js                 # Cliente Axios
 │   │   └── main.jsx
-│   ├── Dockerfile.prod            # Contenedor de producción con Nginx serving static files
+│   ├── public/
+│   │   └── favicon.ico            # 340 bytes (32x32, fondo azul #0066CC con 'D')
+│   ├── vite.config.js             # PWA config: favicon.ico excluido del precache Workbox
+│   ├── Dockerfile.prod            # Build Vite → Nginx serving static
 │   └── package.json
 ├── docker-compose.yml             # Orquestación desarrollo local
 └── docker-compose.prod.yml        # Orquestación producción (Frontend: 8080, Backend: 8081)
@@ -70,21 +83,26 @@ DB_USER=inventario_user
 DB_PASSWORD=contrasena_secreta_aqui
 DB_SSL=false                     # 'true' para forzar conexiones SSL
 
-# Seguridad JWT (Sesión Tradicional)
+# Seguridad JWT — token almacenado en cookie httpOnly (NO localStorage)
 JWT_SECRET=un_secreto_largo_y_aleatorio_aqui
 JWT_EXPIRES_IN=12h
 
 # Servidor SMTP (Notificaciones por Correo)
-SMTP_HOST=smtp.office365.com     # Servidor SMTP de tu proveedor
-SMTP_PORT=587                    # Puerto SMTP (ej. 587 para TLS)
-SMTP_USER=ti@dominospizza.cl     # Cuenta de correo origen
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+SMTP_USER=ti@dominospizza.cl
 SMTP_PASSWORD=contrasena_smtp_aqui
 EMAIL_FROM=noreply@dominospizza.cl
 
 # Integración de Enrutamiento
-FRONTEND_URL=http://tu-dominio-inventario.cl:8080 # Dominio principal del Frontend
-BACKEND_URL=http://tu-dominio-api.cl:8081        # Endpoint principal del Backend (usado para links de confirmación)
+FRONTEND_URL=http://tu-dominio-inventario.cl:8080
+BACKEND_URL=http://tu-dominio-api.cl:8081        # Usado para links de confirmación de devoluciones
+
+# Agente IA (Claude / Anthropic) — sin esta clave /api/chat devuelve 503
+ANTHROPIC_API_KEY=sk-ant-api03-...               # Obtener en console.anthropic.com → API Keys
 ```
+
+> **Nota de seguridad:** El JWT viaja en una cookie `httpOnly; Secure; SameSite=Strict` — nunca en `localStorage`. `ANTHROPIC_API_KEY` no debe commitearse; agrégala directamente al `.env` del servidor (ver sección de despliegue).
 
 ---
 
@@ -193,8 +211,12 @@ Todos los endpoints (excepto el login, recuperación de clave y confirmación p�
 ### Reportería e Importaciones
 *   `GET /api/historial`: Reporte e historial de auditoría de movimientos.
 *   `GET /api/kpis`: Métricas y estadísticas para el Dashboard (totales, por estado, por tipo, alertas de IMEIs y SIMs duplicados).
-*   `POST /api/importar`: Importación masiva de activos y colaboradores desde planillas Excel.
-*   `GET /api/exportar`: Exportación masiva de todo el inventario consolidado a un archivo Excel (.xlsx).
+*   `POST /api/import/preview`: Preview de importación masiva desde Excel (dry-run).
+*   `POST /api/import/commit`: Confirmar importación masiva.
+*   `GET /api/export-sql`: Exportar inventario completo en SQL (superadmin).
+
+### Agente IA
+*   `POST /api/chat` *(autenticado, rate limit: 20 req/min)*: Conversación multi-turno con el agente Claude. Recibe `{ mensajes: [...] }` con el historial completo y devuelve `{ respuesta, historial }`. El agente tiene acceso a 4 herramientas internas: `buscar_activos`, `actualizar_activo`, `obtener_resumen`, `listar_colaboradores`. Requiere `ANTHROPIC_API_KEY` válida con créditos; sin ella devuelve 503.
 
 ---
 
@@ -247,5 +269,46 @@ docker exec -it inventario_backend_prod node migrate-asignaciones.js
 
 ### 4. Monitorear logs del sistema en caliente:
 ```bash
-docker logs -f inventario_backend_prod
+docker compose -f docker-compose.prod.yml logs -f backend
 ```
+
+### 5. Configurar ANTHROPIC_API_KEY en producción:
+```bash
+# Si hay key duplicada en .env (causada por >> múltiples veces):
+nano /var/www/inventario-dominos/.env   # dejar solo una línea ANTHROPIC_API_KEY=...
+
+# Verificar que NO haya variable de entorno del shell sobreescribiendo el .env:
+echo $ANTHROPIC_API_KEY               # si muestra algo, ejecutar: unset ANTHROPIC_API_KEY
+
+# Recrear contenedor para que tome el .env actualizado:
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+
+# Verificar que el contenedor tenga la key correcta:
+docker exec inventario_backend_prod printenv ANTHROPIC_API_KEY
+```
+
+---
+
+## 🤖 Agente IA — Arquitectura
+
+El agente está implementado en `backend/agent.js` usando el patrón **agentic loop** de la API de Anthropic:
+
+1. Recibe el historial de mensajes desde el frontend (`AgentChat.jsx`).
+2. Llama a `claude-haiku-4-5-20251001` con `tools` definidas.
+3. Si `stop_reason === 'tool_use'`, ejecuta las herramientas en paralelo y agrega los resultados al historial.
+4. Repite hasta `stop_reason === 'end_turn'` (máx. 10 iteraciones).
+5. Devuelve `{ respuesta, historial }` al frontend.
+
+**Herramientas disponibles:**
+
+| Herramienta | Descripción |
+|---|---|
+| `buscar_activos` | Filtra activos por tipo, estado, marca, modelo o texto libre |
+| `actualizar_activo` | Modifica tipo, estado, marca, modelo, ubicación u observaciones de un activo por serie |
+| `obtener_resumen` | Estadísticas del inventario: totales por tipo y estado |
+| `listar_colaboradores` | Lista colaboradores con filtro por nombre, RUT o área |
+
+**Notas importantes:**
+- El agente **siempre consulta antes de modificar** (instrucción en system prompt).
+- Los archivos JSX en `frontend/src/components/activos/` deben tener extensión `.jsx` (no `.js`), de lo contrario Vite/Rollup falla en producción.
+- La ruta `/api/chat` debe declararse **antes** del middleware 404 en `server.js`.

@@ -1,381 +1,160 @@
-# 🚀 Backend - Inventario TI Domino's Chile
+# Backend — IT COMPASS (Inventario TI Domino's Chile)
 
-Sistema profesional de backend para gestión de inventario de activos TI con autenticación corporativa, roles de usuario y base de datos PostgreSQL en Supabase.
+API REST construida con Node.js + Express + PostgreSQL. Autohospedada en Docker.
 
-## 📋 Requisitos
+## Stack
 
-- **Node.js** v16 o superior
-- **npm** v8 o superior
-- **Cuenta Supabase** (ya configurada)
-- **Variables de entorno** (.env)
+- **Runtime**: Node.js v20 (Alpine)
+- **Framework**: Express 4
+- **Base de datos**: PostgreSQL 15 via `pg` (pool nativo)
+- **Auth**: JWT en cookie `httpOnly` + Microsoft MSAL/Azure Entra ID SSO
+- **Validación**: Zod (`schemas.js`) — incluye validación de RUT chileno con dígito verificador
+- **Email**: Nodemailer (SMTP)
+- **Agente IA**: `@anthropic-ai/sdk` — Claude con tool use (`agent.js`)
+- **Linting**: ESLint 8 (`.eslintrc.cjs`)
 
-## 🔧 Instalación
+## Requisitos
 
-### 1. Crear archivo `.env`
+- Node.js v20+
+- PostgreSQL 15 (o usar Docker Compose)
 
-Copia el archivo `.env.example` a `.env` y completa con tus credenciales:
+## Instalación local
 
 ```bash
 cp .env.example .env
-```
-
-Luego edita `.env` con:
-
-```bash
-PORT=8080
-SUPABASE_URL=https://ivjwxvhixrskraepqzse.supabase.co
-SUPABASE_KEY=tu-clave-supabase-aqui
-JWT_SECRET=tu-secreto-jwt-muy-seguro
-JWT_EXPIRES_IN=8h
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=tu-correo@dominospizza.cl
-SMTP_PASSWORD=tu-contraseña-app
-EMAIL_FROM=noreply@dominospizza.cl
-FRONTEND_URL=http://localhost:3000
-```
-
-### 2. Instalar dependencias
-
-```bash
+# Editar .env con tus credenciales
 npm install
-```
-
-### 3. Crear tablas en Supabase
-
-Abre la consola SQL de Supabase y ejecuta el contenido del archivo `schema.sql`:
-
-1. Ve a tu proyecto Supabase
-2. Abre la pestaña "SQL Editor"
-3. Crea una nueva query
-4. Copia todo el contenido de `backend/schema.sql`
-5. Ejecuta la query
-
-### 4. Crear usuario admin inicial
-
-```bash
-node seed-admin.js
-```
-
-Esto creará un usuario admin con credenciales iniciales que **debes cambiar después del primer login**.
-
-## 🚀 Iniciar el servidor
-
-```bash
-# Modo producción
-npm start
-
-# Modo desarrollo (con auto-reload)
 npm run dev
 ```
 
-El servidor estará disponible en `http://localhost:8080`
+## Variables de entorno
 
-## 📚 Endpoints de API
+Ver `.env.example` para la lista completa. Las críticas:
 
-### 🔐 Autenticación
+| Variable | Descripción |
+|---|---|
+| `DB_HOST` | `localhost` en dev, `db` en Docker Compose |
+| `JWT_SECRET` | Secreto largo y aleatorio. Nunca committear el real. |
+| `ANTHROPIC_API_KEY` | Para el agente IA. Sin esta clave `/api/chat` devuelve 503. Obtener en console.anthropic.com |
+| `FRONTEND_URL` | URL del frontend (para CORS y links de email) |
 
-#### Login
-```
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "usuario@dominospizza.cl",
-  "password": "tu-contraseña"
-}
-
-Response:
-{
-  "message": "Login exitoso",
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "usuario": {
-    "id": 1,
-    "email": "usuario@dominospizza.cl",
-    "nombre": "Nombre Usuario",
-    "rol": "admin"
-  }
-}
-```
-
-#### Recuperar contraseña
-```
-POST /api/auth/forgot-password
-Content-Type: application/json
-
-{
-  "email": "usuario@dominospizza.cl"
-}
-
-Response:
-{
-  "message": "Instrucciones de recuperación enviadas al email"
-}
-```
-
-#### Resetear contraseña
-```
-POST /api/auth/reset-password
-Content-Type: application/json
-
-{
-  "token": "token-de-recuperacion",
-  "newPassword": "nueva-contraseña"
-}
-
-Response:
-{
-  "message": "Contraseña actualizada exitosamente"
-}
-```
-
-### 📦 Activos
-
-Todos los endpoints requieren autenticación con header:
-```
-Authorization: Bearer {token}
-```
-
-#### Listar activos
-```
-GET /api/activos
-Authorization: Bearer {token}
-
-Response: [
-  {
-    "id": 1,
-    "serie": "ABC123",
-    "marca": "Lenovo",
-    "modelo": "ThinkPad E15",
-    "estado": "Asignado",
-    "tipo_dispositivo": "Laptop",
-    ...
-  }
-]
-```
-
-#### Crear activo (admin)
-```
-POST /api/activos
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "serie": "ABC123",
-  "marca": "Lenovo",
-  "modelo": "ThinkPad E15",
-  "estado": "Asignado",
-  "tipo_dispositivo": "Laptop",
-  "rut_responsable": "12345678-K",
-  "ubicacion": "Santiago - Oficina",
-  "observaciones": "Sin problemas",
-  "fecha_compra": "2023-01-15",
-  "valor": "1500000",
-  "numero_factura": "FAC-001"
-}
-
-Response:
-{
-  "message": "Activo creado exitosamente",
-  "data": { ... }
-}
-```
-
-#### Actualizar activo (admin)
-```
-PUT /api/activos/:serie
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "estado": "Mantenimiento",
-  "observaciones": "Cambio de disco duro"
-}
-
-Response:
-{
-  "message": "Activo actualizado exitosamente",
-  "data": { ... }
-}
-```
-
-#### Eliminar activo (admin)
-```
-DELETE /api/activos/:serie
-Authorization: Bearer {token}
-
-Response:
-{
-  "message": "Activo eliminado exitosamente"
-}
-```
-
-### 👥 Colaboradores
-
-#### Listar colaboradores
-```
-GET /api/colaboradores
-Authorization: Bearer {token}
-
-Response: [
-  {
-    "rut": "12345678-K",
-    "nombre": "Juan Pérez",
-    "correo": "juan@dominospizza.cl",
-    "area": "TI",
-    ...
-  }
-]
-```
-
-#### Crear colaborador (admin)
-```
-POST /api/colaboradores
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "rut": "12345678-K",
-  "nombre": "Juan Pérez",
-  "correo": "juan@dominospizza.cl",
-  "area": "TI",
-  "cargo": "Especialista IT",
-  "telefono": "+56912345678"
-}
-
-Response:
-{
-  "message": "Colaborador creado exitosamente",
-  "data": { ... }
-}
-```
-
-### 👤 Usuarios (admin)
-
-#### Listar usuarios
-```
-GET /api/usuarios
-Authorization: Bearer {token}
-
-Response: [
-  {
-    "id": 1,
-    "email": "admin@dominospizza.cl",
-    "nombre": "Administrador",
-    "rol": "admin",
-    "activo": true
-  }
-]
-```
-
-#### Crear usuario (admin)
-```
-POST /api/usuarios
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "email": "newuser@dominospizza.cl",
-  "nombre": "Nuevo Usuario",
-  "password": "ContraseñaSegura123",
-  "rol": "viewer"
-}
-
-Response:
-{
-  "message": "Usuario creado exitosamente",
-  "data": { ... }
-}
-```
-
-### 💊 Health Check
+## Estructura de archivos
 
 ```
-GET /health
-
-Response:
-{
-  "status": "Backend ejecutándose correctamente ✓",
-  "timestamp": "2026-02-03T00:00:00.000Z",
-  "version": "1.0.0"
-}
+backend/
+├── scripts/           # Scripts utilitarios (seed, migración de datos, conciliación)
+├── migrations/        # Migraciones SQL correlativas (004, 005, ...)
+├── agent.js           # Agente IA: loop tool use con Claude API
+├── db.js              # Pool pg + todas las funciones de consulta SQL
+├── mail.js            # Plantillas HTML de correo + envío SMTP
+├── schemas.js         # Schemas Zod para validación de requests + validarRut()
+├── server.js          # Punto de entrada: middlewares, rutas Express
+├── schema.sql         # DDL completo: tablas, vistas, índices
+└── Dockerfile
 ```
 
-## 🔐 Autenticación y Roles
+## Endpoints principales
 
-### Roles disponibles:
-- **admin**: Puede crear, modificar y eliminar activos y colaboradores
-- **viewer**: Solo lectura de activos y colaboradores
+Todos requieren cookie de sesión (JWT `httpOnly`) excepto los marcados como públicos.
 
-### Flujo de autenticación:
-1. Usuario hace login con email corporativo @dominospizza.cl
-2. Backend valida credenciales
-3. Backend retorna JWT token válido por 8 horas
-4. Cliente almacena token en localStorage
-5. Cliente envía token en header `Authorization: Bearer {token}` en cada request
+### Auth
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/auth/login` | Login local (email + password) |
+| POST | `/api/auth/sso-login` | Login Microsoft MSAL |
+| GET | `/api/auth/verify` | Verificar sesión activa |
+| POST | `/api/auth/logout` | Cerrar sesión (limpia cookie) |
+| POST | `/api/auth/forgot-password` | Solicitar reset de contraseña |
+| POST | `/api/auth/reset-password` | Aplicar nueva contraseña con token |
 
-## 🛡️ Seguridad
+### Activos
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/activos` | Listar activos (via vista `v_activos`) |
+| GET | `/api/activos/:serie` | Obtener activo por serie |
+| POST | `/api/activos` | Crear activo *(admin)* |
+| PUT | `/api/activos/:serie` | Actualizar activo *(admin)* |
+| DELETE | `/api/activos/:serie` | Soft delete *(admin)* |
 
-- ✅ Contraseñas hasheadas con bcrypt
-- ✅ Autenticación JWT con expiración
-- ✅ Validación de datos con Zod
-- ✅ CORS habilitado
-- ✅ Solo emails @dominospizza.cl permitidos
-- ✅ Roles basados en permisos
-- ✅ Tokens de recuperación de contraseña seguros
+### Colaboradores
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/colaboradores` | Listar colaboradores |
+| POST | `/api/colaboradores` | Crear colaborador *(admin)* |
+| PUT | `/api/colaboradores/:rut` | Actualizar colaborador *(admin)* |
+| DELETE | `/api/colaboradores/:rut` | Soft delete + desasignar equipos *(admin)* |
 
-## 📧 Configuración de Email
+### Asignaciones
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/asignaciones` | Listar asignaciones (filtros: estado, serie, rut) |
+| POST | `/api/asignaciones` | Asignar equipo a colaborador *(admin)* |
+| PUT | `/api/asignaciones/:id/cerrar` | Solicitar devolución → envía email con token |
+| GET | `/api/asignaciones/confirmar/:token` | **[PÚBLICO]** Confirmación digital de devolución |
 
-Para recuperación de contraseña, necesitas configurar SMTP.
+### Agente IA
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/chat` | Conversación multi-turno con el agente Claude (rate limit: 20 req/min) |
 
-### Gmail (recomendado):
-1. Habilita "Acceso de aplicaciones menos seguras" en tu cuenta Google
-2. O usa una "Contraseña de Aplicación" (más seguro)
-3. Configura en `.env`:
-   - SMTP_HOST: smtp.gmail.com
-   - SMTP_PORT: 587
-   - SMTP_USER: tu-correo@gmail.com
-   - SMTP_PASSWORD: tu-contraseña-app
+**Body:** `{ mensajes: [{ role, content }, ...] }` — historial completo de la conversación.  
+**Response:** `{ respuesta: string, historial: [...] }`
 
-## 🐛 Troubleshooting
+### Otros
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/kpis` | KPIs para el Dashboard |
+| GET | `/api/areas` | Listar áreas |
+| POST | `/api/areas` | Crear área *(admin)* |
+| GET | `/api/historial` | Historial de auditoría |
+| POST | `/api/import/preview` | Preview importación masiva (dry-run) |
+| POST | `/api/import/commit` | Confirmar importación |
+| GET | `/health` | Health check (no requiere auth) |
 
-### Error: "SUPABASE_URL is not defined"
-- Verifica que el archivo `.env` exista y tenga SUPABASE_URL
+## Agente IA — `agent.js`
 
-### Error: "Token inválido"
-- Verifica que JWT_SECRET esté configurado correctamente
-- Asegúrate que el token no haya expirado
+Implementa el patrón **agentic loop** de Anthropic. El agente itera hasta 10 veces:
+1. Llama a `claude-haiku-4-5-20251001` con el historial y las herramientas.
+2. Si `stop_reason === 'tool_use'`, ejecuta las herramientas en paralelo.
+3. Si `stop_reason === 'end_turn'`, devuelve la respuesta final.
 
-### Error: "Email o contraseña incorrectos"
-- Verifica que el usuario exista en la base de datos
-- Verifica que la contraseña sea correcta
+Herramientas disponibles: `buscar_activos`, `actualizar_activo`, `obtener_resumen`, `listar_colaboradores`.
 
-### No llegan emails de recuperación
-- Verifica credenciales SMTP
-- Habilita "Aplicaciones menos seguras" en Gmail
-- Revisa la carpeta de Spam
+## Roles y permisos
 
-## 📖 Documentación Adicional
+| Rol | Permisos |
+|---|---|
+| `viewer` | Solo lectura |
+| `admin` | Lectura + escritura de activos, colaboradores y asignaciones |
+| `superadministrador` | Todo + gestión de usuarios y operaciones de mantenimiento |
 
-- [Documentación de Supabase](https://supabase.io/docs)
-- [Documentación de Express.js](https://expressjs.com)
-- [Documentación de JWT](https://jwt.io)
-- [Documentación de Zod](https://zod.dev)
+## Despliegue en producción (Docker)
 
-## 📝 Notas Importantes
+```bash
+# Actualizar y reconstruir
+git pull
+docker compose -f docker-compose.prod.yml up -d --build
 
-1. **Cambiar JWT_SECRET**: En producción, cambiar a un valor único y seguro
-2. **Variables de entorno**: Nunca commitear `.env` a git
-3. **CORS**: Configurar con dominio específico en producción
-4. **Logs**: Implementar servicio de logs en producción
-5. **Backup**: Hacer backup regular de base de datos
+# Ver logs en vivo
+docker compose -f docker-compose.prod.yml logs -f backend
 
-## 🤝 Soporte
+# Recrear solo el backend (ej. tras cambiar .env)
+docker compose -f docker-compose.prod.yml up -d --force-recreate backend
+```
 
-Para problemas o sugerencias, contacta al equipo de TI Domino's Chile.
+## Troubleshooting frecuente
 
----
+**`/api/chat` devuelve 503**  
+→ `ANTHROPIC_API_KEY` no está en el `.env` del servidor o está vacía.
 
-**Versión:** 1.0.0  
-**Última actualización:** 2026-02-03  
-**Autor:** Equipo de TI Domino's Chile
+**`/api/chat` devuelve 500 "API key inválida o revocada"**  
+→ La key fue revocada. Generar nueva en console.anthropic.com y reemplazar en `.env`. Luego: `docker compose ... up -d --force-recreate backend`.
+
+**`printenv ANTHROPIC_API_KEY` muestra una key antigua aunque el `.env` tiene una nueva**  
+→ Hay una variable de entorno del shell sobreescribiendo el `.env`. Ejecutar `unset ANTHROPIC_API_KEY` antes de recrear el contenedor. Verificar que no esté definida en `~/.bashrc` o `/etc/environment`.
+
+**Error 500 "API key inválida" con créditos en cero**  
+→ Agregar créditos en console.anthropic.com → Billing.
+
+**Build de frontend falla con "Expression expected" en `constants.js`**  
+→ El archivo `frontend/src/components/activos/constants.jsx` contiene JSX y debe tener extensión `.jsx`. Si se renombra localmente pero no se commitea, el servidor sigue usando el `.js`.
