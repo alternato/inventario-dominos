@@ -4,26 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useActivosStore } from '../store/activosStore';
 import { X } from 'lucide-react';
+import { normalizeRut, validarRut } from '../utils/rut';
 
 const schema = z.object({
-  rut:      z.string().min(1, 'RUT requerido'),
+  rut:      z.string().min(1, 'RUT requerido').refine(validarRut, 'RUT inválido (verifica el dígito verificador)'),
   nombre:   z.string().min(2, 'Nombre requerido'),
   correo:   z.string().email('Email inválido').optional().or(z.literal('')),
   area:     z.string().min(1, 'Área requerida'),
   cargo:    z.string().optional(),
   telefono: z.string().optional(),
 });
-
-// Elimina puntos y asegura formato XXXXXXXX-X
-const normalizeRut = (raw = '') => {
-  // Quitar todo excepto dígitos, K y guion
-  let clean = raw.replace(/\./g, '').replace(/[^0-9kK-]/g, '').toUpperCase();
-  // Si no tiene guion pero tiene más de 1 char, insertar guion antes del último
-  if (!clean.includes('-') && clean.length > 1) {
-    clean = clean.slice(0, -1) + '-' + clean.slice(-1);
-  }
-  return clean;
-};
 
 export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) => {
   const { crearColaborador, actualizarColaborador, areas, cargarAreas, crearArea } = useActivosStore();

@@ -1,5 +1,4 @@
 require('dotenv').config();
-const Sentry = require('@sentry/node');
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -26,14 +25,6 @@ const {
 } = require('./schemas');
 const { verifyMsToken } = require('./msValidator');
 const { processImportFile } = require('./importController');
-
-if (process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.NODE_ENV || 'development',
-    tracesSampleRate: 0.1,
-  });
-}
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -967,11 +958,6 @@ app.get('/api/migrate', authenticate, requireSuperAdmin, async (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
-
-// Sentry debe capturar errores antes que el handler propio
-if (process.env.SENTRY_DSN) {
-  Sentry.setupExpressErrorHandler(app);
-}
 
 app.use((err, req, res, next) => {
   console.error('Error:', err);

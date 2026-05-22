@@ -6,7 +6,17 @@
       "Bash(xargs wc -l)",
       "Bash(npm install *)",
       "Bash(npm run *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(node -e \"require\\('C:/Users/EmilioDroguett/OneDrive - Dominos Pizza Chile/Escritorio/WebInv/inventario-dominos/backend/node_modules/is-glob'\\)\")",
+      "Bash(npm uninstall *)",
+      "Bash(npm test *)",
+      "Bash(npx jest *)",
+      "Bash(node -e \"require\\('./node_modules/jest-haste-map/build/watchers/common.js'\\)\")",
+      "Bash(node -e \"require\\('./node_modules/walker/lib/walker'\\)\")",
+      "Bash(node --experimental-vm-modules node_modules/.bin/jest --testPathPattern=__tests__ --watchAll=false --forceExit)",
+      "Bash(node node_modules/jest-cli/bin/jest.js --testPathPattern=__tests__ --watchAll=false --forceExit)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/jest/package.json'\\).version\\)\")"
     ]
   }
 }

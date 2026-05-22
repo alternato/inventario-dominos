@@ -673,6 +673,4 @@ module.exports = {
   createArea,
   updateArea,
   deleteArea,
-  // Pool directo (para queries custom)
-  pool,
 };

@@ -286,7 +286,12 @@ export const ColaboradoresPage = () => {
                               type="text"
                               readOnly
                               value={`${window.location.origin.replace(':5173', ':8081')}/api/asignaciones/confirmar/${asig.token_confirmacion}`}
-                              onClick={(e) => { e.target.select(); document.execCommand('copy'); showToast('Link copiado al portapapeles'); }}
+                              onClick={(e) => {
+                                const url = e.target.value;
+                                navigator.clipboard.writeText(url)
+                                  .then(() => showToast('Link copiado al portapapeles'))
+                                  .catch(() => { e.target.select(); document.execCommand('copy'); showToast('Link copiado al portapapeles'); });
+                              }}
                               className="w-full text-[10px] bg-white border border-amber-200 rounded px-1.5 py-1 outline-none cursor-pointer font-mono"
                               title="Haz clic para copiar"
                             />

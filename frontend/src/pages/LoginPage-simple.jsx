@@ -219,7 +219,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
 
           <div className="mt-12 text-center">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">
-              © 2026 Domino's Pizza Chile
+              © 2026 Domino&apos;s Pizza Chile
             </p>
           </div>
 

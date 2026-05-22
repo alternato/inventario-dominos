@@ -1,5 +1,27 @@
 const { z } = require('zod');
 
+// ─── Validación de RUT chileno (dígito verificador) ──────────
+function validarRut(rut) {
+  if (!rut || typeof rut !== 'string') return false;
+  const clean = rut.replace(/\./g, '').toUpperCase();
+  if (!/^\d{1,8}-[\dK]$/.test(clean)) return false;
+  const [body, dv] = clean.split('-');
+  const digits = body.split('').reverse();
+  let sum = 0;
+  let factor = 2;
+  for (const d of digits) {
+    sum += parseInt(d) * factor;
+    factor = factor === 7 ? 2 : factor + 1;
+  }
+  const expected = 11 - (sum % 11);
+  const expectedDv = expected === 11 ? '0' : expected === 10 ? 'K' : String(expected);
+  return dv === expectedDv;
+}
+
+const rutSchema = z.string()
+  .min(1, 'RUT requerido')
+  .refine(validarRut, 'RUT inválido (verifica el dígito verificador)');
+
 // Helper: política de contraseñas robusta (M5)
 const passwordSchema = z.string()
   .min(8, 'Contraseña debe tener mínimo 8 caracteres')
@@ -55,7 +77,7 @@ const updateActivoSchema = createActivoSchema.partial().extend({
 const AREAS = ['Operaciones', 'Administración', 'Logística', 'TI', 'RRHH', 'Marketing', 'Otro'];
 
 const createColaboradorSchema = z.object({
-  rut:      z.string().min(1, 'RUT requerido'),
+  rut:      rutSchema,
   nombre:   z.string().min(1, 'Nombre requerido'),
   correo:   z.string().email('Email inválido').optional().nullable(),
   area:     z.enum(AREAS, { errorMap: () => ({ message: `Área debe ser una de: ${AREAS.join(', ')}` }) }),
@@ -111,4 +133,5 @@ module.exports = {
   createUsuarioSchema,
   updateUsuarioSchema,
   validate,
+  validarRut,
 };
