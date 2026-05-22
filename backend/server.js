@@ -978,8 +978,11 @@ app.post('/api/chat', authenticate, agentLimiter, async (req, res) => {
     const { respuesta, historial } = await ejecutarAgente(mensajes);
     res.json({ respuesta, historial });
   } catch (err) {
-    console.error('Error en agente:', err.message);
-    res.status(500).json({ error: 'Error al procesar la solicitud del agente.' });
+    console.error('Error en agente:', err.message, err.status, err.error);
+    const detail = err.status === 401 ? 'API key inválida o revocada.'
+      : err.status === 429 ? 'Límite de la API de Anthropic alcanzado.'
+      : err.message || 'Error interno.';
+    res.status(500).json({ error: `Error en el agente: ${detail}` });
   }
 });
 
