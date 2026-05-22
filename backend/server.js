@@ -25,6 +25,7 @@ const {
 } = require('./schemas');
 const { verifyMsToken } = require('./msValidator');
 const { processImportFile } = require('./importController');
+const { ejecutarAgente } = require('./agent');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -957,6 +958,33 @@ app.get('/api/migrate', authenticate, requireSuperAdmin, async (req, res) => {
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
+});
+
+// ===== AGENTE IA =====
+
+const agentLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: { error: 'Demasiadas consultas al agente. Espera un minuto.' },
+});
+
+app.post('/api/chat', authenticate, agentLimiter, async (req, res) => {
+  try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({ error: 'El agente no está configurado (falta ANTHROPIC_API_KEY).' });
+    }
+
+    const { mensajes } = req.body;
+    if (!Array.isArray(mensajes) || mensajes.length === 0) {
+      return res.status(400).json({ error: 'Se requiere un array "mensajes".' });
+    }
+
+    const { respuesta, historial } = await ejecutarAgente(mensajes);
+    res.json({ respuesta, historial });
+  } catch (err) {
+    console.error('Error en agente:', err.message);
+    res.status(500).json({ error: 'Error al procesar la solicitud del agente.' });
+  }
 });
 
 app.use((err, req, res, next) => {
