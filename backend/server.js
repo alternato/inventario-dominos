@@ -956,10 +956,6 @@ app.get('/api/migrate', authenticate, requireSuperAdmin, async (req, res) => {
   }
 });
 
-app.use((req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
-});
-
 // ===== AGENTE IA =====
 
 const agentLimiter = rateLimit({
@@ -985,6 +981,10 @@ app.post('/api/chat', authenticate, agentLimiter, async (req, res) => {
     console.error('Error en agente:', err.message);
     res.status(500).json({ error: 'Error al procesar la solicitud del agente.' });
   }
+});
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
 app.use((err, req, res, next) => {
