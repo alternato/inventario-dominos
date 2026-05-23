@@ -1,6 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Loader2, Bot, User, Trash2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import apiClient from '../api';
+
+const mdComponents = {
+  p:      ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+  strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+  ul:     ({ children }) => <ul className="list-disc list-inside space-y-0.5 my-1">{children}</ul>,
+  ol:     ({ children }) => <ol className="list-decimal list-inside space-y-0.5 my-1">{children}</ol>,
+  li:     ({ children }) => <li className="leading-snug">{children}</li>,
+  code:   ({ inline, children }) => inline
+    ? <code className="bg-black/10 rounded px-1 font-mono text-xs">{children}</code>
+    : <pre className="bg-black/10 rounded p-2 my-1 overflow-x-auto font-mono text-xs whitespace-pre-wrap"><code>{children}</code></pre>,
+  h3:     ({ children }) => <p className="font-semibold mt-1.5 mb-0.5">{children}</p>,
+  h4:     ({ children }) => <p className="font-medium mt-1 mb-0.5">{children}</p>,
+};
 
 const SUGERENCIAS = [
   'Muéstrame cuántos equipos hay por tipo',
@@ -188,13 +202,16 @@ export const AgentChat = () => {
                     </div>
                   )}
                   <div
-                    className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                    className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
                       m.role === 'user'
-                        ? 'bg-[#0066CC] text-white rounded-tr-sm'
+                        ? 'bg-[#0066CC] text-white rounded-tr-sm whitespace-pre-wrap'
                         : 'bg-gray-100 text-gray-800 rounded-tl-sm'
                     }`}
                   >
-                    {m.content}
+                    {m.role === 'assistant'
+                      ? <ReactMarkdown components={mdComponents}>{m.content}</ReactMarkdown>
+                      : m.content
+                    }
                   </div>
                   {m.role === 'user' && (
                     <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">

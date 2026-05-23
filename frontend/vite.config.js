@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      disable: !!process.env.DISABLE_PWA,
       registerType: 'autoUpdate',
       includeAssets: ['apple-touch-icon.png', 'masked-icon.svg'],
       workbox: {
