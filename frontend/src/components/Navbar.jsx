@@ -10,29 +10,35 @@ const UserPhoto = ({ email, nombre }) => {
 
   useEffect(() => {
     if (!email) return;
+    let objectUrl = null;
+    let cancelled = false;
     const fetchPhoto = async () => {
       try {
         const msal = await getMsalInstance();
         const accounts = msal.getAllAccounts();
-        if (accounts.length === 0) return;
+        if (accounts.length === 0 || cancelled) return;
         const tokenResp = await msal.acquireTokenSilent({
           scopes: ['User.Read'],
           account: accounts[0],
         });
-        // Foto del propio usuario logueado
         const resp = await fetch(
           'https://graph.microsoft.com/v1.0/me/photo/$value',
           { headers: { Authorization: `Bearer ${tokenResp.accessToken}` } }
         );
-        if (resp.ok) {
+        if (resp.ok && !cancelled) {
           const blob = await resp.blob();
-          setPhotoUrl(URL.createObjectURL(blob));
+          objectUrl = URL.createObjectURL(blob);
+          setPhotoUrl(objectUrl);
         }
       } catch {
         // Sin foto: muestra iniciales
       }
     };
     fetchPhoto();
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [email]);
 
   const inicial = nombre?.charAt(0).toUpperCase() || '?';

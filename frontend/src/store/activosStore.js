@@ -162,9 +162,11 @@ export const useActivosStore = create((set, get) => ({
     try {
       const response = await asignacionesAPI.crear(data);
       const nueva = response.data?.data || response.data;
-      // Refresh activos to reflect new state
-      const resActivos = await activosAPI.listar();
-      set({ activos: resActivos.data });
+      const resActivo = await activosAPI.obtener(data.serie_activo);
+      const actualizado = resActivo.data?.data || resActivo.data;
+      set((state) => ({
+        activos: state.activos.map(a => a.serie === data.serie_activo ? { ...a, ...actualizado } : a),
+      }));
       return { ok: true, data: nueva };
     } catch (error) {
       const msg = error.response?.data?.error || error.message;
@@ -174,11 +176,20 @@ export const useActivosStore = create((set, get) => ({
 
   cerrarAsignacion: async (id, data) => {
     try {
+      const { activos } = get();
+      const activoAfectado = activos.find(a => a.asignacion_id === id);
       const response = await asignacionesAPI.cerrar(id, data);
       const cerrada = response.data?.data || response.data;
-      // Refresh activos
-      const resActivos = await activosAPI.listar();
-      set({ activos: resActivos.data });
+      if (activoAfectado) {
+        const resActivo = await activosAPI.obtener(activoAfectado.serie);
+        const actualizado = resActivo.data?.data || resActivo.data;
+        set((state) => ({
+          activos: state.activos.map(a => a.serie === activoAfectado.serie ? { ...a, ...actualizado } : a),
+        }));
+      } else {
+        const resActivos = await activosAPI.listar();
+        set({ activos: resActivos.data });
+      }
       return { ok: true, data: cerrada };
     } catch (error) {
       const msg = error.response?.data?.error || error.message;
