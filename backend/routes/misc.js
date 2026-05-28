@@ -133,9 +133,12 @@ router.get('/export-sql', authenticate, requireSuperAdmin, async (req, res) => {
 router.get('/migrate', authenticate, requireSuperAdmin, async (req, res) => {
   try {
     await db.query(`
-      ALTER TABLE activos      ADD COLUMN IF NOT EXISTS imsi            VARCHAR(20);
-      ALTER TABLE activos      ADD COLUMN IF NOT EXISTS numero_telefono VARCHAR(20);
-      ALTER TABLE activos      ADD COLUMN IF NOT EXISTS compania        VARCHAR(50);
+      ALTER TABLE activos       ADD COLUMN IF NOT EXISTS deleted_at     TIMESTAMPTZ;
+      ALTER TABLE activos       ADD COLUMN IF NOT EXISTS created_at     TIMESTAMPTZ DEFAULT NOW();
+      ALTER TABLE activos       ADD COLUMN IF NOT EXISTS updated_at     TIMESTAMPTZ DEFAULT NOW();
+      ALTER TABLE activos       ADD COLUMN IF NOT EXISTS imsi            VARCHAR(20);
+      ALTER TABLE activos       ADD COLUMN IF NOT EXISTS numero_telefono VARCHAR(20);
+      ALTER TABLE activos       ADD COLUMN IF NOT EXISTS compania        VARCHAR(50);
       ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS deleted_at     TIMESTAMPTZ;
       ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS activo         BOOLEAN DEFAULT TRUE;
       CREATE TABLE IF NOT EXISTS areas (
