@@ -21,6 +21,10 @@ function App() {
   const { isSuperAdmin, setUsuario } = useAuthStore();
 
   useEffect(() => {
+    document.title = `VOLTA v${__APP_VERSION__} · Inventario Domino's`;
+  }, []);
+
+  useEffect(() => {
     // Verificar sesión contra el backend — no confiar solo en localStorage
     authAPI.verify()
       .then(res => {

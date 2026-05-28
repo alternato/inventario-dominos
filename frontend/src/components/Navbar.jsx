@@ -110,7 +110,7 @@ export const Navbar = ({ onLogout }) => {
             }}>OLTA</span><span style={{ color: '#E31837', textShadow: '0 0 4px white' }}>.</span>
           </span>
           <span className="text-[10px] bg-white/20 text-white font-bold px-1.5 py-0.5 rounded tracking-wide align-middle select-none mr-4">
-            v1.3.0
+            v{__APP_VERSION__}
           </span>
         </div>
 
