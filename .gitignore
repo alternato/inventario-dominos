@@ -1,3 +1,7 @@
+# Claude Code — configuración local con posibles tokens
+.claude/settings.local.json
+.claude/launch.json
+
 # Archivos de entorno — NUNCA subir al repo
 .env
 .env.local
