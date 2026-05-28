@@ -132,8 +132,31 @@ router.get('/export-sql', authenticate, requireSuperAdmin, async (req, res) => {
 
 router.get('/migrate', authenticate, requireSuperAdmin, async (req, res) => {
   try {
-    await db.query('ALTER TABLE activos ADD COLUMN IF NOT EXISTS imsi VARCHAR(20);');
-    res.json({ message: 'Base de Datos actualizada exitosamente.' });
+    await db.query(`
+      ALTER TABLE activos      ADD COLUMN IF NOT EXISTS imsi            VARCHAR(20);
+      ALTER TABLE activos      ADD COLUMN IF NOT EXISTS numero_telefono VARCHAR(20);
+      ALTER TABLE activos      ADD COLUMN IF NOT EXISTS compania        VARCHAR(50);
+      ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS deleted_at     TIMESTAMPTZ;
+      ALTER TABLE colaboradores ADD COLUMN IF NOT EXISTS activo         BOOLEAN DEFAULT TRUE;
+      CREATE TABLE IF NOT EXISTS areas (
+        id     SERIAL PRIMARY KEY,
+        nombre VARCHAR(100) UNIQUE NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS asignaciones (
+        id                 SERIAL PRIMARY KEY,
+        serie_activo       VARCHAR(100) NOT NULL,
+        rut_colaborador    VARCHAR(20)  NOT NULL,
+        fecha_inicio       TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+        fecha_fin          TIMESTAMPTZ,
+        estado             VARCHAR(20)  NOT NULL DEFAULT 'activa',
+        motivo_devolucion  TEXT,
+        notas              TEXT,
+        usuario_id         INTEGER REFERENCES usuarios(id),
+        token_confirmacion VARCHAR(100),
+        created_at         TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+    res.json({ message: 'Base de datos actualizada exitosamente.' });
   } catch (e) {
     console.error('Error en migración:', e);
     res.status(500).json({ error: 'Error al actualizar la base de datos: ' + e.message });
