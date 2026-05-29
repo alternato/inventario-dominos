@@ -55,6 +55,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: false,
+    allowedHosts: ['inventario.dominospizza.cl'],
   },
   build: {
     outDir: 'dist',
