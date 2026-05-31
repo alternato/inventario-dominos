@@ -56,6 +56,11 @@ export default defineConfig({
     port: 5173,
     strictPort: false,
     allowedHosts: ['inventario.dominospizza.cl'],
+    hmr: {
+      host: 'inventario.dominospizza.cl',
+      clientPort: 443,
+      protocol: 'wss',
+    },
   },
   build: {
     outDir: 'dist',
