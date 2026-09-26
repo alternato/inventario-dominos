@@ -62,6 +62,50 @@ const resetPassword = async (token, newPassword) => {
   return rows[0] || null;
 };
 
+/**
+ * Registra un `jti` en la denylist de sesiones revocadas (Req. 11.5).
+ * Idempotente: si el `jti` ya existe, no falla ni duplica.
+ * @param {string} jti - Identificador único del token a revocar.
+ * @param {Date} expiraAt - Momento de expiración natural del token.
+ */
+const revocarSesion = async (jti, expiraAt) => {
+  await query(
+    `INSERT INTO sesiones_revocadas (jti, expira_at)
+     VALUES ($1, $2)
+     ON CONFLICT (jti) DO NOTHING`,
+    [jti, expiraAt]
+  );
+};
+
+/**
+ * Indica si un `jti` está en la denylist de sesiones vigente (Req. 11.5).
+ * Solo cuenta como revocado si la entrada aún no venció (`expira_at > NOW()`),
+ * de modo que las filas caducadas no bloqueen tokens nuevos que reutilicen ids.
+ * @param {string} jti - Identificador único del token a comprobar.
+ * @returns {Promise<boolean>} `true` si el token está revocado y vigente.
+ */
+const sesionRevocada = async (jti) => {
+  if (!jti) return false;
+  const { rows } = await query(
+    `SELECT 1 FROM sesiones_revocadas WHERE jti = $1 AND expira_at > NOW() LIMIT 1`,
+    [jti]
+  );
+  return rows.length > 0;
+};
+
+/**
+ * Elimina de la denylist las sesiones ya expiradas (Req. 11.5).
+ * La expiración natural del JWT las vuelve innecesarias, así la tabla no crece
+ * indefinidamente. Pensada para ejecutarse periódicamente.
+ * @returns {Promise<number>} Número de filas eliminadas.
+ */
+const limpiarSesionesRevocadas = async () => {
+  const { rowCount } = await query(
+    `DELETE FROM sesiones_revocadas WHERE expira_at <= NOW()`
+  );
+  return rowCount;
+};
+
 module.exports = {
   getUsuarioByEmail,
   getUsuarios,
@@ -69,4 +113,7 @@ module.exports = {
   updateUsuario,
   updatePasswordReset,
   resetPassword,
+  revocarSesion,
+  sesionRevocada,
+  limpiarSesionesRevocadas,
 };

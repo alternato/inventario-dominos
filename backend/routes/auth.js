@@ -8,6 +8,7 @@ const mail = require('../mail');
 const { loginSchema, resetPasswordSchema, validate } = require('../schemas');
 const { verifyMsToken } = require('../msValidator');
 const { authenticate, COOKIE_OPTIONS } = require('../middleware');
+const sanitizeUsuario = require('../lib/sanitizeUsuario');
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -27,7 +28,7 @@ function signToken(usuario) {
   return jwt.sign(
     { id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '8h', jwtid: crypto.randomUUID() }
   );
 }
 
@@ -42,7 +43,7 @@ router.post('/login', loginLimiter, async (req, res) => {
       return res.status(401).json({ error: 'Email o contraseña incorrectos' });
     }
     res.cookie('authToken', signToken(usuario), COOKIE_OPTIONS);
-    res.json({ message: 'Login exitoso', usuario: { id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol } });
+    res.json({ message: 'Login exitoso', usuario: sanitizeUsuario({ id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol }) });
   } catch (error) {
     if (error.name === 'ZodError') return res.status(400).json({ error: 'Datos inválidos' });
     res.status(500).json({ error: 'Error al procesar login' });
@@ -86,7 +87,7 @@ router.post('/sso-login', loginLimiter, async (req, res) => {
     }
 
     res.cookie('authToken', signToken(usuario), COOKIE_OPTIONS);
-    res.json({ message: 'SSO Login exitoso', usuario: { id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol } });
+    res.json({ message: 'SSO Login exitoso', usuario: sanitizeUsuario({ id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol }) });
   } catch (error) {
     console.error('SSO Error:', error);
     res.status(500).json({ error: 'Error al procesar SSO login' });
@@ -94,10 +95,24 @@ router.post('/sso-login', loginLimiter, async (req, res) => {
 });
 
 router.get('/verify', verifyLimiterLocal, authenticate, (req, res) => {
-  res.json({ usuario: req.user });
+  res.json({ usuario: sanitizeUsuario(req.user) });
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
+  try {
+    const token = req.cookies?.authToken || req.headers.authorization?.split(' ')[1];
+    if (token) {
+      // Decodificar sin verificar firma es suficiente aquí: solo necesitamos
+      // `jti`/`exp` para revocar; un token no válido no otorga acceso.
+      const decoded = jwt.decode(token);
+      if (decoded && decoded.jti && decoded.exp) {
+        await db.revocarSesion(decoded.jti, new Date(decoded.exp * 1000));
+      }
+    }
+  } catch (error) {
+    // No bloquear el cierre de sesión si la revocación falla; la cookie igual se limpia.
+    console.error('Error al revocar sesión en logout:', error.message);
+  }
   res.clearCookie('authToken', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
   res.json({ message: 'Sesión cerrada' });
 });

@@ -48,11 +48,11 @@ const TIPOS_DISPOSITIVO = ['Laptop', 'Desktop', 'Smartphone', 'Tablet', 'Impreso
 const ESTADOS_ACTIVO    = ['Asignado', 'Disponible', 'Mantenimiento', 'Descartado'];
 
 const createActivoSchema = z.object({
-  serie:            z.string().min(1, 'Serie requerida'),
-  marca:            z.string().min(1, 'Marca requerida'),
-  modelo:           z.string().min(1, 'Modelo requerido'),
-  estado:           z.enum(ESTADOS_ACTIVO, { errorMap: () => ({ message: `Estado debe ser uno de: ${ESTADOS_ACTIVO.join(', ')}` }) }),
-  tipo_dispositivo: z.enum(TIPOS_DISPOSITIVO, { errorMap: () => ({ message: `Tipo debe ser uno de: ${TIPOS_DISPOSITIVO.join(', ')}` }) }),
+  serie:            z.string({ required_error: 'Serie requerida', invalid_type_error: 'Serie requerida' }).min(1, 'Serie requerida'),
+  marca:            z.string({ required_error: 'Marca requerida', invalid_type_error: 'Marca requerida' }).min(1, 'Marca requerida'),
+  modelo:           z.string({ required_error: 'Modelo requerido', invalid_type_error: 'Modelo requerido' }).min(1, 'Modelo requerido'),
+  estado:           z.enum(ESTADOS_ACTIVO, { errorMap: (issue) => ({ message: issue.code === 'invalid_type' ? 'Estado requerido' : `Estado debe ser uno de: ${ESTADOS_ACTIVO.join(', ')}` }) }),
+  tipo_dispositivo: z.enum(TIPOS_DISPOSITIVO, { errorMap: (issue) => ({ message: issue.code === 'invalid_type' ? 'Tipo de dispositivo requerido' : `Tipo debe ser uno de: ${TIPOS_DISPOSITIVO.join(', ')}` }) }),
   rut_responsable:  z.string().optional().nullable(),
   ubicacion:        z.string().optional().nullable(),
   observaciones:    z.string().optional().nullable(),
@@ -106,6 +106,23 @@ const updateUsuarioSchema = z.object({
   password: passwordSchema.optional(),
 });
 
+// ─── Asignaciones ────────────────────────────────────────────
+const ESTADOS_FISICOS_DEVOLUCION = ['Disponible', 'Mantenimiento', 'Descartado'];
+
+const createAsignacionSchema = z.object({
+  serie_activo:    z.string({ required_error: 'Serie del activo requerida', invalid_type_error: 'Serie del activo requerida' }).min(1, 'Serie del activo requerida'),
+  rut_colaborador: rutSchema,
+  entregado_por:   z.string().optional().nullable(),
+  notas:           z.string().optional().nullable(),
+});
+
+const cerrarAsignacionSchema = z.object({
+  motivo_devolucion:        z.string().optional().nullable(),
+  estado_fisico_devolucion: z.enum(ESTADOS_FISICOS_DEVOLUCION, { errorMap: () => ({ message: `Estado físico de devolución debe ser uno de: ${ESTADOS_FISICOS_DEVOLUCION.join(', ')}` }) }).optional(),
+  desvincular_colaborador:  z.boolean().optional(),
+  correo_alterno:           z.string().email('Email inválido').optional().nullable(),
+});
+
 // ─── Middleware helper ───────────────────────────────────────
 /**
  * Genera un middleware Express que valida req.body contra el schema Zod dado.
@@ -132,6 +149,8 @@ module.exports = {
   updateColaboradorSchema,
   createUsuarioSchema,
   updateUsuarioSchema,
+  createAsignacionSchema,
+  cerrarAsignacionSchema,
   validate,
   validarRut,
 };

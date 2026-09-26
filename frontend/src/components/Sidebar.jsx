@@ -50,6 +50,7 @@ export const Sidebar = () => {
               key={path}
               to={path}
               onClick={() => setIsOpen(false)}
+              aria-current={isActive(path) ? 'page' : undefined}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition font-medium ${
                 isActive(path)
                   ? 'bg-primary text-white shadow'

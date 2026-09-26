@@ -2,11 +2,18 @@ import { useState, useEffect } from 'react';
 import { useActivosStore } from '../store/activosStore';
 import { useAuthStore } from '../store/authStore';
 import { X, Package, User, Search, Mail } from 'lucide-react';
+import { Stepper } from './Stepper';
+
+const PASOS_ASIGNACION = [
+  { label: 'Colaborador' },
+  { label: 'Entrega y confirmación' },
+];
 
 export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
   const { colaboradores, cargarColaboradores, crearAsignacion } = useActivosStore();
   const { usuario } = useAuthStore();
 
+  const [paso, setPaso] = useState(0);
   const [busqueda, setBusqueda] = useState('');
   const [colabSeleccionado, setColabSeleccionado] = useState(null);
   const [entregadoPor, setEntregadoPor] = useState('');
@@ -17,6 +24,7 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
   useEffect(() => {
     if (isOpen) {
       cargarColaboradores();
+      setPaso(0);
       setColabSeleccionado(null);
       setBusqueda('');
       setEntregadoPor(usuario?.nombre || '');
@@ -29,6 +37,12 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
     const q = busqueda.toLowerCase();
     return c.nombre?.toLowerCase().includes(q) || c.rut?.toLowerCase().includes(q);
   }).slice(0, 8);
+
+  const avanzarPaso = () => {
+    if (!colabSeleccionado) return setError('Debes seleccionar un colaborador');
+    setError('');
+    setPaso(1);
+  };
 
   const handleConfirmar = async () => {
     if (!colabSeleccionado) return setError('Debes seleccionar un colaborador');
@@ -67,7 +81,25 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        {/* Stepper multi-paso */}
+        <div className="px-6 pt-4">
+          <Stepper
+            steps={PASOS_ASIGNACION}
+            currentStep={paso}
+            clickable
+            onStepClick={(i) => { if (i < paso) { setError(''); setPaso(i); } }}
+            ariaLabel="Progreso de la asignación"
+          />
+        </div>
+
+        <form
+          className="p-6 space-y-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (paso === 0) avanzarPaso();
+            else handleConfirmar();
+          }}
+        >
           {/* Info del activo */}
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-center gap-3">
             <Package className="w-8 h-8 text-blue-400 flex-shrink-0" />
@@ -77,12 +109,14 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
             </div>
           </div>
 
-          {/* Buscador de colaborador */}
+          {/* Paso 1: Buscador de colaborador */}
+          {paso === 0 && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Colaborador *</label>
+            <label htmlFor="asig-busqueda" className="block text-sm font-medium text-gray-700 mb-1">Colaborador *</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
+                id="asig-busqueda"
                 type="text"
                 placeholder="Buscar por nombre o RUT..."
                 value={busqueda}
@@ -101,7 +135,7 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
                   <p className="font-medium text-gray-800 text-sm">{colabSeleccionado.nombre}</p>
                   <p className="text-xs text-gray-500">{colabSeleccionado.rut} · {colabSeleccionado.area}</p>
                 </div>
-                <button onClick={() => { setColabSeleccionado(null); setBusqueda(''); }} className="text-gray-400 hover:text-red-500">
+                <button type="button" aria-label="Quitar colaborador seleccionado" onClick={() => { setColabSeleccionado(null); setBusqueda(''); }} className="text-gray-400 hover:text-red-500">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -112,6 +146,7 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
                 ) : (
                   colaboradoresFiltrados.map(c => (
                     <button
+                      type="button"
                       key={c.rut}
                       onClick={() => { setColabSeleccionado(c); setBusqueda(c.nombre); }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 text-left transition"
@@ -129,13 +164,30 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
               </div>
             ) : null}
           </div>
+          )}
+
+          {/* Paso 2: resumen del colaborador seleccionado + detalles de entrega */}
+          {paso === 1 && (
+          <>
+          {colabSeleccionado && (
+            <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
+              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+                {colabSeleccionado.nombre?.charAt(0)}
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-800 text-sm">{colabSeleccionado.nombre}</p>
+                <p className="text-xs text-gray-500">{colabSeleccionado.rut} · {colabSeleccionado.area}</p>
+              </div>
+            </div>
+          )}
 
           {/* Entregado por */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Entregado por (TI)</label>
+            <label htmlFor="asig-entregado-por" className="block text-sm font-medium text-gray-700 mb-1">Entregado por (TI)</label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
+                id="asig-entregado-por"
                 type="text"
                 value={entregadoPor}
                 onChange={e => setEntregadoPor(e.target.value)}
@@ -146,8 +198,9 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
 
           {/* Notas */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notas (opcional)</label>
+            <label htmlFor="asig-notas" className="block text-sm font-medium text-gray-700 mb-1">Notas (opcional)</label>
             <textarea
+              id="asig-notas"
               value={notas}
               onChange={e => setNotas(e.target.value)}
               rows={2}
@@ -163,24 +216,42 @@ export const ModalAsignacion = ({ isOpen, onClose, activo, onSuccess }) => {
               Se enviará un correo informativo a <strong>rrhh@dominospizza.cl</strong> con los datos de esta asignación.
             </p>
           </div>
+          </>
+          )}
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           {/* Botones */}
           <div className="flex gap-3 justify-end pt-2 border-t">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirmar}
-              disabled={isSubmitting || !colabSeleccionado}
-              className="px-5 py-2 text-sm bg-primary text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-            >
-              {isSubmitting ? 'Asignando...' : '✓ Confirmar Asignación'}
-            </button>
+            {paso === 0 ? (
+              <>
+                <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={!colabSeleccionado}
+                  className="px-5 py-2 text-sm bg-primary text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  Siguiente
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={() => { setError(''); setPaso(0); }} className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                  Atrás
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !colabSeleccionado}
+                  className="px-5 py-2 text-sm bg-primary text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSubmitting ? 'Asignando...' : '✓ Confirmar Asignación'}
+                </button>
+              </>
+            )}
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

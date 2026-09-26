@@ -3,8 +3,26 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useActivosStore } from '../store/activosStore';
-import { X } from 'lucide-react';
+import { X, AlertTriangle, Package, CheckCircle2, XCircle } from 'lucide-react';
 import { normalizeRut, validarRut } from '../utils/rut';
+
+// Campo con label accesible asociado por id/htmlFor.
+// Definido fuera del componente para no recrearse en cada render
+// (evita perder el foco al escribir, requisito de navegación por teclado).
+const Field = ({ label, name, required, register, errors, ...props }) => (
+  <div>
+    <label htmlFor={`colab-${name}`} className="block text-sm font-medium text-gray-700 mb-1">
+      {label}{required && ' *'}
+    </label>
+    <input
+      id={`colab-${name}`}
+      {...register(name)}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none disabled:bg-gray-100"
+      {...props}
+    />
+    {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name].message}</p>}
+  </div>
+);
 
 const schema = z.object({
   rut:      z.string().min(1, 'RUT requerido').refine(validarRut, 'RUT inválido (verifica el dígito verificador)'),
@@ -26,6 +44,18 @@ export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) =>
   });
 
   const areaWatch = watch('area');
+  const correoWatch = watch('correo');
+
+  // Ficha_Colaborador: datos derivados del colaborador existente (Req. 2.1, 2.5)
+  const esEdicion = !!colaborador;
+  // `activo` puede venir como boolean o null; por defecto se considera activo.
+  const estaActivo = colaborador ? colaborador.activo !== false : true;
+  // total_activos lo expone el backend (db/colaboradores.js); puede llegar como string.
+  const totalActivos = colaborador
+    ? Number(colaborador.total_activos ?? 0) || 0
+    : 0;
+  // Aviso de correo faltante (Req. 2.3): impide la Firma_Digital por correo.
+  const correoFaltante = !correoWatch || correoWatch.trim() === '';
 
   useEffect(() => {
     if (isOpen) {
@@ -65,20 +95,6 @@ export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) =>
 
   if (!isOpen) return null;
 
-  const Field = ({ label, name, required, ...props }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}{required && ' *'}
-      </label>
-      <input
-        {...register(name)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none disabled:bg-gray-100"
-        {...props}
-      />
-      {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name].message}</p>}
-    </div>
-  );
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
@@ -92,10 +108,42 @@ export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) =>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          {/* Ficha_Colaborador: resumen de estado y activos asignados (Req. 2.1, 2.5) */}
+          {esEdicion && (
+            <div className="flex flex-wrap items-center gap-3 rounded-lg bg-gray-50 border border-gray-200 px-4 py-3">
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                  estaActivo ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
+                }`}
+              >
+                {estaActivo
+                  ? <CheckCircle2 className="w-3.5 h-3.5" />
+                  : <XCircle className="w-3.5 h-3.5" />}
+                {estaActivo ? 'Activo' : 'Inactivo'}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                <Package className="w-3.5 h-3.5" />
+                {totalActivos} {totalActivos === 1 ? 'activo asignado' : 'activos asignados'}
+              </span>
+            </div>
+          )}
+
+          {/* Aviso de correo faltante (Req. 2.3): bloquea Firma_Digital por correo */}
+          {correoFaltante && (
+            <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-300 px-4 py-3 text-amber-800">
+              <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <p className="text-sm">
+                <span className="font-semibold">Sin correo registrado.</span>{' '}
+                La Firma Digital de devolución no podrá enviarse por correo corporativo.
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">RUT *</label>
+              <label htmlFor="colab-rut" className="block text-sm font-medium text-gray-700 mb-1">RUT *</label>
               <input
+                id="colab-rut"
                 {...register('rut')}
                 placeholder="12345678-9"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none disabled:bg-gray-100"
@@ -110,15 +158,16 @@ export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) =>
                 <p className="text-xs text-amber-600 mt-1">⚠️ Cambia solo si el RUT era incorrecto</p>
               )}
             </div>
-            <Field label="Nombre completo" name="nombre" required placeholder="Juan Pérez" />
+            <Field label="Nombre completo" name="nombre" required placeholder="Juan Pérez" register={register} errors={errors} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Área *</label>
+              <label htmlFor="colab-area" className="block text-sm font-medium text-gray-700 mb-1">Área *</label>
               {!showNuevaArea ? (
                 <div className="flex gap-2">
                   <select 
+                    id="colab-area"
                     {...register('area', {
                       onChange: (e) => {
                         if (e.target.value === 'ADD_NEW') {
@@ -142,6 +191,7 @@ export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) =>
                 <div className="flex gap-2">
                   <input
                     type="text"
+                    aria-label="Nombre de nueva área"
                     value={nuevaAreaNombre}
                     onChange={(e) => setNuevaAreaNombre(e.target.value)}
                     placeholder="Nombre de nueva área"
@@ -159,11 +209,11 @@ export const ModalColaborador = ({ isOpen, onClose, colaborador, onSuccess }) =>
               )}
               {errors.area && <p className="text-red-500 text-xs mt-1">{errors.area.message}</p>}
             </div>
-            <Field label="Cargo" name="cargo" placeholder="Ej: Supervisor" />
+            <Field label="Cargo" name="cargo" placeholder="Ej: Supervisor" register={register} errors={errors} />
           </div>
 
-          <Field label="Correo electrónico" name="correo" type="email" placeholder="juan@empresa.cl" />
-          <Field label="Teléfono" name="telefono" placeholder="+56 9 1234 5678" />
+          <Field label="Correo electrónico" name="correo" type="email" placeholder="juan@empresa.cl" register={register} errors={errors} />
+          <Field label="Teléfono" name="telefono" placeholder="+56 9 1234 5678" register={register} errors={errors} />
 
           <div className="flex gap-3 justify-end pt-2 border-t">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">

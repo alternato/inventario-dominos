@@ -99,6 +99,8 @@ describe('404 handler', () => {
   it('returns 404 for unknown routes', async () => {
     const res = await request(app).get('/api/ruta-inexistente');
     expect(res.status).toBe(404);
-    expect(res.body.error).toMatch(/no encontrada/i);
+    // Contrato de error uniforme (Req. 13.2): { error: { type, message, details } }
+    expect(res.body.error.type).toBe('NOT_FOUND');
+    expect(res.body.error.message).toMatch(/no encontrada/i);
   });
 });

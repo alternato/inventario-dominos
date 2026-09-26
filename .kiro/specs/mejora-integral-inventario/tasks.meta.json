@@ -1,0 +1,1247 @@
+{
+  "pbtResults": {
+    "1.6 Escribir prueba de propiedad para el saneamiento de usuario": {
+      "status": "passed",
+      "lastRunTimestamp": 1790349589587
+    },
+    "1.2 Escribir prueba de propiedad para el formato de error": {
+      "status": "passed",
+      "lastRunTimestamp": 1790349900438
+    },
+    "1.8 Escribir prueba de propiedad para el enmascaramiento de logs": {
+      "status": "passed",
+      "lastRunTimestamp": 1790349903790
+    },
+    "7.2 Escribir prueba de propiedad para el rechazo de campos obligatorios": {
+      "status": "passed",
+      "lastRunTimestamp": 1790350480333
+    },
+    "7.3 Escribir prueba de propiedad para la validación de RUT": {
+      "status": "passed",
+      "lastRunTimestamp": 1790350481355
+    },
+    "2.2 Escribir prueba de propiedad para la respuesta de error de validación": {
+      "status": "passed",
+      "lastRunTimestamp": 1790350522292
+    },
+    "8.5 Escribir pruebas de propiedad para el historial": {
+      "status": "passed",
+      "lastRunTimestamp": 1790350683880
+    },
+    "8.7 Escribir prueba de propiedad para la detección de inconsistencia": {
+      "status": "passed",
+      "lastRunTimestamp": 1790350872268
+    },
+    "8.3 Escribir prueba de propiedad para el conteo de activos asignados": {
+      "status": "passed",
+      "lastRunTimestamp": 1790353194602
+    },
+    "11.2 Escribir prueba de propiedad para el indicador de completitud": {
+      "status": "passed",
+      "lastRunTimestamp": 1790355493174
+    },
+    "11.4 Escribir prueba de propiedad para el debounce de búsqueda": {
+      "status": "passed",
+      "lastRunTimestamp": 1790355660441
+    },
+    "15.6 Escribir prueba de propiedad para el estado válido de Asignacion en UI": {
+      "status": "passed",
+      "lastRunTimestamp": 1790362294073
+    },
+    "14.3 Escribir prueba de propiedad para la confirmación de eliminación": {
+      "status": "passed",
+      "lastRunTimestamp": 1790362298193
+    },
+    "15.4 Escribir prueba de propiedad para etiquetas accesibles": {
+      "status": "passed",
+      "lastRunTimestamp": 1790435371436
+    }
+  },
+  "executionHistory": {
+    "1.1 Crear `backend/lib/apiError.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348903923
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348944713
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349092804
+      }
+    ],
+    "1.2 Escribir prueba de propiedad para el formato de error": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348904650
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349103397
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349970892
+      }
+    ],
+    "1.3 Crear `backend/lib/paginate.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348905226
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348946118
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349094264
+      }
+    ],
+    "1.4 Escribir pruebas de propiedad para la paginación": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348906160
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349105525
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349972370
+      }
+    ],
+    "1.5 Crear `backend/lib/sanitizeUsuario.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348906651
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348948033
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349095669
+      }
+    ],
+    "1.6 Escribir prueba de propiedad para el saneamiento de usuario": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348907180
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349106991
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349973769
+      }
+    ],
+    "1.7 Crear `backend/lib/logger.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348907639
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348949174
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349097074
+      }
+    ],
+    "1.8 Escribir prueba de propiedad para el enmascaramiento de logs": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348908100
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349107749
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349975030
+      }
+    ],
+    "2.1 Actualizar el manejador de errores de `backend/app.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348908426
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349109129
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349969691
+      }
+    ],
+    "2.2 Escribir prueba de propiedad para la respuesta de error de validación": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348908805
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350389846
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350548923
+      }
+    ],
+    "3.1 Crear `backend/migrations/006_mejoras_integrales.sql`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348909216
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348950528
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349098122
+      }
+    ],
+    "3.2 Registrar/ejecutar la migración con el runner existente": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348909478
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349980641
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350119249
+      }
+    ],
+    "4.1 Crear `backend/db/asignaciones.js` con `crearAsignacion` transaccional": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348909850
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350127694
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350376929
+      }
+    ],
+    "4.2 Escribir prueba de propiedad para el rechazo de doble asignación activa": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348910754
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350560640
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350793450
+      }
+    ],
+    "4.3 Escribir prueba de propiedad para referencias inexistentes": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348911136
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350794811
+      }
+    ],
+    "4.4 Escribir prueba de propiedad para la postcondición atómica de creación": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348911604
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350796465
+      }
+    ],
+    "4.5 Implementar `cerrarAsignacion` transaccional en `backend/db/asignaciones.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348912001
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350129369
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350378375
+      }
+    ],
+    "4.6 Escribir prueba de propiedad para la postcondición atómica de cierre": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348912423
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350797784
+      }
+    ],
+    "4.7 Escribir prueba de propiedad para la generación condicional de token": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348912671
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350799191
+      }
+    ],
+    "4.8 Escribir prueba de propiedad para la marca de colaborador inactivo": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348913321
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350800588
+      }
+    ],
+    "4.9 Escribir prueba de propiedad para el rollback total ante fallo": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348913543
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350802372
+      }
+    ],
+    "4.10 Implementar `confirmarFirma(token)` transaccional en `backend/db/asignaciones.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348913804
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350130817
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350379887
+      }
+    ],
+    "4.11 Escribir pruebas de propiedad para la confirmación de Firma_Digital": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348914069
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350803796
+      }
+    ],
+    "4.12 Implementar `getAsignaciones` con filtros combinados y paginación": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348914622
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350132173
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350381614
+      }
+    ],
+    "4.13 Escribir prueba de propiedad para los filtros combinados de asignaciones": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348914947
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350806337
+      }
+    ],
+    "5.1 Añadir esquemas Zod de asignaciones a `backend/schemas.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348915236
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353100937
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353339985
+      }
+    ],
+    "5.2 Refactorizar `backend/routes/asignaciones.js` a controlador delgado": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348915603
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353351288
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353535556
+      }
+    ],
+    "5.3 Eliminar el doble camino de asignación en `backend/db/activos.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348915999
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353104221
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353343622
+      }
+    ],
+    "5.4 Escribir pruebas de integración de los flujos de asignación (Req. 13.4)": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348916415
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353546885
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790354965611
+      }
+    ],
+    "6. Checkpoint — asegurar que las pruebas del backend de asignaciones pasan": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348916916
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790354979267
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355080760
+      }
+    ],
+    "7.1 Consolidar/verificar `rutSchema` y `createActivoSchema` en `backend/schemas.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348917186
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349981914
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350118033
+      }
+    ],
+    "7.2 Escribir prueba de propiedad para el rechazo de campos obligatorios": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348917488
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350391494
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350545240
+      }
+    ],
+    "7.3 Escribir prueba de propiedad para la validación de RUT": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348917933
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350392589
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350542745
+      }
+    ],
+    "8.1 Añadir paginación y filtros indexados a `backend/db/activos.js#getActivos`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348918164
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350562865
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350787376
+      }
+    ],
+    "8.2 Añadir paginación y filtros indexados a `backend/db/colaboradores.js#getColaboradores`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348918482
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350563833
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350788867
+      }
+    ],
+    "8.3 Escribir prueba de propiedad para el conteo de activos asignados": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348918863
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353104866
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353342519
+      }
+    ],
+    "8.4 Verificar orden y forma del historial en `backend/db/historial.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348919340
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350393992
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350549809
+      }
+    ],
+    "8.5 Escribir pruebas de propiedad para el historial": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348919590
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350566581
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350792003
+      }
+    ],
+    "8.6 Función de detección de inconsistencia estado/asignación": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348919768
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350384114
+      }
+    ],
+    "8.7 Escribir prueba de propiedad para la detección de inconsistencia": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348920013
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350812652
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353089144
+      }
+    ],
+    "9.1 Emitir JWT con `jti` y revocar en logout": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348920429
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350133467
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350383075
+      }
+    ],
+    "9.2 Rechazar tokens revocados en `backend/middleware.js#authenticate`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348921119
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350565853
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350790633
+      }
+    ],
+    "9.3 Escribir prueba de propiedad para la revocación de sesión tras logout": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348921346
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350813657
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353092278
+      }
+    ],
+    "10. Checkpoint — asegurar que toda la suite del backend pasa": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348921641
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355082172
+      }
+    ],
+    "11.1 Crear helper de completitud `Interfaz_Web/src/utils/completitud.js`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348922248
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355088605
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355319112
+      }
+    ],
+    "11.2 Escribir prueba de propiedad para el indicador de completitud": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348922568
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355331126
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355512293
+      }
+    ],
+    "11.3 Crear hook `useDebouncedValue(value, 300)` en `Interfaz_Web/src/hooks/`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348922858
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355090071
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355320663
+      }
+    ],
+    "11.4 Escribir prueba de propiedad para el debounce de búsqueda": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348923256
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355332543
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355678632
+      }
+    ],
+    "11.5 Crear hook `useSubmit()` en `Interfaz_Web/src/hooks/`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348923536
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355091511
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355322141
+      }
+    ],
+    "11.6 Escribir pruebas de propiedad para el control de envío": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348923881
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355333996
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355680986
+      }
+    ],
+    "12.1 Añadir banderas `dirty` por dominio en `Interfaz_Web/src/store/`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348924132
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355092804
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355323407
+      }
+    ],
+    "12.2 Escribir pruebas de propiedad para la caché del store": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348924471
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355335258
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355681862
+      }
+    ],
+    "13.1 Crear `Interfaz_Web/src/components/CompletitudBadge.jsx`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348924909
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355337144
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355511014
+      }
+    ],
+    "13.2 Enriquecer la Ficha_Activo (`components/FichaActivo`)": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348925548
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356016113
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356284171
+      }
+    ],
+    "13.3 Enriquecer la Ficha_Colaborador (`components/FichaColaborador`)": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348925928
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355706763
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356003775
+      }
+    ],
+    "14.1 Crear `components/Breadcrumb.jsx` y reforzar `Sidebar`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348926403
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355700957
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356006497
+      }
+    ],
+    "14.2 Crear `components/Toast.jsx` + `useFeedback` y `components/ConfirmDialog.jsx`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348926900
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355702895
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355998481
+      }
+    ],
+    "14.3 Escribir prueba de propiedad para la confirmación de eliminación": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348927184
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356443708
+      },
+      {
+        "executionId": "2cd605d5-42d0-4498-a0ad-ce69bef0d14d",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435176704
+      }
+    ],
+    "14.4 Crear `components/EmptyState.jsx` y `components/ErrorRetry.jsx`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348927517
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355704380
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356000339
+      }
+    ],
+    "14.5 Crear `components/Stepper.jsx` (flujos multi-paso)": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348927761
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355705751
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356004075
+      }
+    ],
+    "15.1 Ocultar/deshabilitar controles de escritura para rol `viewer`": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348928131
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356291447
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356435435
+      }
+    ],
+    "15.2 Escribir prueba de propiedad para controles del viewer": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348928443
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356445098
+      },
+      {
+        "executionId": "e35929d5-1bd6-4597-8f7e-30ac94fa3c62",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435201387
+      }
+    ],
+    "15.3 Etiquetas accesibles y navegación por teclado en formularios": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348928707
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356447650
+      },
+      {
+        "executionId": "2cd605d5-42d0-4498-a0ad-ce69bef0d14d",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435179879
+      },
+      {
+        "executionId": "e35929d5-1bd6-4597-8f7e-30ac94fa3c62",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435213316
+      }
+    ],
+    "15.4 Escribir prueba de propiedad para etiquetas accesibles": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348929104
+      },
+      {
+        "executionId": "e35929d5-1bd6-4597-8f7e-30ac94fa3c62",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435218747
+      },
+      {
+        "executionId": "e35929d5-1bd6-4597-8f7e-30ac94fa3c62",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435393608
+      }
+    ],
+    "15.5 Mostrar el ciclo de vida de la Asignacion en la Interfaz_Web": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348929346
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356027810
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356284847
+      }
+    ],
+    "15.6 Escribir prueba de propiedad para el estado válido de Asignacion en UI": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348929782
+      },
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356446538
+      },
+      {
+        "executionId": "2cd605d5-42d0-4498-a0ad-ce69bef0d14d",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435177942
+      }
+    ],
+    "16. Checkpoint final — asegurar que backend y frontend pasan": [
+      {
+        "executionId": "fd4a071b-e339-4f28-b44f-8d5655bc63f8",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790348930060
+      },
+      {
+        "executionId": "e35929d5-1bd6-4597-8f7e-30ac94fa3c62",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435399662
+      },
+      {
+        "executionId": "7a7e04dd-b942-4658-8af5-0832a7944349",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790447912351
+      }
+    ],
+    "1. Utilidades transversales del backend (base para todo lo demás)": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790349975406
+      }
+    ],
+    "3. Migración de base de datos 006 (índices, índice único parcial, denylist de sesiones)": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350119596
+      }
+    ],
+    "7. Validación de RUT y campos obligatorios de Activo": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350546146
+      }
+    ],
+    "2. Manejador de errores central uniforme": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350550383
+      }
+    ],
+    "4. Centralizar el ciclo de vida de Asignaciones en un módulo transaccional": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790350806558
+      }
+    ],
+    "9. Seguridad de sesión: denylist de logout": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353092748
+      }
+    ],
+    "8. Paginación y anti-N+1 en listados de Activos y Colaboradores": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790353344279
+      }
+    ],
+    "5. Controlador delgado de asignaciones + validación Zod uniforme": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790354966020
+      }
+    ],
+    "11. Utilidades y hooks transversales del frontend": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355681298
+      }
+    ],
+    "12. Caché e invalidación del store (Zustand)": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790355682206
+      }
+    ],
+    "13. Fichas de detalle enriquecidas": [
+      {
+        "executionId": "76a413fa-c032-4352-8c58-6cd189c9b754",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790356284407
+      }
+    ],
+    "14. Navegación, feedback y estados de la interfaz": [
+      {
+        "executionId": "2cd605d5-42d0-4498-a0ad-ce69bef0d14d",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435177147
+      }
+    ],
+    "15. Control por rol y accesibilidad": [
+      {
+        "executionId": "e35929d5-1bd6-4597-8f7e-30ac94fa3c62",
+        "chatSessionId": "sess_1588ba7d-59fc-42b8-b60b-ca07cf854cc1",
+        "timestamp": 1790435393776
+      }
+    ]
+  }
+}

@@ -5,7 +5,7 @@ const { authenticate, requireAdmin } = require('../middleware');
 
 router.get('/', authenticate, async (req, res) => {
   try {
-    res.json(await db.getActivos());
+    res.json(await db.getActivos({ query: req.query }));
   } catch {
     res.status(500).json({ error: 'Error al obtener activos' });
   }

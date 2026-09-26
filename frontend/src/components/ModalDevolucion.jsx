@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useActivosStore } from '../store/activosStore';
 import { X, AlertTriangle, UserMinus, PackageCheck, Mail, Info } from 'lucide-react';
+import { Stepper } from './Stepper';
+
+const PASOS_DEVOLUCION = [
+  { label: 'Motivo y estado' },
+  { label: 'Confirmación' },
+];
 
 export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
   const { cerrarAsignacion, cargarAsignacionesActivo } = useActivosStore();
 
+  const [paso, setPaso] = useState(0);
   const [motivo, setMotivo] = useState('Desvinculación');
   const [nuevoEstado, setNuevoEstado] = useState('Disponible');
   const [desvincular, setDesvincular] = useState(false);
@@ -15,6 +22,7 @@ export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
 
   useEffect(() => {
     if (isOpen && activo) {
+      setPaso(0);
       setMotivo('Desvinculación');
       setNuevoEstado('Disponible');
       setDesvincular(false);
@@ -32,6 +40,15 @@ export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
   const tieneCorreoCorporativo = !!(activo?.colaborador?.correo || activo?.colaborador_correo);
   const correoCorporativo = activo?.colaborador?.correo || activo?.colaborador_correo || '';
   const necesitaCorreoAlterno = !tieneCorreoCorporativo;
+
+  const avanzarPaso = () => {
+    if (!asignacionActiva) {
+      setError('No se encontró una asignación activa para este equipo.');
+      return;
+    }
+    setError('');
+    setPaso(1);
+  };
 
   const confirmarDevolucion = async () => {
     if (!activo) return;
@@ -74,7 +91,25 @@ export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        {/* Stepper multi-paso */}
+        <div className="px-6 pt-4">
+          <Stepper
+            steps={PASOS_DEVOLUCION}
+            currentStep={paso}
+            clickable
+            onStepClick={(i) => { if (i < paso) { setError(''); setPaso(i); } }}
+            ariaLabel="Progreso de la devolución"
+          />
+        </div>
+
+        <form
+          className="p-6 space-y-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (paso === 0) avanzarPaso();
+            else confirmarDevolucion();
+          }}
+        >
           {/* Info equipo + colaborador */}
           <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
             <div className="flex items-start">
@@ -89,11 +124,14 @@ export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
             </div>
           </div>
 
-          {/* Motivo y Estado */}
+          {/* Paso 1: Motivo y Estado */}
+          {paso === 0 && (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Motivo de devolución</label>
+              <label htmlFor="dev-motivo" className="block text-sm font-medium text-gray-700 mb-1">Motivo de devolución</label>
               <select
+                id="dev-motivo"
                 value={motivo}
                 onChange={e => setMotivo(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
@@ -107,8 +145,9 @@ export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estado físico al entregar</label>
+              <label htmlFor="dev-estado" className="block text-sm font-medium text-gray-700 mb-1">Estado físico al entregar</label>
               <select
+                id="dev-estado"
                 value={nuevoEstado}
                 onChange={e => setNuevoEstado(e.target.value)}
                 className="w-full px-3 py-2 border border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
@@ -140,8 +179,11 @@ export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
               </label>
             </div>
           )}
+          </>
+          )}
 
-          {/* Confirmación por email */}
+          {/* Paso 2: Confirmación por email */}
+          {paso === 1 && (
           <div className="border border-gray-200 rounded-lg p-4 space-y-3">
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-primary" />
@@ -161,6 +203,7 @@ export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
                 </p>
                 <input
                   type="email"
+                  aria-label="Correo alternativo para confirmación de devolución"
                   placeholder="correo.personal@gmail.com (opcional)"
                   value={correoAlterno}
                   onChange={e => setCorreoAlterno(e.target.value)}
@@ -172,24 +215,41 @@ export const ModalDevolucion = ({ isOpen, onClose, activo, onSuccess }) => {
               </div>
             )}
           </div>
+          )}
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           {/* Botones */}
           <div className="flex gap-3 justify-end pt-2 border-t">
-            <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={confirmarDevolucion}
-              disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 disabled:opacity-50 text-sm"
-            >
-              {isSubmitting ? 'Procesando...' : 'Confirmar Devolución'}
-            </button>
+            {paso === 0 ? (
+              <>
+                <button type="button" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !asignacionActiva}
+                  className="flex items-center gap-2 px-5 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 disabled:opacity-50 text-sm"
+                >
+                  Siguiente
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={() => { setError(''); setPaso(0); }} disabled={isSubmitting} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">
+                  Atrás
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2 px-5 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 disabled:opacity-50 text-sm"
+                >
+                  {isSubmitting ? 'Procesando...' : 'Confirmar Devolución'}
+                </button>
+              </>
+            )}
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

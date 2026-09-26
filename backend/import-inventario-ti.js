@@ -9,6 +9,26 @@ const esc = (val) => {
   return `'${String(val).replace(/'/g, "''")}'`;
 };
 
+const MARCA_MAP = {
+  // Variantes de mayúsculas
+  'asus': 'ASUS', 'Asus': 'ASUS',
+  'hp': 'HP', 'Hp': 'HP',
+  'dell': 'Dell', 'DELL': 'Dell',
+  // Typos
+  'XIOAMI': 'Xiaomi', 'xioami': 'Xiaomi',
+  // Modelos usados como marca → marca real
+  'Iphone': 'Apple', 'iphone': 'Apple', 'IPHONE': 'Apple',
+  'Macbook': 'Apple', 'macbook': 'Apple', 'MACBOOK': 'Apple',
+  'Galaxy': 'Samsung', 'galaxy': 'Samsung',
+  // Sin marca válida
+  'Celular': 'Genérica', 'N/A': 'Genérica', 'Pendiente': 'Genérica',
+};
+
+const normalizarMarca = (m) => {
+  const s = (m || '').toString().trim();
+  return MARCA_MAP[s] || s || 'Genérica';
+};
+
 const mapEstado = (v) => {
   if (!v) return 'Disponible';
   const n = v.toString().toLowerCase();
@@ -63,7 +83,7 @@ for (const r of pcRows) {
   if (cargador && cargador.toString().toUpperCase() === 'SI') extras.push('Cargador');
   if (obs) extras.push(obs.toString().trim());
 
-  activosPC.push({ serie: serieClean, tipo: 'Laptop', marca: marca || 'Genérica', modelo: modelo || 'Desconocido', estado: mapEstado(estado), rut: rutClean, ubicacion: (ubicacion || '').trim(), obs: extras.join(' | ') || null });
+  activosPC.push({ serie: serieClean, tipo: 'Laptop', marca: normalizarMarca(marca), modelo: modelo || 'Desconocido', estado: mapEstado(estado), rut: rutClean, ubicacion: (ubicacion || '').trim(), obs: extras.join(' | ') || null });
 }
 
 // ── Telefonía ────────────────────────────────────────────────────────────
@@ -78,7 +98,8 @@ for (const r of telRows) {
   if (imeisVistos.has(imeiClean)) continue;
   imeisVistos.add(imeiClean);
 
-  const { marca, modelo } = parseMarcaModelo(equipo);
+  const { marca: marcaRaw, modelo } = parseMarcaModelo(equipo);
+  const marca = normalizarMarca(marcaRaw);
   const extrasArr = [];
   if (usuario) extrasArr.push(`Usuario: ${usuario}`);
   if (obsRaw) extrasArr.push(obsRaw.toString().trim());
