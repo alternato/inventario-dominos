@@ -42,7 +42,12 @@ export const Dashboard = () => {
       .finally(() => setLoadingKpis(false));
   }, []);
 
-  const stats = {
+  const stats = kpis?.totales ? {
+    total:         Number(kpis.totales.total)         || 0,
+    asignados:     Number(kpis.totales.asignados)     || 0,
+    disponibles:   Number(kpis.totales.disponibles)   || 0,
+    mantenimiento: Number(kpis.totales.mantenimiento) || 0,
+  } : {
     total:         activos.length,
     asignados:     activos.filter(a => a.estado === 'Asignado').length,
     disponibles:   activos.filter(a => a.estado === 'Disponible').length,
