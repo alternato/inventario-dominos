@@ -1,23 +1,27 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useActivosStore } from '../store/activosStore';
 import { useAuthStore } from '../store/authStore';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { ModalFormulario } from '../components/ModalFormulario';
 import { ModalDevolucion } from '../components/ModalDevolucion';
 import { ModalAsignacion } from '../components/ModalAsignacion';
 import ImportDataModal from '../components/ImportDataModal';
+import { Pagination } from '../components/Pagination';
 import { DetallePanelActivo } from '../components/activos/DetallePanelActivo';
 import { ActivosHeader } from '../components/activos/ActivosHeader';
 import { ActivosFiltros } from '../components/activos/ActivosFiltros';
 import { ActivosTabla } from '../components/activos/ActivosTabla';
 
 export const ActivosPage = () => {
-  const { activos, cargarActivos, eliminarActivo } = useActivosStore();
+  const { activos, activosPagination, cargarActivos, eliminarActivo } = useActivosStore();
   const { isAdmin } = useAuthStore();
   const location = useLocation();
 
   const [busqueda,            setBusqueda]            = useState(location.state?.busqueda    || '');
   const [filtroEstado,        setFiltroEstado]        = useState(location.state?.filtroEstado || '');
+  const [page,                setPage]                = useState(1);
+  const [pageSize,            setPageSize]            = useState(50);
   const [modalOpen,           setModalOpen]           = useState(false);
   const [devolucionModalOpen, setDevolucionModalOpen] = useState(false);
   const [asignacionModalOpen, setAsignacionModalOpen] = useState(false);
@@ -26,12 +30,39 @@ export const ActivosPage = () => {
   const [panelActivo,         setPanelActivo]         = useState(null);
   const [toast,               setToast]               = useState(null);
 
+  // La búsqueda se estabiliza 300 ms antes de disparar una consulta al servidor.
+  const busquedaDebounced = useDebouncedValue(busqueda, 300);
+
   const showToast = (msg, tipo = 'success') => {
     setToast({ msg, tipo });
     setTimeout(() => setToast(null), 4000);
   };
 
-  useEffect(() => { cargarActivos(); }, []);
+  // Params de consulta al servidor: omite q/estado vacíos para no enviar filtros nulos.
+  const buildParams = useCallback(() => ({
+    page,
+    pageSize,
+    q: busquedaDebounced || undefined,
+    estado: filtroEstado || undefined,
+  }), [page, pageSize, busquedaDebounced, filtroEstado]);
+
+  // Al cambiar el término de búsqueda o el estado, volver a la primera página.
+  useEffect(() => {
+    setPage(1);
+  }, [busquedaDebounced, filtroEstado]);
+
+  // Paginación/filtrado en servidor: recarga ante cualquier cambio de page,
+  // pageSize, búsqueda (debounced) o estado.
+  useEffect(() => {
+    cargarActivos({
+      params: {
+        page,
+        pageSize,
+        q: busquedaDebounced || undefined,
+        estado: filtroEstado || undefined,
+      },
+    });
+  }, [page, pageSize, busquedaDebounced, filtroEstado, cargarActivos]);
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') setPanelActivo(null); };
@@ -39,22 +70,9 @@ export const ActivosPage = () => {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  const activosFiltrados = activos.filter((a) => {
-    const term = busqueda.toLowerCase();
-    const coincideBusqueda =
-      a.serie?.toLowerCase().includes(term) ||
-      a.marca?.toLowerCase().includes(term) ||
-      a.modelo?.toLowerCase().includes(term) ||
-      (a.tipo_dispositivo && a.tipo_dispositivo.toLowerCase().includes(term)) ||
-      (a.responsable_nombre && a.responsable_nombre.toLowerCase().includes(term)) ||
-      (a.ubicacion && a.ubicacion.toLowerCase().includes(term)) ||
-      (a.imei && a.imei.toLowerCase().includes(term)) ||
-      (a.numero_sim && a.numero_sim.toLowerCase().includes(term)) ||
-      (a.imsi && a.imsi.toLowerCase().includes(term));
-    const coincideEstado = !filtroEstado || a.estado === filtroEstado;
-    return coincideBusqueda && coincideEstado;
-  });
-
+  // NOTA: con paginación en servidor este cálculo solo ve la página actual,
+  // por lo que el aviso de duplicados es "best-effort" sobre las filas cargadas
+  // (una pista visual). No se carga el listado completo a propósito.
   const duplicadosSeries = useMemo(() => {
     const seen = new Map();
     const dupes = new Set();
@@ -75,7 +93,7 @@ export const ActivosPage = () => {
         alert(`Error al eliminar: ${result.error || 'Error desconocido'}`);
       } else {
         if (panelActivo?.serie === serie) setPanelActivo(null);
-        await cargarActivos();
+        await cargarActivos({ force: true, params: buildParams() });
       }
     }
   };
@@ -112,8 +130,8 @@ export const ActivosPage = () => {
       {/* Columna principal */}
       <div className="flex-1 flex flex-col gap-5 transition-all duration-300 2xl:px-4" style={{ minWidth: 0 }}>
         <ActivosHeader
-          total={activos.length}
-          filtrados={activosFiltrados.length}
+          total={activosPagination.total}
+          filtrados={activosPagination.total}
           filtroEstado={filtroEstado}
           isAdmin={isAdmin()}
           onNuevo={() => { setActivoSeleccionado(null); setModalOpen(true); }}
@@ -126,7 +144,7 @@ export const ActivosPage = () => {
           onFiltroEstado={setFiltroEstado}
         />
         <ActivosTabla
-          activos={activosFiltrados}
+          activos={activos}
           duplicadosSeries={duplicadosSeries}
           panelActivo={panelActivo}
           onSelectRow={setPanelActivo}
@@ -137,6 +155,14 @@ export const ActivosPage = () => {
           onEditar={handleEditar}
           onDevolucion={handleDevolucionRapida}
           onEliminar={handleEliminar}
+        />
+        <Pagination
+          page={activosPagination.page}
+          pageSize={activosPagination.pageSize}
+          total={activosPagination.total}
+          totalPages={activosPagination.totalPages}
+          onPageChange={setPage}
+          onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
         />
       </div>
 
@@ -169,18 +195,18 @@ export const ActivosPage = () => {
         isOpen={devolucionModalOpen}
         onClose={() => { setDevolucionModalOpen(false); setActivoSeleccionado(null); }}
         activo={activoSeleccionado}
-        onSuccess={(msg) => showToast(msg)}
+        onSuccess={(msg) => { showToast(msg); cargarActivos({ force: true, params: buildParams() }); }}
       />
       <ModalAsignacion
         isOpen={asignacionModalOpen}
         onClose={() => { setAsignacionModalOpen(false); setActivoSeleccionado(null); }}
         activo={activoSeleccionado}
-        onSuccess={(msg) => showToast(msg)}
+        onSuccess={(msg) => { showToast(msg); cargarActivos({ force: true, params: buildParams() }); }}
       />
       <ImportDataModal
         isOpen={importModalOpen}
         onClose={() => setImportModalOpen(false)}
-        onImportSuccess={() => cargarActivos()}
+        onImportSuccess={() => cargarActivos({ force: true, params: buildParams() })}
       />
     </div>
   );

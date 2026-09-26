@@ -40,7 +40,7 @@ export const authAPI = {
 
 // ─── ACTIVOS ────────────────────────────────────────────────
 export const activosAPI = {
-  listar:     ()           => apiClient.get('/activos'),
+  listar:     (params = {}) => apiClient.get('/activos', { params }),
   obtener:    (serie)      => apiClient.get(`/activos/${encodeURIComponent(serie)}`),
   crear:      (data)       => apiClient.post('/activos', data),
   actualizar: (serie, data)=> apiClient.put(`/activos/${encodeURIComponent(serie)}`, data),
@@ -52,7 +52,7 @@ export const activosAPI = {
 
 // ─── COLABORADORES ──────────────────────────────────────────
 export const colaboradoresAPI = {
-  listar:     ()          => apiClient.get('/colaboradores'),
+  listar:     (params = {}) => apiClient.get('/colaboradores', { params }),
   obtener:    (rut)       => apiClient.get(`/colaboradores/${rut}`),
   crear:      (data)      => apiClient.post('/colaboradores', data),
   actualizar: (rut, data) => apiClient.put(`/colaboradores/${rut}`, data),
@@ -99,4 +99,4 @@ export const asignacionesAPI = {
   porColab:  (rut)    => apiClient.get(`/colaboradores/${rut}/asignaciones`),
 };
 
-export default apiClient;
+export default apiClient;

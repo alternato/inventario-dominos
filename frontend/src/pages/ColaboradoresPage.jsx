@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useActivosStore } from '../store/activosStore';
 import { useAuthStore } from '../store/authStore';
 import {
@@ -7,23 +7,49 @@ import {
 } from 'lucide-react';
 import { ModalColaborador } from '../components/ModalColaborador';
 import { MicrosoftPhoto } from '../components/MicrosoftPhoto';
+import { Pagination } from '../components/Pagination';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 
 export const ColaboradoresPage = () => {
-  const { colaboradores, cargarColaboradores, cargarActivos, activos, eliminarColaborador, areas, cargarAreas, cargarAsignacionesColab } = useActivosStore();
+  const { colaboradores, colaboradoresPagination, cargarColaboradores, eliminarColaborador, areas, cargarAreas, cargarAsignacionesColab } = useActivosStore();
   const { isAdmin } = useAuthStore();
   const [busqueda, setBusqueda] = useState('');
   const [filtroArea, setFiltroArea] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const [modalOpen, setModalOpen] = useState(false);
   const [seleccionado, setSeleccionado] = useState(null);
   const [vistaDetalle, setVistaDetalle] = useState(null);
   const [historialAsig, setHistorialAsig] = useState([]);
   const [toast, setToast] = useState(null);
 
+  const busquedaDebounced = useDebouncedValue(busqueda, 300);
+
+  // Cargar áreas una sola vez (para el filtro).
   useEffect(() => {
-    cargarColaboradores();
-    cargarActivos();
     cargarAreas();
   }, []);
+
+  // Resetear a la primera página cuando cambian la búsqueda o el filtro de área.
+  useEffect(() => {
+    setPage(1);
+  }, [busquedaDebounced, filtroArea]);
+
+  // Fetch server-side: se re-ejecuta al cambiar página, tamaño, búsqueda o área.
+  const fetchColaboradores = useCallback(() => {
+    return cargarColaboradores({
+      params: {
+        page,
+        pageSize,
+        q: busquedaDebounced || undefined,
+        area: filtroArea || undefined,
+      },
+    });
+  }, [cargarColaboradores, page, pageSize, busquedaDebounced, filtroArea]);
+
+  useEffect(() => {
+    fetchColaboradores();
+  }, [fetchColaboradores]);
 
   useEffect(() => {
     if (vistaDetalle) {
@@ -42,26 +68,15 @@ export const ColaboradoresPage = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const filtrados = colaboradores.filter((c) => {
-    const q = busqueda.toLowerCase();
-    const coincide =
-      c.nombre?.toLowerCase().includes(q) ||
-      c.rut?.toLowerCase().includes(q) ||
-      c.correo?.toLowerCase().includes(q) ||
-      c.cargo?.toLowerCase().includes(q) ||
-      c.telefono?.toLowerCase().includes(q);
-    const coincideArea = !filtroArea || c.area === filtroArea;
-    return coincide && coincideArea;
-  });
-
-  const activosDeColaborador = (rut) =>
-    activos.filter((a) => a.rut_responsable === rut && a.estado === 'Asignado');
-
   const handleEliminar = async (rut, nombre) => {
     if (!confirm(`¿Eliminar a ${nombre}? Sus activos quedarán sin asignar.`)) return;
     const r = await eliminarColaborador(rut);
-    if (r.ok) showToast('Colaborador eliminado');
-    else showToast(r.error, 'error');
+    if (r.ok) {
+      showToast('Colaborador eliminado');
+      fetchColaboradores();
+    } else {
+      showToast(r.error, 'error');
+    }
     if (vistaDetalle?.rut === rut) setVistaDetalle(null);
   };
 
@@ -89,7 +104,7 @@ export const ColaboradoresPage = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Colaboradores</h1>
-          <p className="text-gray-500 mt-1">{colaboradores.length} colaboradores registrados</p>
+          <p className="text-gray-500 mt-1">{colaboradoresPagination.total} colaboradores registrados</p>
         </div>
         {isAdmin() && (
           <button
@@ -139,8 +154,8 @@ export const ColaboradoresPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filtrados.map((col) => {
-                  const nEquipos = activosDeColaborador(col.rut).length;
+                {colaboradores.map((col) => {
+                  const nEquipos = Number(col.total_activos ?? 0);
                   const isSelected = vistaDetalle?.rut === col.rut;
                   return (
                     <tr
@@ -198,13 +213,24 @@ export const ColaboradoresPage = () => {
             </table>
           </div>
 
-          {filtrados.length === 0 && (
+          {colaboradores.length === 0 && (
             <div className="text-center py-16 text-gray-500">
               <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
               <p className="font-medium">No se encontraron colaboradores</p>
               <p className="text-sm">Intenta con otro término de búsqueda</p>
             </div>
           )}
+
+          <div className="px-4 py-3 border-t border-gray-100">
+            <Pagination
+              page={colaboradoresPagination.page}
+              pageSize={colaboradoresPagination.pageSize}
+              total={colaboradoresPagination.total}
+              totalPages={colaboradoresPagination.totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+            />
+          </div>
         </div>
 
         {/* Panel de detalle */}
@@ -337,7 +363,7 @@ export const ColaboradoresPage = () => {
         isOpen={modalOpen}
         onClose={() => { setModalOpen(false); setSeleccionado(null); }}
         colaborador={seleccionado}
-        onSuccess={(msg) => showToast(msg)}
+        onSuccess={(msg) => { showToast(msg); fetchColaboradores(); }}
       />
     </div>
   );
