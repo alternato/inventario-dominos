@@ -16,22 +16,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
         globIgnores: ['favicon.ico'],
-        runtimeCaching: [
-          {
-            // Llamadas a la API — Network First: intenta red, cae a caché si no hay conexión
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 5,
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 5 * 60, // 5 minutos
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
+        // Nunca interceptar/almacenar respuestas de /api/ para evitar datos obsoletos
+        navigateFallbackDenylist: [/^\/api\//],
       },
       manifest: {
         name: "Domino's IT Inv",
