@@ -94,6 +94,54 @@ router.post('/sso-login', loginLimiter, async (req, res) => {
   }
 });
 
+/**
+ * SSO por header de confianza inyectado por el portal (Caddy).
+ * El portal ya autenticó con Microsoft 365 y nos pasa:
+ *   - X-Portal-Secret: secreto compartido (debe coincidir con PORTAL_SHARED_SECRET).
+ *   - X-Auth-Request-Email: email del usuario ya autenticado por el portal.
+ * No auto-crea usuarios: el rol SIEMPRE sale de la tabla local.
+ */
+router.get('/portal', async (req, res) => {
+  try {
+    const expectedSecret = process.env.PORTAL_SHARED_SECRET;
+    // Sin secreto configurado en el backend → el flujo portal está deshabilitado.
+    if (!expectedSecret) {
+      return res.status(403).json({ error: 'SSO de portal no habilitado' });
+    }
+
+    const providedSecret = req.headers['x-portal-secret'];
+    if (typeof providedSecret !== 'string' || providedSecret.length === 0) {
+      return res.status(403).json({ error: 'Acceso de portal no autorizado' });
+    }
+
+    // Comparación en tiempo constante. timingSafeEqual exige igual longitud,
+    // por eso comparamos primero la longitud (vía buffers) de forma segura.
+    const a = Buffer.from(providedSecret);
+    const b = Buffer.from(expectedSecret);
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+      return res.status(403).json({ error: 'Acceso de portal no autorizado' });
+    }
+
+    const emailHeader = req.headers['x-auth-request-email'];
+    const email = (typeof emailHeader === 'string' ? emailHeader : '').trim().toLowerCase();
+    if (!email) {
+      return res.status(403).json({ error: 'Email de portal ausente' });
+    }
+
+    const usuario = await db.getUsuarioByEmail(email);
+    // No existe o inactivo → 403, nunca se auto-provisiona por este flujo.
+    if (!usuario || !usuario.activo) {
+      return res.status(403).json({ error: 'Usuario no autorizado en inventario' });
+    }
+
+    res.cookie('authToken', signToken(usuario), COOKIE_OPTIONS);
+    res.json({ message: 'Portal SSO exitoso', usuario: sanitizeUsuario({ id: usuario.id, email: usuario.email, nombre: usuario.nombre, rol: usuario.rol }) });
+  } catch (error) {
+    console.error('Portal SSO Error:', error.message);
+    res.status(500).json({ error: 'Error al procesar portal SSO' });
+  }
+});
+
 router.get('/verify', verifyLimiterLocal, authenticate, (req, res) => {
   res.json({ usuario: sanitizeUsuario(req.user) });
 });
