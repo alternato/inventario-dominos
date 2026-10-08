@@ -34,6 +34,7 @@ export const authAPI = {
   ssoLogin:      (email, msToken)  => apiClient.post('/auth/sso-login', { email, msToken }),
   logout:        ()                => apiClient.post('/auth/logout'),
   verify:        ()                => apiClient.get('/auth/verify'),
+  portal:        ()                => apiClient.get('/auth/portal'),
   forgotPassword:(email)           => apiClient.post('/auth/forgot-password', { email }),
   resetPassword: (token, newPassword) => apiClient.post('/auth/reset-password', { token, newPassword }),
 };

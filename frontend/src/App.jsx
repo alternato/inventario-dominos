@@ -25,21 +25,32 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const aplicarUsuario = (usuario) => {
+      localStorage.setItem('usuario', JSON.stringify(usuario));
+      setUsuario(usuario); // 👈 Esto actualiza el Navbar en tiempo real
+      setIsAuthenticated(true);
+    };
+
     // Verificar sesión contra el backend — no confiar solo en localStorage
     authAPI.verify()
       .then(res => {
-        // Actualizar localStorage Y el store de Zustand con los datos frescos del servidor
-        if (res.data?.usuario) {
-          localStorage.setItem('usuario', JSON.stringify(res.data.usuario));
-          setUsuario(res.data.usuario); // 👈 Esto actualiza el Navbar en tiempo real
-        }
-        setIsAuthenticated(true);
+        if (res.data?.usuario) aplicarUsuario(res.data.usuario);
+        else setIsAuthenticated(true);
       })
       .catch(() => {
-        // Token inválido/expirado: limpiar localStorage
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('usuario');
-        setIsAuthenticated(false);
+        // Sin sesión local: intentar SSO por el portal (header de confianza)
+        // antes de mostrar el login. Si el portal no aplica, fallback a login.
+        return authAPI.portal()
+          .then(res => {
+            if (res.data?.usuario) aplicarUsuario(res.data.usuario);
+            else throw new Error('Portal sin usuario');
+          })
+          .catch(() => {
+            // Token inválido/expirado y portal no disponible: limpiar y mostrar login
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('usuario');
+            setIsAuthenticated(false);
+          });
       })
       .finally(() => setLoading(false));
   }, []);
