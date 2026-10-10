@@ -5,6 +5,7 @@ import { getMsalInstance } from '../msalInstance';
 import { loginRequest } from '../authConfig';
 import { useAuthStore } from '../store/authStore';
 import { AlertCircle, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { DevCredit } from '../components/DevCredit';
 
 const DominosLogo = () => (
   <img
@@ -221,6 +222,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
             <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">
               © 2026 Domino&apos;s Pizza Chile
             </p>
+            <DevCredit className="mt-3" />
           </div>
 
         </div>
