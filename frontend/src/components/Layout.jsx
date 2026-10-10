@@ -1,5 +1,6 @@
 import { Navbar } from './Navbar';
 import { AgentChat } from './AgentChat';
+import { DevCredit } from './DevCredit';
 
 export const Layout = ({ children, onLogout }) => {
   return (
@@ -8,6 +9,9 @@ export const Layout = ({ children, onLogout }) => {
       <div className="flex-1 overflow-y-auto w-full">
         <main className="w-full max-w-[1600px] 2xl:max-w-[2100px] mx-auto px-4 md:px-6 2xl:px-12 py-6 flex flex-col min-h-full">
           {children}
+          <footer className="mt-auto pt-6">
+            <DevCredit />
+          </footer>
         </main>
       </div>
       <AgentChat />
