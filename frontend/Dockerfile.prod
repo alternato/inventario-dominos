@@ -13,6 +13,10 @@ COPY . .
 
 ARG VITE_API_URL=/api
 ENV VITE_API_URL=$VITE_API_URL
+# Detras del portal PIT el service worker (PWA) puede servir paginas desde cache sin pasar
+# por el login M365. En PRD se construye con DISABLE_PWA=1 (igual que corria el modo dev).
+ARG DISABLE_PWA=
+ENV DISABLE_PWA=$DISABLE_PWA
 
 RUN npm run build
 
